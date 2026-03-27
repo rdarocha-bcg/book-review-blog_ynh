@@ -28,8 +28,9 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
-# Tooling / local
-.cursor/
+# Cursor – ignore local cache; keep MCP config (see .cursor/mcp.json)
+.cursor/*
+!.cursor/mcp.json
 
 # Miscellaneous
 /.angular/cache
@@ -37,6 +38,8 @@ yarn-error.log
 /connect.lock
 /coverage
 /libpeerconnection.log
+test-results/
+playwright-report/
 testem.js
 /.ws-ok
 /node_modules

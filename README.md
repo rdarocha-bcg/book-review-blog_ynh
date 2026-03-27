@@ -35,6 +35,7 @@ Open **http://localhost:4200/**.
 | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) | Common issues and fixes |
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Production build and deploy (e.g. Yunohost) |
 | [GIT_AND_RELEASE.md](./GIT_AND_RELEASE.md) | Git, tags, and going live |
+| [CURSOR_MCP.md](./CURSOR_MCP.md) | Cursor MCP (Playwright browser) for local debugging |
 
 ## Tech stack
 
