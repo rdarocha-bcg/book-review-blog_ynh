@@ -45,6 +45,8 @@ testem.js
 /node_modules
 /.env
 /.env.local
+api/.env
+api/dist/
 /karma.conf.js
 
 # Local toolchain (e.g. portable Node from scripts/dev-windows.ps1)

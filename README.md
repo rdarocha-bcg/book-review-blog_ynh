@@ -16,7 +16,7 @@ npm start
 
 **Same as `npm start`:** `npm run dev`
 
-**Full local process** (backend, proxy, Windows script, port issues): **[docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md)**
+**Full local process** (Angular + optional Docker MariaDB + Fastify API, proxy, Windows script): **[docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md)**
 
 **Windows only — Node too old or stale server on port 4200:**
 
@@ -31,6 +31,9 @@ Use **Node for Windows** and a normal terminal if you want to avoid WSL.
 | Command | Description |
 |--------|-------------|
 | `npm start` / `npm run dev` | Dev server at http://127.0.0.1:4200 (IPv4; checks Node ≥ 18.19) |
+| `npm run db:up` / `npm run db:down` | Local MariaDB via Docker (see docs/LOCAL_DEV.md) |
+| `npm run dev:api` | Fastify API in `api/` (port 3000; needs DB + `api/.env`) |
+| `npm run db:migrate` | Apply SQL migrations in `api/` (after `npm ci` in `api/`) |
 | `npm run build` | Development build |
 | `npm run build:prod` | Production build |
 | `npm run build:stats` | Production build + `stats.json` for bundle analysis |
@@ -42,16 +45,18 @@ Use **Node for Windows** and a normal terminal if you want to avoid WSL.
 
 | Document | Purpose |
 |----------|---------|
-| [START_HERE.md](./START_HERE.md) | Entry point and navigation |
-| [QUICKSTART.md](./QUICKSTART.md) | 5-minute setup and first steps |
-| [docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md) | Local launch process (npm, proxy, Windows) |
-| [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md) | Development and patterns |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Architecture and structure |
-| [YUNOHOST_INTEGRATION.md](./YUNOHOST_INTEGRATION.md) | Backend API and deployment |
+| [QUICKSTART.md](./QUICKSTART.md) | Short setup and first steps |
+| [docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md) | Local stack (Angular, proxy, Docker DB, API, Windows) |
+| [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md) | Development workflow and patterns |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Application structure |
+| [API.md](./API.md) | Expected REST contract (frontend ↔ backend) |
+| [docs/API_SSO.md](./docs/API_SSO.md) | SSO headers and API behavior behind YunoHost |
+| [YUNOHOST_INTEGRATION.md](./YUNOHOST_INTEGRATION.md) | Backend packaging and deployment |
 | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) | Common issues and fixes |
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | Production build and deploy (e.g. Yunohost) |
-| [GIT_AND_RELEASE.md](./GIT_AND_RELEASE.md) | Git, tags, and going live |
-| [CURSOR_MCP.md](./CURSOR_MCP.md) | Cursor MCP (Playwright browser) for local debugging |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | Production build and deploy |
+| [GIT_AND_RELEASE.md](./GIT_AND_RELEASE.md) | Git workflow and releases |
+| [CODING_STANDARDS.md](./CODING_STANDARDS.md) | Style and conventions |
+| [CURSOR_MCP.md](./CURSOR_MCP.md) | Cursor MCP (Playwright) for local debugging |
 
 ## Tech stack
 
@@ -74,7 +79,7 @@ Configure the API base URL in:
 - `src/environments/environment.ts` (development)
 - `src/environments/environment.prod.ts` (production)
 
-For local dev with a remote API, use the proxy: set `apiUrl` to the proxy path and run `npm start`. See [YUNOHOST_INTEGRATION.md](./YUNOHOST_INTEGRATION.md) and `proxy.conf.json`.
+For local dev, use the proxy (`proxy.conf.cjs`): `apiUrl` `/api` and run `npm start`. For the bundled Fastify API + DB, see [docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md) and [YUNOHOST_INTEGRATION.md](./YUNOHOST_INTEGRATION.md).
 
 ## License
 

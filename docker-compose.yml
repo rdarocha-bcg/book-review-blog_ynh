@@ -1,0 +1,22 @@
+# Local MariaDB for book-review-blog API (see docs/LOCAL_DEV.md).
+services:
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: rootlocal
+      MARIADB_DATABASE: book_review_blog
+      MARIADB_USER: bookapp
+      MARIADB_PASSWORD: bookapp_local
+    ports:
+      - '3306:3306'
+    volumes:
+      - book_review_blog_db:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+volumes:
+  book_review_blog_db:

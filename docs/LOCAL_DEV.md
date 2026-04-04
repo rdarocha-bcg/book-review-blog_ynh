@@ -21,14 +21,43 @@ Use **Windows PowerShell or CMD** with Node for Windows if you want to avoid WSL
 
 `npm start` runs:
 
-`ng serve --host 127.0.0.1 --port 4200 --proxy-config proxy.conf.json --disable-host-check`
+`ng serve --host 127.0.0.1 --port 4200 --proxy-config proxy.conf.cjs --disable-host-check`
 
 so the dev server listens on **IPv4** loopback and uses the **proxy** for `/api`.
 
-## Backend (API)
+## Full stack locally (Angular + Fastify API + MariaDB)
 
-- Dev uses `apiUrl: '/api'`; `proxy.conf.json` forwards `/api` to **`http://localhost:3000`** by default.
-- If nothing runs on port 3000, the UI can still load; list endpoints may return empty or error until you point `proxy.conf.json` `target` at a real API (e.g. Yunohost). See [YUNOHOST_INTEGRATION.md](../YUNOHOST_INTEGRATION.md).
+Use this when you want `/api` to hit the real Fastify app in `api/` instead of a remote Yunohost instance.
+
+1. **Docker** (Docker Desktop or Engine) for MariaDB.
+2. From the repo root, start the database. `npm run db:up` runs `docker compose up -d --wait`, which blocks until the MariaDB service passes its healthcheck (requires **Docker Compose v2.20+**). If `--wait` is unsupported, run `docker compose up -d` manually, then wait until `docker compose ps` shows **healthy** before migrating.
+
+3. Configure the API:
+
+   ```bash
+   cp api/.env.example api/.env
+   ```
+
+   Keep `ADMIN_USERNAMES=devuser` so it matches the default `ynh-user` injected by `proxy.conf.cjs` (or set `DEV_YNH_USER` when you run `npm start`).
+
+4. Install API dependencies (once), apply SQL migrations, then run the API:
+
+   ```bash
+   cd api && npm ci && npm run migrate && npm run dev
+   ```
+
+   Or from the repo root: `npm run db:migrate` (after `npm ci` in `api/` once).
+
+5. In a **second** terminal, from the repo root: `npm start` and open **http://127.0.0.1:4200/**.
+
+6. Stop the database when finished: `npm run db:down` (data is kept in the Docker volume until you remove it).
+
+Convenience scripts at repo root: `npm run db:up`, `npm run db:down`, `npm run db:migrate`, `npm run dev:api` (same Node ≥ 18.19 check as `npm start` for `db:migrate` and `dev:api`).
+
+## Backend (API) — summary
+
+- Dev uses `apiUrl: '/api'`; `proxy.conf.cjs` forwards `/api` to **`http://127.0.0.1:3000`** and injects dev SSOWat-style headers (`DEV_*` env vars optional).
+- If nothing runs on port 3000, the UI can still load; API calls will fail until you run the local API or point the proxy at another backend. See [YUNOHOST_INTEGRATION.md](../YUNOHOST_INTEGRATION.md).
 
 ## Windows helper script
 

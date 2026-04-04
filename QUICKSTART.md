@@ -162,10 +162,10 @@ npm start
 
 ## Need Help?
 
-📖 Read:
-- `DEVELOPER_GUIDE.md` - Full development guide
-- `ARCHITECTURE_DETAILS.md` - How things work
-- `PROJECT_SUMMARY.md` - Project overview
+Read:
+- `DEVELOPER_GUIDE.md` — development workflow and patterns
+- `ARCHITECTURE.md` — structure and layers
+- `API.md` — backend contract expected by the frontend
 
 🔍 Search:
 - Component: `src/app/shared/components/`
@@ -227,10 +227,10 @@ npm install                 # Install dependencies
 
 ## Before You Start Editing
 
-1. Read `PROJECT_SUMMARY.md` - Understand the project
-2. Check `ARCHITECTURE_DETAILS.md` - See how it works
-3. Look at existing code - Follow the pattern
-4. Read `DEVELOPER_GUIDE.md` - Best practices
+1. Skim `README.md` — scope and commands
+2. Read `ARCHITECTURE.md` — how the app is organized
+3. Follow existing feature code in `src/app/features/`
+4. Use `DEVELOPER_GUIDE.md` for patterns and testing
 
 ---
 
@@ -281,9 +281,9 @@ src/
 
 ### Questions?
 Check the docs:
-1. DEVELOPER_GUIDE.md
-2. ARCHITECTURE_DETAILS.md
-3. Existing code examples
+1. `DEVELOPER_GUIDE.md`
+2. `ARCHITECTURE.md`
+3. Existing code under `src/app/`
 
 ### Stuck?
 1. Check browser console for errors

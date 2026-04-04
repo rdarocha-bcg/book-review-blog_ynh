@@ -494,10 +494,10 @@ apiUrl: 'http://localhost:3000/api', // Dev with proxy
 ## 📞 Questions?
 
 Refer to:
-- `PROJECT_SUMMARY.md` - Project overview
-- `ARCHITECTURE.md` - Design patterns
-- `NEXT_STEPS.md` - Tasks to complete
-- `IMPLEMENTATION_SUMMARY.md` - What was built
+- `README.md` — setup and command reference
+- `ARCHITECTURE.md` — design and folder layout
+- `API.md` and `docs/API_SSO.md` — backend contract and SSO
+- `docs/LOCAL_DEV.md` — full local stack
 
 ---
 
