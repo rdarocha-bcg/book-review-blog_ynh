@@ -42,8 +42,11 @@
 ## 📁 Project Structure
 
 ### Root Level Files
+
+Example on Windows (native, not WSL):
+
 ```
-/mnt/c/Users/remid/source/repos/newdir/
+C:\Users\remid\source\repos\newdir\
 ├── 📄 Configuration Files
 │   ├── package.json              (Dependencies & scripts)
 │   ├── angular.json              (Angular config)

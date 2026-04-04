@@ -4,18 +4,33 @@ Angular frontend for a book review blog. Reviews, auth, and admin are implemente
 
 ## Quick start
 
-```bash
+1. **Node.js ≥ 18.19** (LTS recommended). `npm start` fails fast with a clear message if Node is too old.
+2. From the repo root:
+
+```powershell
 npm install
 npm start
 ```
 
-Open **http://localhost:4200/**.
+3. When you see **Compiled successfully**, open **http://127.0.0.1:4200/** (use this URL on Windows if `localhost` gives `ERR_CONNECTION_REFUSED`).
+
+**Same as `npm start`:** `npm run dev`
+
+**Full local process** (backend, proxy, Windows script, port issues): **[docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md)**
+
+**Windows only — Node too old or stale server on port 4200:**
+
+`powershell -ExecutionPolicy Bypass -File .\scripts\dev-windows.ps1 -KillPort4200`
+
+Uses system Node when possible; otherwise downloads portable Node under `.tools\` (no admin). Omit `-KillPort4200` if you do not need to free port 4200.
+
+Use **Node for Windows** and a normal terminal if you want to avoid WSL.
 
 ## Commands
 
 | Command | Description |
 |--------|-------------|
-| `npm start` | Dev server at http://localhost:4200 |
+| `npm start` / `npm run dev` | Dev server at http://127.0.0.1:4200 (IPv4; checks Node ≥ 18.19) |
 | `npm run build` | Development build |
 | `npm run build:prod` | Production build |
 | `npm run build:stats` | Production build + `stats.json` for bundle analysis |
@@ -29,6 +44,7 @@ Open **http://localhost:4200/**.
 |----------|---------|
 | [START_HERE.md](./START_HERE.md) | Entry point and navigation |
 | [QUICKSTART.md](./QUICKSTART.md) | 5-minute setup and first steps |
+| [docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md) | Local launch process (npm, proxy, Windows) |
 | [DEVELOPER_GUIDE.md](./DEVELOPER_GUIDE.md) | Development and patterns |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Architecture and structure |
 | [YUNOHOST_INTEGRATION.md](./YUNOHOST_INTEGRATION.md) | Backend API and deployment |

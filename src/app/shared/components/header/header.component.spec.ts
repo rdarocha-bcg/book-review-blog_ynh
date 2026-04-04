@@ -3,6 +3,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
 import { HeaderComponent } from './header.component';
 import { AuthService } from '@core/services/auth.service';
+import { SSO_LOGOUT_REDIRECT } from '@core/tokens/sso-redirect.token';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -19,7 +20,10 @@ describe('HeaderComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [HeaderComponent, RouterTestingModule],
-      providers: [{ provide: AuthService, useValue: authService }],
+      providers: [
+        { provide: AuthService, useValue: authService },
+        { provide: SSO_LOGOUT_REDIRECT, useValue: () => {} },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeaderComponent);

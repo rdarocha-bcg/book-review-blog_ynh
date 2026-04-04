@@ -1,7 +1,9 @@
-import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectionStrategy, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { SSO_LOGOUT_REDIRECT } from '@core/tokens/sso-redirect.token';
+import { environment } from '@environments/environment';
 import { Subject } from 'rxjs';
 
 /**
@@ -21,7 +23,7 @@ import { Subject } from 'rxjs';
           <ul class="hidden md:flex gap-6" role="menubar">
             <li role="none"><a routerLink="/" class="hover:text-yellow-400 transition" role="menuitem">Home</a></li>
             <li role="none"><a routerLink="/blog" class="hover:text-yellow-400 transition" role="menuitem">Blog</a></li>
-            <li *ngIf="isAuthenticated$ | async" role="none">
+            <li *ngIf="(currentUser$ | async)?.role === 'admin'" role="none">
               <a routerLink="/admin" class="hover:text-yellow-400 transition" role="menuitem">Admin</a>
             </li>
           </ul>
@@ -65,7 +67,10 @@ export class HeaderComponent implements OnDestroy {
   currentUser$ = this.authService.getCurrentUser$();
   private destroy$ = new Subject<void>();
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    @Inject(SSO_LOGOUT_REDIRECT) private ssoLogoutRedirect: (url: string) => void,
+  ) {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -74,6 +79,7 @@ export class HeaderComponent implements OnDestroy {
 
   logout(): void {
     this.authService.logout();
+    this.ssoLogoutRedirect(environment.ssoLogoutUrl);
   }
 }
 

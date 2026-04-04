@@ -1,6 +1,36 @@
 # Troubleshooting Guide - Book Review Blog
 
+For the standard **local dev sequence** (install → start → URL), see **[docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md)**.
+
 ## Development
+
+### Site inaccessible sur `localhost:4200` (Windows)
+
+**Symptom**: le navigateur ne charge pas ou « connection refused ».
+
+**Cause fréquente (IPv4 vs IPv6)** : le serveur peut n’écouter que sur `[::1]` (IPv6) alors que tu ouvres **127.0.0.1** (IPv4) — sous Windows ce n’est pas la même socket → `ERR_CONNECTION_REFUSED`. Vérifie avec : `netstat -ano | findstr :4200` (tu verras `127.0.0.1` ou `0.0.0.0` ou `[::1]`).
+
+**À faire**:
+- Le script **`npm start`** force **`--host 127.0.0.1`** (IPv4) pour éviter qu’Angular n’écoute seulement sur **`[::1]`** (IPv6) quand la résolution de `localhost` favorise IPv6 — dans ce cas **http://127.0.0.1:4200** est refusé.
+- **Tuer l’ancien serveur** si le port est pris par un vieux processus :  
+  `netstat -ano | findstr :4200` puis `taskkill /PID <pid> /F` (remplace `<pid>` par la dernière colonne), puis relance **`npm start`** dans le dossier du projet.
+- Après modification de la config, toujours **Ctrl+C** dans le terminal qui tourne puis **`npm start`** à nouveau.
+- Si tu vois encore refus : assure-toi qu’un terminal affiche `Compiled successfully` (sinon le serveur n’est pas démarré).
+- Pare-feu : autoriser Node / le port 4200 si demandé.
+
+---
+
+### Page d’accueil vide ou « No reviews » sans backend
+
+**Symptom**: l’app s’affiche mais il n’y a pas de critiques, ou des erreurs réseau dans l’onglet Network.
+
+**Explication**: en dev, `environment.ts` utilise **`/api`** ; `ng serve` **proxifie** vers la cible définie dans **`proxy.conf.json`** (par défaut `http://localhost:3000`). Si aucune API n’écoute sur ce port, les appels échouent ; l’app peut quand même s’afficher avec une liste vide.
+
+**Solutions**:
+- Lance ton API locale sur le port **3000**, ou
+- Édite **`proxy.conf.json`** : mets `target` sur ton instance Yunohost / autre URL réelle (HTTPS + `secure: true` si besoin), puis redémarre `npm start`.
+
+---
 
 ### `npm start` fails or port 4200 in use
 

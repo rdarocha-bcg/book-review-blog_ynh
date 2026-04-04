@@ -85,7 +85,21 @@ describe('ReviewListComponent', () => {
   });
 
   it('should track reviews by id', () => {
-    const review = { id: '1', title: 'Test' };
+    const review = {
+      id: '1',
+      title: 'Test',
+      author: 'A',
+      bookTitle: 'B',
+      bookAuthor: 'C',
+      rating: 4,
+      genre: 'fiction',
+      description: 'd',
+      content: 'c',
+      publishedAt: new Date(),
+      updatedAt: new Date(),
+      createdBy: 'u',
+      isPublished: true,
+    };
     expect(component.trackByReviewId(0, review)).toBe('1');
   });
 });

@@ -9,9 +9,8 @@ describe('AuthGuard', () => {
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    authService = jasmine.createSpyObj('AuthService', [], {
-      isAuthenticatedSync: () => false,
-    });
+    authService = jasmine.createSpyObj('AuthService', ['isAuthenticatedSync']);
+    authService.isAuthenticatedSync.and.returnValue(false);
     router = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({

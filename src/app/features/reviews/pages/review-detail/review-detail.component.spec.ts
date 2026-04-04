@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { ReviewDetailComponent } from './review-detail.component';
-import { ReviewService } from '../../../services/review.service';
+import { ReviewService } from '../../services/review.service';
 
 describe('ReviewDetailComponent', () => {
   let component: ReviewDetailComponent;

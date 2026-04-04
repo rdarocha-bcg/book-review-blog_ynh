@@ -9,6 +9,8 @@ import { environment } from '@environments/environment';
  */
 type HttpOptions = Record<string, unknown>;
 
+const withCreds = { withCredentials: true };
+
 @Injectable({
   providedIn: 'root',
 })
@@ -24,7 +26,7 @@ export class ApiService {
    * @returns Observable of the response body
    */
   get<T>(endpoint: string, options?: HttpOptions): Observable<T> {
-    return this.http.get<T>(`${this.apiUrl}/${endpoint}`, options);
+    return this.http.get<T>(`${this.apiUrl}/${endpoint}`, { ...withCreds, ...options });
   }
 
   /**
@@ -35,7 +37,7 @@ export class ApiService {
    * @returns Observable of the response body
    */
   post<T>(endpoint: string, data: unknown, options?: HttpOptions): Observable<T> {
-    return this.http.post<T>(`${this.apiUrl}/${endpoint}`, data, options);
+    return this.http.post<T>(`${this.apiUrl}/${endpoint}`, data, { ...withCreds, ...options });
   }
 
   /**
@@ -46,7 +48,7 @@ export class ApiService {
    * @returns Observable of the response body
    */
   put<T>(endpoint: string, data: unknown, options?: HttpOptions): Observable<T> {
-    return this.http.put<T>(`${this.apiUrl}/${endpoint}`, data, options);
+    return this.http.put<T>(`${this.apiUrl}/${endpoint}`, data, { ...withCreds, ...options });
   }
 
   /**
@@ -67,7 +69,7 @@ export class ApiService {
    * @returns Observable of the response body
    */
   delete<T>(endpoint: string, options?: HttpOptions): Observable<T> {
-    return this.http.delete<T>(`${this.apiUrl}/${endpoint}`, options);
+    return this.http.delete<T>(`${this.apiUrl}/${endpoint}`, { ...withCreds, ...options });
   }
 }
 

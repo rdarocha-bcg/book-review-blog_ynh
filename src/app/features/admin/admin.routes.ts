@@ -9,7 +9,8 @@ export const ADMIN_ROUTES: Routes = [
       import('./pages/admin-dashboard/admin-dashboard.component').then(
         (m) => m.AdminDashboardComponent
       ),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['admin'] },
   },
   {
     path: 'users',

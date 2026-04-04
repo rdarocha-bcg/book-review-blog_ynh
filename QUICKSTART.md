@@ -1,11 +1,16 @@
 # Quick Start Guide 🚀
 
+For the **full local launch runbook** (Node check, API proxy, Windows port cleanup), see **[docs/LOCAL_DEV.md](./docs/LOCAL_DEV.md)**.
+
 ## 30-Second Setup
 
-```bash
-cd /mnt/c/Users/remid/source/repos/newdir
+Run on **Windows natively** (PowerShell or CMD)—WSL is not required and avoids extra RAM/CPU from the Linux VM.
+
+```powershell
+cd $HOME\source\repos\newdir   # or: cd C:\Users\remid\source\repos\newdir
+npm install   # first time only
 npm start
-# Visit http://localhost:4200
+# Visit http://127.0.0.1:4200
 ```
 
 Done! The app is running.
@@ -21,7 +26,7 @@ npm start
 Wait for "✔ Browser application bundle generation complete" message.
 
 ### 2. Open in Browser
-Navigate to: `http://localhost:4200`
+Navigate to: `http://127.0.0.1:4200`
 
 ### 3. Create Account
 - Click **Login** (top right)

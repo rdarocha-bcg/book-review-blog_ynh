@@ -1,0 +1,67 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/main/schemas/manifest.v2.schema.json
+
+packaging_format = 2
+
+id = "book-review-blog"
+name = "Book Review Blog"
+description.en = "A book review blog with reviews, YunoHost SSO authentication, and admin panel."
+description.fr = "Un blog de critiques littéraires avec avis, authentification SSO YunoHost et panneau admin."
+
+version = "0.1~ynh1"
+
+maintainers = ["remid"]
+
+[upstream]
+license = "Proprietary"
+code = "https://github.com/remid/book-review-blog"
+
+[integration]
+yunohost = ">= 12.0"
+helpers_version = "2.1"
+architectures = "all"
+multi_instance = true
+ldap = true
+sso = true
+disk = "500M"
+ram.build = "512M"
+ram.runtime = "200M"
+
+[install]
+    [install.domain]
+    type = "domain"
+
+    [install.path]
+    type = "path"
+    default = "/blog"
+
+    [install.init_main_permission]
+    type = "group"
+    default = "visitors"
+
+    [install.admin_usernames]
+    type = "string"
+    default = ""
+    ask.en = "Comma-separated YunoHost usernames that should be application admins (e.g. alice,bob). Leave empty if none."
+    ask.fr = "Noms d'utilisateur YunoHost (séparés par des virgules) pour le rôle admin de l'app. Laisser vide si aucun."
+
+[resources]
+    [resources.system_user]
+
+    [resources.install_dir]
+
+    [resources.database]
+    type = "mysql"
+
+    [resources.ports]
+    main.default = 3000
+
+    [resources.permissions]
+    main.url = "/"
+    main.show_tile = true
+
+    admin.url = "/admin"
+    admin.show_tile = false
+    admin.allowed = "admins"
+
+    [resources.apt]
+    packages = "nginx"

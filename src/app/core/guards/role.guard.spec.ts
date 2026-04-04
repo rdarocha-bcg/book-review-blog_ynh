@@ -10,9 +10,8 @@ describe('RoleGuard', () => {
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    authService = jasmine.createSpyObj('AuthService', [], {
-      getCurrentUser: () => ({ id: '1', role: 'user' }),
-    });
+    authService = jasmine.createSpyObj('AuthService', ['getCurrentUser']);
+    authService.getCurrentUser.and.returnValue({ id: '1', role: 'user' });
     router = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({

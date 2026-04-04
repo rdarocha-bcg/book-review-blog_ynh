@@ -47,6 +47,9 @@ testem.js
 /.env.local
 /karma.conf.js
 
+# Local toolchain (e.g. portable Node from scripts/dev-windows.ps1)
+/.tools/
+
 # System files
 .DS_Store
 Thumbs.db

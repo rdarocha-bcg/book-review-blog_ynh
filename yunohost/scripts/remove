@@ -1,0 +1,30 @@
+#!/bin/bash
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# STOP & REMOVE SYSTEMD
+#=================================================
+ynh_script_progression --message="Stopping API service..." --weight=1
+
+ynh_systemd_action --service_name=$app --action=stop --log_path=systemd || true
+ynh_remove_systemd_config
+
+#=================================================
+# REMOVE NGINX
+#=================================================
+ynh_script_progression --message="Removing NGINX configuration..." --weight=1
+
+ynh_remove_nginx_config
+
+#=================================================
+# REMOVE NODE.JS
+#=================================================
+ynh_script_progression --message="Removing Node.js..." --weight=1
+
+ynh_remove_nodejs
+
+#=================================================
+# END
+#=================================================
+ynh_script_progression --message="Removal completed!" --last

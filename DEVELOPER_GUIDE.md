@@ -7,18 +7,20 @@
 - npm or yarn package manager
 
 ### Initial Setup
-```bash
-# Clone/open the project
-cd /mnt/c/Users/remid/source/repos/newdir
 
-# Dependencies already installed, but if needed:
+Use **Windows** (PowerShell/CMD) with **Node.js for Windows**—not WSL—so the dev server does not run inside the Linux VM.
+
+```powershell
+cd $HOME\source\repos\newdir   # adjust if your clone path differs
+
+# Dependencies (if needed):
 npm install --legacy-peer-deps
 
-# Start development server
 npm start
-
-# Open browser to http://localhost:4200
+# Browser: http://127.0.0.1:4200
 ```
+
+In **Cursor/VS Code**: open the folder from the Windows path (e.g. `C:\Users\...\newdir`), not via **Remote - WSL** or `\\wsl$\...`.
 
 ---
 
