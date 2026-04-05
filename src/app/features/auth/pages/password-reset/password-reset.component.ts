@@ -35,7 +35,7 @@ import { Subject, takeUntil } from 'rxjs';
               type="email"
               formControlName="email"
               placeholder="Enter your email"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Email'"
               [attr.aria-invalid]="isFieldInvalid('email')"
             />
@@ -47,7 +47,7 @@ import { Subject, takeUntil } from 'rxjs';
           <button
             type="submit"
             [disabled]="!form.valid || isSubmitting"
-            class="w-full bg-yellow-400 text-slate-900 py-2 rounded font-semibold hover:bg-yellow-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full bg-[var(--accent)] text-[var(--primary)] py-2 rounded font-semibold hover:brightness-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span *ngIf="!isSubmitting">Send reset link</span>
             <span *ngIf="isSubmitting">Sending...</span>

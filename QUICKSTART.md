@@ -204,11 +204,14 @@ npm run build:prod
 # Upload dist/ folder to staging server
 ```
 
-### To Yunohost
+### To YunoHost
+On the server, install from this repository (see [YUNOHOST_INTEGRATION.md](./YUNOHOST_INTEGRATION.md)):
+
 ```bash
-npm run build:prod
-# Follow YUNOHOST_INTEGRATION.md
+yunohost app install https://github.com/remid/book-review-blog
 ```
+
+The instance builds the Angular app and API on the host; you do not need to run `npm run build:prod` locally for that path.
 
 ---
 

@@ -1,7 +1,8 @@
-import { Component, OnDestroy, ChangeDetectionStrategy, Inject } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectionStrategy, Inject, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { SiteConfigService } from '@core/services/site-config.service';
 import { SSO_LOGOUT_REDIRECT } from '@core/tokens/sso-redirect.token';
 import { environment } from '@environments/environment';
 import { Subject } from 'rxjs';
@@ -15,16 +16,21 @@ import { Subject } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <header class="bg-slate-900 text-white shadow-lg" role="banner">
+    <header class="bg-[var(--primary)] text-white shadow-lg" role="banner">
       <a href="#main-content" class="skip-link">Skip to main content</a>
       <nav class="container mx-auto px-4 py-4 flex items-center justify-between" aria-label="Main navigation">
         <div class="flex items-center gap-8">
-          <a routerLink="/" class="text-2xl font-bold" aria-label="BookReview home">📚 BookReview</a>
+          <a
+            routerLink="/"
+            class="text-2xl font-bold"
+            [attr.aria-label]="site.config().siteNameShort + ' home'"
+            >📚 {{ site.config().siteNameShort }}</a
+          >
           <ul class="hidden md:flex gap-6" role="menubar">
-            <li role="none"><a routerLink="/" class="hover:text-yellow-400 transition" role="menuitem">Home</a></li>
-            <li role="none"><a routerLink="/blog" class="hover:text-yellow-400 transition" role="menuitem">Blog</a></li>
+            <li role="none"><a routerLink="/" class="hover:text-[var(--accent)] transition" role="menuitem">Home</a></li>
+            <li role="none"><a routerLink="/blog" class="hover:text-[var(--accent)] transition" role="menuitem">Blog</a></li>
             <li *ngIf="(currentUser$ | async)?.role === 'admin'" role="none">
-              <a routerLink="/admin" class="hover:text-yellow-400 transition" role="menuitem">Admin</a>
+              <a routerLink="/admin" class="hover:text-[var(--accent)] transition" role="menuitem">Admin</a>
             </li>
           </ul>
         </div>
@@ -35,7 +41,7 @@ import { Subject } from 'rxjs';
           <button
             *ngIf="isAuthenticated$ | async"
             routerLink="/reviews/new"
-            class="bg-green-600 text-white px-4 py-2 rounded font-semibold hover:bg-green-700 transition"
+            class="bg-[var(--secondary)] text-white px-4 py-2 rounded font-semibold hover:brightness-90 transition"
             aria-label="Create new review"
           >
             + New Review
@@ -43,7 +49,7 @@ import { Subject } from 'rxjs';
           <button
             *ngIf="(isAuthenticated$ | async) === false"
             routerLink="/login"
-            class="bg-yellow-400 text-slate-900 px-4 py-2 rounded font-semibold hover:bg-yellow-300 transition"
+            class="bg-[var(--accent)] text-[var(--primary)] px-4 py-2 rounded font-semibold hover:brightness-95 transition"
             aria-label="Login"
           >
             Login
@@ -63,6 +69,7 @@ import { Subject } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnDestroy {
+  readonly site = inject(SiteConfigService);
   isAuthenticated$ = this.authService.isAuthenticated();
   currentUser$ = this.authService.getCurrentUser$();
   private destroy$ = new Subject<void>();

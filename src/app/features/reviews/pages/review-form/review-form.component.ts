@@ -37,7 +37,7 @@ import { Subject, takeUntil } from 'rxjs';
               type="text"
               formControlName="title"
               placeholder="Enter review title"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Review Title'"
               [attr.aria-invalid]="isFieldInvalid('title')"
             />
@@ -52,7 +52,7 @@ import { Subject, takeUntil } from 'rxjs';
               type="text"
               formControlName="bookTitle"
               placeholder="Enter book title"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Book Title'"
               [attr.aria-invalid]="isFieldInvalid('bookTitle')"
             />
@@ -67,7 +67,7 @@ import { Subject, takeUntil } from 'rxjs';
               type="text"
               formControlName="bookAuthor"
               placeholder="Enter book author"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Book Author'"
               [attr.aria-invalid]="isFieldInvalid('bookAuthor')"
             />
@@ -80,7 +80,7 @@ import { Subject, takeUntil } from 'rxjs';
             <select
               id="genre"
               formControlName="genre"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Genre'"
               [attr.aria-invalid]="isFieldInvalid('genre')"
             >
@@ -109,7 +109,7 @@ import { Subject, takeUntil } from 'rxjs';
               min="1"
               max="5"
               placeholder="Enter rating"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Rating'"
               [attr.aria-invalid]="isFieldInvalid('rating')"
             />
@@ -127,7 +127,7 @@ import { Subject, takeUntil } from 'rxjs';
               placeholder="Enter a short description (max 300 characters)"
               rows="3"
               maxlength="300"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Description'"
               [attr.aria-invalid]="isFieldInvalid('description')"
             ></textarea>
@@ -147,7 +147,7 @@ import { Subject, takeUntil } from 'rxjs';
               formControlName="content"
               placeholder="Enter the full review content"
               rows="10"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 font-mono text-sm"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] font-mono text-sm"
               [attr.aria-label]="'Review Content'"
               [attr.aria-invalid]="isFieldInvalid('content')"
             ></textarea>
@@ -162,7 +162,7 @@ import { Subject, takeUntil } from 'rxjs';
               type="url"
               formControlName="imageUrl"
               placeholder="Enter image URL (optional)"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Image URL'"
             />
             <p class="text-gray-500 text-xs mt-1">Optional: Paste a URL to a book cover image</p>

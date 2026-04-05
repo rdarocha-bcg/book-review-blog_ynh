@@ -1,8 +1,31 @@
 # YunoHost integration — SSO + bundled API
 
-The **YunoHost package** in `yunohost/` deploys the **Angular SPA**, the **Fastify API** (`api/`), and **MariaDB** on the same instance. Authentication uses **YunoHost SSO** (SSOWat headers), not JWT in the browser.
+The **YunoHost package** lives at the **repository root** (`manifest.toml`, `scripts/`, `conf/`, `doc/`) and deploys the **Angular SPA**, the **Fastify API** (`api/`), and **MariaDB** on the same instance. Authentication uses **YunoHost SSO** (SSOWat headers), not JWT in the browser.
 
 **Canonical API contract:** [docs/API_SSO.md](docs/API_SSO.md).
+
+---
+
+## Install on your instance
+
+From a shell on the server (use your own repository URL if it is not this one):
+
+```bash
+yunohost app install https://github.com/remid/book-review-blog
+```
+
+| Question | Notes |
+|----------|--------|
+| Domain | vhost |
+| Path | Default `/blog` → app at `https://domain.tld/blog` |
+| Main permission | Who may open the app (e.g. visitors) |
+| Admin usernames | Comma-separated YunoHost logins → app **admin** (`ADMIN_USERNAMES`) |
+
+Upgrade: `yunohost app upgrade book-review-blog` (or your instance id).
+
+Logs: `journalctl -u book-review-blog -f` (service name follows the instance).
+
+**Requirements:** YunoHost ≥ 12.0; see `manifest.toml` for RAM hints.
 
 ---
 
@@ -20,7 +43,7 @@ The **YunoHost package** in `yunohost/` deploys the **Angular SPA**, the **Fasti
 |------|---------|
 | `src/environments/environment.ts` | Dev: `apiUrl: '/api'`, SSO URLs placeholders |
 | `src/environments/environment.prod.ts` | Replaced at YunoHost build: `__API_PATH__`, `__DOMAIN__` |
-| `yunohost/conf/environment.prod.ts` | Template copied/sed during install |
+| `conf/environment.prod.ts` | Template copied/sed during install |
 
 ---
 
@@ -62,6 +85,9 @@ Set app admins locally, e.g. `ADMIN_USERNAMES=devuser` to match the proxy defaul
 
 ---
 
-## Packaging sources for YunoHost
+## Packaging layout
 
-Install scripts expect app sources under `../sources` (standard YunoHost layout): repo root including `api/`, `src/`, `package.json`, `angular.json`, etc.
+- **This repository (monorepo):** `scripts/_common.sh` copies the app from the repo root with `rsync`, excluding `scripts/`, `conf/`, `doc/`, `node_modules/`, build artifacts, etc. No separate `sources/` folder is required.
+- **Classic `*_ynh` split repo:** if `sources/package.json` exists next to `scripts/`, that directory is used instead (standard upstream tarball layout).
+
+Pre-install notes for users: [doc/PRE_INSTALL.md](doc/PRE_INSTALL.md).

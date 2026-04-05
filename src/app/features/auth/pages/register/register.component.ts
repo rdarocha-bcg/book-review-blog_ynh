@@ -21,7 +21,7 @@ import { Subject, takeUntil } from 'rxjs';
           the admin tools on your server.
         </p>
         <a
-          class="inline-block w-full bg-yellow-400 text-slate-900 py-3 rounded font-semibold hover:bg-yellow-300 transition mb-4"
+          class="inline-block w-full bg-[var(--accent)] text-[var(--primary)] py-3 rounded font-semibold hover:brightness-95 transition mb-4"
           [href]="ssoLoginUrl"
         >
           Open YunoHost portal

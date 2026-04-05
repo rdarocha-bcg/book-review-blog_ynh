@@ -103,7 +103,7 @@ export class NotificationComponent {
     const baseClasses = 'p-4 rounded-lg shadow-lg animate-slideIn text-white flex gap-3';
 
     const typeClasses: Record<string, string> = {
-      success: 'bg-green-600',
+      success: 'bg-[var(--secondary)]',
       error: 'bg-red-600',
       warning: 'bg-yellow-600',
       info: 'bg-blue-600',

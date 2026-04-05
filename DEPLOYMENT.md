@@ -2,14 +2,14 @@
 
 ## YunoHost (recommended)
 
-Use the official package under `yunohost/`. One install provides:
+Use the package at the **repo root** (`manifest.toml`, `scripts/`, `conf/`). One install provides:
 
 - Production build of the Angular app (correct `base-href` and `apiUrl`)
 - Fastify API as a `systemd` service
 - MariaDB schema via SQL migrations
 - NGINX: SPA + `/api` proxy to localhost with SSOWat headers
 
-See [yunohost/README.md](yunohost/README.md) and [yunohost/doc/PRE_INSTALL.md](yunohost/doc/PRE_INSTALL.md).
+See [YUNOHOST_INTEGRATION.md](YUNOHOST_INTEGRATION.md) and [doc/PRE_INSTALL.md](doc/PRE_INSTALL.md).
 
 **API contract / auth:** [docs/API_SSO.md](docs/API_SSO.md), [YUNOHOST_INTEGRATION.md](YUNOHOST_INTEGRATION.md).
 

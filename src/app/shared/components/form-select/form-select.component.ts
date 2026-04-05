@@ -30,7 +30,7 @@ export interface SelectOption {
         (change)="onChange($event)"
         [attr.aria-invalid]="isInvalid"
         [attr.aria-describedby]="errorId"
-        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         [class.border-red-600]="isInvalid"
       >
         <option value="">{{ placeholder }}</option>

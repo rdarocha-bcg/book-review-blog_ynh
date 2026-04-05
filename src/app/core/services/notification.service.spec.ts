@@ -65,13 +65,15 @@ describe('NotificationService', () => {
 
   it('remove() should remove notification by id', (done) => {
     service.success('To remove', 0);
-    let idToRemove: string;
+    let removeCalled = false;
     service.getNotifications().subscribe((list) => {
-      if (list.length === 1 && !idToRemove) {
-        idToRemove = list[0].id;
-        service.remove(idToRemove);
+      if (list.length === 1 && !removeCalled) {
+        removeCalled = true;
+        service.remove(list[0].id);
+      } else if (list.length === 0 && removeCalled) {
+        expect(list.length).toBe(0);
+        done();
       }
-      if (list.length === 0) done();
     });
   });
 

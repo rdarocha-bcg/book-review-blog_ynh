@@ -29,9 +29,9 @@ describe('ErrorComponent', () => {
   });
 
   it('should display custom status and message when set', () => {
-    component.statusCode = 403;
-    component.title = 'Forbidden';
-    component.message = 'Access denied.';
+    fixture.componentRef.setInput('statusCode', 403);
+    fixture.componentRef.setInput('title', 'Forbidden');
+    fixture.componentRef.setInput('message', 'Access denied.');
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('403');

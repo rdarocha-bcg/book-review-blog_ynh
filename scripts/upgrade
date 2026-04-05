@@ -3,22 +3,31 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# INSTALL NODE.JS
+# STOP API
 #=================================================
-ynh_script_progression --message="Installing Node.js $nodejs_version..." --weight=15
+ynh_script_progression --message="Stopping API..." --weight=1
+
+ynh_systemd_action --service_name=$app --action=stop --log_path=systemd || true
+
+#=================================================
+# UPGRADE NODE.JS
+#=================================================
+ynh_script_progression --message="Upgrading Node.js to $nodejs_version..." --weight=8
 
 ynh_install_nodejs --nodejs_version=$nodejs_version
 
 #=================================================
-# COPY APP SOURCES
+# COPY SOURCES
 #=================================================
-ynh_script_progression --message="Setting up source files..." --weight=5
+ynh_script_progression --message="Upgrading source files..." --weight=5
 
-cp -a ../sources/. "$install_dir/src"
+ynh_copy_app_sources "$install_dir/src"
 
-#=================================================
-# PATHS & ENVIRONMENT
-#=================================================
+mkdir -p "$install_dir/src/src/assets"
+cp "$pkg_dir/conf/site.config.json" "$install_dir/src/src/assets/site.config.json"
+
+admin_usernames=$(ynh_app_setting_get --app=$app --key=admin_usernames)
+
 if [ "$path" = "/" ]; then
     base_href="/"
     api_path="/api"
@@ -27,16 +36,14 @@ else
     api_path="$path/api"
 fi
 
-ynh_app_setting_set --app=$app --key=admin_usernames --value="$admin_usernames"
-
 sed -e "s|__API_PATH__|$api_path|g" -e "s|__DOMAIN__|$domain|g" \
-    ../conf/environment.prod.ts \
+    "$pkg_dir/conf/environment.prod.ts" \
     > "$install_dir/src/src/environments/environment.prod.ts"
 
 #=================================================
-# BUILD ANGULAR
+# REBUILD FRONTEND
 #=================================================
-ynh_script_progression --message="Building Angular app (this may take a few minutes)..." --weight=35
+ynh_script_progression --message="Rebuilding Angular app..." --weight=30
 
 pushd "$install_dir/src"
     ynh_use_nodejs
@@ -45,17 +52,33 @@ pushd "$install_dir/src"
 popd
 
 #=================================================
-# DEPLOY STATIC FILES
+# DEPLOY WWW
 #=================================================
 ynh_script_progression --message="Deploying static files..." --weight=3
 
+site_cfg_bak=""
+if [ -f "$install_dir/www/assets/site.config.json" ]; then
+    site_cfg_bak=$(mktemp)
+    cp "$install_dir/www/assets/site.config.json" "$site_cfg_bak"
+fi
+
+rm -rf "$install_dir/www"
 mkdir -p "$install_dir/www"
 cp -a "$install_dir/src/dist/book-review-blog/." "$install_dir/www/"
 
+if [ -n "$site_cfg_bak" ] && [ -f "$site_cfg_bak" ]; then
+    mkdir -p "$install_dir/www/assets"
+    cp "$site_cfg_bak" "$install_dir/www/assets/site.config.json"
+    rm -f "$site_cfg_bak"
+else
+    mkdir -p "$install_dir/www/assets"
+    cp "$pkg_dir/conf/site.config.json" "$install_dir/www/assets/site.config.json"
+fi
+
 #=================================================
-# BUILD & DEPLOY API
+# REBUILD API
 #=================================================
-ynh_script_progression --message="Building API..." --weight=15
+ynh_script_progression --message="Rebuilding API..." --weight=12
 
 pushd "$install_dir/src/api"
     ynh_use_nodejs
@@ -63,7 +86,7 @@ pushd "$install_dir/src/api"
     ynh_exec_warn_less $ynh_node_load_PATH npm run build
 popd
 
-mkdir -p "$install_dir/api"
+rm -rf "$install_dir/api/node_modules" "$install_dir/api/dist" "$install_dir/api/migrations" "$install_dir/api/package.json" "$install_dir/api/package-lock.json"
 cp -a "$install_dir/src/api/package.json" "$install_dir/src/api/package-lock.json" "$install_dir/api/"
 cp -a "$install_dir/src/api/dist" "$install_dir/api/"
 cp -a "$install_dir/src/api/migrations" "$install_dir/api/"
@@ -90,14 +113,14 @@ chown $app:$app "$install_dir/api/.env"
 chown -R $app:$app "$install_dir/api"
 
 #=================================================
-# DATABASE MIGRATIONS
+# MIGRATIONS
 #=================================================
-ynh_script_progression --message="Running database migrations..." --weight=3
+ynh_script_progression --message="Running database migrations..." --weight=2
 
 ynh_exec_as $app "cd \"$install_dir/api\" && node dist/migrate.js"
 
 #=================================================
-# API STARTUP WRAPPER (Node on PATH)
+# RUN WRAPPER
 #=================================================
 node_bin="$(command -v node)"
 cat > "$install_dir/api/run.sh" <<EOF
@@ -110,31 +133,22 @@ EOF
 chmod +x "$install_dir/api/run.sh"
 chown $app:$app "$install_dir/api/run.sh"
 
+chown -R $app:$app "$install_dir/api"
 chown -R $app:www-data "$install_dir/www"
 chmod -R 750 "$install_dir/www"
 
 #=================================================
-# SYSTEMD
+# SYSTEMD & NGINX
 #=================================================
-ynh_script_progression --message="Configuring systemd service..." --weight=2
+ynh_script_progression --message="Updating systemd and NGINX..." --weight=3
 
 ynh_add_systemd_config
-
 ynh_systemd_action --service_name=$app --action=start --log_path=systemd
-
-#=================================================
-# NGINX
-#=================================================
-ynh_script_progression --message="Configuring NGINX..." --weight=3
-
 ynh_add_nginx_config
 
-#=================================================
-# CLEAN SOURCES
-#=================================================
 rm -rf "$install_dir/src"
 
 #=================================================
 # END
 #=================================================
-ynh_script_progression --message="Installation completed!" --last
+ynh_script_progression --message="Upgrade completed!" --last

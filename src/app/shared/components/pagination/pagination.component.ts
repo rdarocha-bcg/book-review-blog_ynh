@@ -19,7 +19,7 @@ export interface PaginationEvent {
       <!-- Info -->
       <div class="text-sm text-gray-600">
         Showing
-        <span class="font-semibold">{{ startIndex + 1 }}</span>
+        <span class="font-semibold">{{ startIndex }}</span>
         to
         <span class="font-semibold">{{ endIndex }}</span>
         of
@@ -44,10 +44,11 @@ export interface PaginationEvent {
           <button
             *ngFor="let pageNum of pageNumbers"
             (click)="onPageChange(pageNum)"
-            [class.active]="pageNum === currentPage"
             class="px-3 py-2 rounded border border-gray-300 transition"
-            [class.bg-yellow-400]="pageNum === currentPage"
-            [class.hover:bg-gray-100]="pageNum !== currentPage"
+            [ngClass]="{
+              'bg-[var(--accent)] text-[var(--primary)] font-semibold': pageNum === currentPage,
+              'hover:bg-gray-100': pageNum !== currentPage
+            }"
             [attr.aria-label]="'Go to page ' + pageNum"
           >
             {{ pageNum }}
@@ -88,11 +89,6 @@ export interface PaginationEvent {
       </div>
     </div>
   `,
-  styles: [`
-    .active {
-      @apply font-semibold;
-    }
-  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaginationComponent {

@@ -43,7 +43,7 @@ export class ButtonComponent {
       'rounded font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variantClasses: Record<ButtonVariant, string> = {
-      primary: 'bg-yellow-400 text-slate-900 hover:bg-yellow-300',
+      primary: 'bg-[var(--accent)] text-[var(--primary)] hover:brightness-95',
       secondary: 'bg-slate-700 text-white hover:bg-slate-600',
       danger: 'bg-red-600 text-white hover:bg-red-700',
       ghost: 'bg-transparent border border-current text-current hover:bg-slate-100',

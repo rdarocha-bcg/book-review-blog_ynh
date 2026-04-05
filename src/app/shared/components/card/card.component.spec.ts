@@ -42,7 +42,7 @@ describe('CardComponent', () => {
   });
 
   it('should display title when provided', () => {
-    component.title = 'Test Card Title';
+    fixture.componentRef.setInput('title', 'Test Card Title');
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     const titleEl = el.querySelector('h3');
@@ -50,7 +50,7 @@ describe('CardComponent', () => {
   });
 
   it('should not render h3 when title is empty', () => {
-    component.title = '';
+    fixture.componentRef.setInput('title', '');
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     const titleEl = el.querySelector('h3');

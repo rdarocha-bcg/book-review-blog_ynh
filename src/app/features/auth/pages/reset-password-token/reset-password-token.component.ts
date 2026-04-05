@@ -28,7 +28,7 @@ import { Subject, takeUntil } from 'rxjs';
               type="password"
               formControlName="password"
               placeholder="New password"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               aria-label="New password"
               [attr.aria-invalid]="form.get('password')?.invalid && form.get('password')?.touched ? 'true' : 'false'"
             />
@@ -41,7 +41,7 @@ import { Subject, takeUntil } from 'rxjs';
               type="password"
               formControlName="confirmPassword"
               placeholder="Confirm new password"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               aria-label="Confirm new password"
             />
             <p *ngIf="form.get('confirmPassword')?.invalid && form.get('confirmPassword')?.touched" class="text-red-600 text-sm mt-1">Passwords must match.</p>
@@ -49,7 +49,7 @@ import { Subject, takeUntil } from 'rxjs';
           <button
             type="submit"
             [disabled]="!form.valid || isSubmitting || !token"
-            class="w-full bg-yellow-400 text-slate-900 py-2 rounded font-semibold hover:bg-yellow-300 transition disabled:opacity-50"
+            class="w-full bg-[var(--accent)] text-[var(--primary)] py-2 rounded font-semibold hover:brightness-95 transition disabled:opacity-50"
             aria-label="Reset password"
           >
             <span *ngIf="!isSubmitting">Reset Password</span>

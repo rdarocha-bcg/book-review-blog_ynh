@@ -1,0 +1,10 @@
+{
+  "siteName": "Book Review Blog",
+  "siteNameShort": "BookReview",
+  "copyrightYear": 2026,
+  "colors": {
+    "primary": "#1f2937",
+    "secondary": "#059669",
+    "accent": "#f59e0b"
+  }
+}

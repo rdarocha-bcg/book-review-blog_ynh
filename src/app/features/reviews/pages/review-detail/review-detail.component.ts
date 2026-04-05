@@ -36,7 +36,7 @@ import { Subject, takeUntil } from 'rxjs';
               <h2 class="text-2xl font-semibold mb-4">{{ review.bookTitle }}</h2>
               <p class="text-lg text-gray-600 mb-4">Book Author: {{ review.bookAuthor }}</p>
               <div class="flex items-center gap-4 mb-4">
-                <span class="text-3xl text-yellow-400">★ {{ review.rating }}/5</span>
+                <span class="text-3xl text-[var(--accent)]">★ {{ review.rating }}/5</span>
                 <span class="text-lg bg-blue-100 text-blue-800 px-3 py-1 rounded">{{ review.genre }}</span>
               </div>
             </div>
@@ -66,7 +66,7 @@ import { Subject, takeUntil } from 'rxjs';
               </div>
               <div>
                 <span class="font-semibold">Rating:</span>
-                <span class="text-yellow-400">{{ review.rating }}/5</span>
+                <span class="text-[var(--accent)]">{{ review.rating }}/5</span>
               </div>
               <div>
                 <span class="font-semibold">Published:</span>

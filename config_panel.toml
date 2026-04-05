@@ -1,0 +1,57 @@
+#:schema https://github.com/YunoHost/apps/raw/main/schemas/config_panel.v1.schema.json
+
+# Site branding and theme (single JSON file: www/assets/site.config.json).
+# Web admin: Apps → this app → "Configure" / config panel.
+
+version = "1.0"
+
+[main]
+name.en = "Site & appearance"
+name.fr = "Site et apparence"
+
+  [main.branding]
+  name.en = "Branding"
+  name.fr = "Identité visuelle"
+
+    [main.branding.site_name]
+    type = "string"
+    ask.en = "Site title (browser tab, footer)"
+    ask.fr = "Titre du site (onglet navigateur, pied de page)"
+    help.en = "Full site name shown in the page title and copyright line."
+    help.fr = "Nom complet affiché dans le titre de la page et le copyright."
+    bind = "siteName:__INSTALL_DIR__/www/assets/site.config.json"
+
+    [main.branding.site_name_short]
+    type = "string"
+    ask.en = "Short name (header logo text)"
+    ask.fr = "Nom court (texte du logo dans l'en-tête)"
+    bind = "siteNameShort:__INSTALL_DIR__/www/assets/site.config.json"
+    pattern.regexp = "^.{1,80}$"
+    pattern.error.en = "Must be between 1 and 80 characters."
+    pattern.error.fr = "Entre 1 et 80 caractères."
+
+    [main.branding.copyright_year]
+    type = "number"
+    ask.en = "Copyright year"
+    ask.fr = "Année de copyright"
+    bind = "copyrightYear:__INSTALL_DIR__/www/assets/site.config.json"
+    min = 1990
+    max = 2100
+
+    [main.branding.primary_color]
+    type = "color"
+    ask.en = "Primary color (header, footer, dark text)"
+    ask.fr = "Couleur principale (en-tête, pied de page, texte foncé)"
+    bind = "colors>primary:__INSTALL_DIR__/www/assets/site.config.json"
+
+    [main.branding.secondary_color]
+    type = "color"
+    ask.en = "Secondary color (links, success actions)"
+    ask.fr = "Couleur secondaire (liens, actions positives)"
+    bind = "colors>secondary:__INSTALL_DIR__/www/assets/site.config.json"
+
+    [main.branding.accent_color]
+    type = "color"
+    ask.en = "Accent color (highlights, primary buttons)"
+    ask.fr = "Couleur d'accent (surbrillance, boutons principaux)"
+    bind = "colors>accent:__INSTALL_DIR__/www/assets/site.config.json"

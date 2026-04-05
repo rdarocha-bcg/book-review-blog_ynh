@@ -20,7 +20,7 @@ describe('ButtonComponent', () => {
   });
 
   it('should display the label', () => {
-    component.label = 'Submit';
+    fixture.componentRef.setInput('label', 'Submit');
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent?.trim()).toContain('Submit');
@@ -36,8 +36,8 @@ describe('ButtonComponent', () => {
 
   it('should apply primary variant classes by default', () => {
     const classes = component.getClasses();
-    expect(classes).toContain('bg-yellow-400');
-    expect(classes).toContain('text-slate-900');
+    expect(classes).toContain('bg-[var(--accent)]');
+    expect(classes).toContain('text-[var(--primary)]');
   });
 
   it('should apply secondary variant classes when set', () => {
@@ -61,19 +61,20 @@ describe('ButtonComponent', () => {
   });
 
   it('should set disabled on the button when disabled or isLoading is true', () => {
-    component.disabled = true;
+    fixture.componentRef.setInput('disabled', true);
     fixture.detectChanges();
-    const button = fixture.nativeElement.querySelector('button');
+    let button = fixture.nativeElement.querySelector('button');
     expect(button?.hasAttribute('disabled')).toBe(true);
 
-    component.disabled = false;
-    component.isLoading = true;
+    fixture.componentRef.setInput('disabled', false);
+    fixture.componentRef.setInput('isLoading', true);
     fixture.detectChanges();
+    button = fixture.nativeElement.querySelector('button');
     expect(button?.hasAttribute('disabled')).toBe(true);
   });
 
   it('should show Loading when isLoading is true', () => {
-    component.isLoading = true;
+    fixture.componentRef.setInput('isLoading', true);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Loading');

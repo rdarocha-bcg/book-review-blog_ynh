@@ -17,7 +17,7 @@ import { RouterLink } from '@angular/router';
         <p class="text-lg text-gray-600 mb-8">{{ message }}</p>
         <a
           routerLink="/"
-          class="bg-yellow-400 text-slate-900 px-6 py-3 rounded font-semibold hover:bg-yellow-300 transition inline-block"
+          class="bg-[var(--accent)] text-[var(--primary)] px-6 py-3 rounded font-semibold hover:brightness-95 transition inline-block"
           aria-label="Go to home page"
         >
           Go Home

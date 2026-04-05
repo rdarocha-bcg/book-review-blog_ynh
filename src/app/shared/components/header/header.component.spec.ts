@@ -1,8 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
+import { signal } from '@angular/core';
 import { HeaderComponent } from './header.component';
 import { AuthService } from '@core/services/auth.service';
+import { SiteConfigService } from '@core/services/site-config.service';
+import { DEFAULT_SITE_CONFIG } from '@core/models/site-config.model';
 import { SSO_LOGOUT_REDIRECT } from '@core/tokens/sso-redirect.token';
 
 describe('HeaderComponent', () => {
@@ -18,10 +21,14 @@ describe('HeaderComponent', () => {
       getCurrentUser$: () => user$.asObservable(),
     });
 
+    const branding = signal(DEFAULT_SITE_CONFIG);
+    const siteConfigStub = { config: branding.asReadonly() };
+
     await TestBed.configureTestingModule({
       imports: [HeaderComponent, RouterTestingModule],
       providers: [
         { provide: AuthService, useValue: authService },
+        { provide: SiteConfigService, useValue: siteConfigStub },
         { provide: SSO_LOGOUT_REDIRECT, useValue: () => {} },
       ],
     }).compileComponents();

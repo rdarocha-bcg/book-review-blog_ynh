@@ -32,6 +32,9 @@ yarn-error.log
 .cursor/*
 !.cursor/mcp.json
 
+# Generated from conf/site.config.json (see npm run copy-site-config)
+/src/assets/site.config.json
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
@@ -47,7 +50,6 @@ testem.js
 /.env.local
 api/.env
 api/dist/
-/karma.conf.js
 
 # Local toolchain (e.g. portable Node from scripts/dev-windows.ps1)
 /.tools/

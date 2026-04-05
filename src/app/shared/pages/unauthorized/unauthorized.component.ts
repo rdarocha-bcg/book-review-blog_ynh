@@ -19,7 +19,7 @@ import { RouterLink } from '@angular/router';
         <div class="space-x-4">
           <a
             routerLink="/login"
-            class="bg-yellow-400 text-slate-900 px-6 py-3 rounded font-semibold hover:bg-yellow-300 transition inline-block"
+            class="bg-[var(--accent)] text-[var(--primary)] px-6 py-3 rounded font-semibold hover:brightness-95 transition inline-block"
             aria-label="Go to login page"
           >
             Login

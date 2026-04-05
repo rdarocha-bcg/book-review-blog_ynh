@@ -5,7 +5,7 @@ This document is the contract for the Fastify backend when deployed behind YunoH
 ## Authentication
 
 - **Source of truth:** HTTP headers set by SSOWat (not forgeable by browsers when traffic goes through YunoHost nginx). See [YunoHost SSO/LDAP](https://doc.yunohost.org/en/dev/packaging/advanced/sso_ldap_integration).
-- **Headers (YunoHost ≥ 12):** documented as `YNH_USER`, `YNH_USER_EMAIL`, `YNH_USER_FULLNAME`; PHP sees `Ynh-User`, etc. Node.js exposes them as **lowercase** (`ynh-user`, `ynh-user-email`, `ynh-user-fullname`). NGINX must forward them to the API (see `yunohost/conf/nginx.conf`).
+- **Headers (YunoHost ≥ 12):** documented as `YNH_USER`, `YNH_USER_EMAIL`, `YNH_USER_FULLNAME`; PHP sees `Ynh-User`, etc. Node.js exposes them as **lowercase** (`ynh-user`, `ynh-user-email`, `ynh-user-fullname`). NGINX must forward them to the API (see `conf/nginx.conf`).
 - **Server trust rule:** In production, only accept `YNH_*` identity when the request comes from a trusted proxy (`127.0.0.1`). In development (`NODE_ENV=development`), headers may be forwarded by `ng serve` proxy for local testing.
 - **JWT / `Authorization: Bearer`:** Not used for v1. The Angular app uses **cookies + same-origin** requests with `withCredentials: true`.
 

@@ -1,14 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { signal } from '@angular/core';
 import { FooterComponent } from './footer.component';
+import { SiteConfigService } from '@core/services/site-config.service';
+import { DEFAULT_SITE_CONFIG } from '@core/models/site-config.model';
 
 describe('FooterComponent', () => {
   let component: FooterComponent;
   let fixture: ComponentFixture<FooterComponent>;
 
   beforeEach(async () => {
+    const branding = signal(DEFAULT_SITE_CONFIG);
     await TestBed.configureTestingModule({
       imports: [FooterComponent, RouterTestingModule],
+      providers: [{ provide: SiteConfigService, useValue: { config: branding.asReadonly() } }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(FooterComponent);
@@ -37,6 +42,6 @@ describe('FooterComponent', () => {
 
   it('should display copyright', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toMatch(/©|2025|Book Review Blog/);
+    expect(el.textContent).toMatch(/©|2026|Book Review Blog/);
   });
 });

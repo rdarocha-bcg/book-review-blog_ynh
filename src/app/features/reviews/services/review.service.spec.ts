@@ -123,20 +123,20 @@ describe('ReviewService', () => {
     req.flush(null);
   });
 
-  it('getLoading$() should emit loading state', (done) => {
+  it('getLoading$() should emit loading state', () => {
     const emissions: boolean[] = [];
-    service.getLoading$().subscribe((loading) => {
-      emissions.push(loading);
-      if (emissions.length >= 2) {
-        expect(emissions[0]).toBe(true);
-        expect(emissions[1]).toBe(false);
-        done();
-      }
-    });
+    const sub = service.getLoading$().subscribe((loading) => emissions.push(loading));
+
+    expect(emissions).toEqual([false]);
 
     service.getReviews().subscribe();
+    expect(emissions).toEqual([false, true]);
+
     const req = httpMock.expectOne((r) => r.url.includes('/reviews'));
     req.flush(mockPaginationResponse);
+
+    expect(emissions).toEqual([false, true, false]);
+    sub.unsubscribe();
   });
 
   it('getReviews() on API error should return empty pagination (after retries)', (done) => {

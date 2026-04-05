@@ -46,7 +46,7 @@ import { Review } from '../../../reviews/models/review.model';
               <button
                 type="button"
                 (click)="approve(review)"
-                class="px-4 py-2 bg-green-600 text-white rounded font-medium hover:bg-green-700 transition"
+                class="px-4 py-2 bg-[var(--secondary)] text-white rounded font-medium hover:brightness-90 transition"
                 [attr.aria-label]="'Approve ' + review.title"
               >Approve</button>
               <button

@@ -17,7 +17,5 @@ import { NotificationComponent } from './shared/components/notification/notifica
     <app-footer></app-footer>
   `,
 })
-export class AppComponent {
-  title = 'Book Review Blog';
-}
+export class AppComponent {}
 

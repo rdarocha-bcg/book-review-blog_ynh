@@ -21,4 +21,4 @@ You do **not** need a separate backend URL. NGINX proxies `/path/api/` to `http:
 ### Reference
 
 - [../README.md](../README.md)
-- [../../docs/API_SSO.md](../../docs/API_SSO.md)
+- [../docs/API_SSO.md](../docs/API_SSO.md)

@@ -113,7 +113,7 @@ import { Subject, takeUntil } from 'rxjs';
             <strong>Genre:</strong> {{ review.genre }}
           </p>
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-yellow-400">★ {{ review.rating }}/5</span>
+            <span class="text-[var(--accent)]">★ {{ review.rating }}/5</span>
           </div>
           <p class="text-sm text-gray-700 line-clamp-3 mb-4">{{ review.description }}</p>
           <a
