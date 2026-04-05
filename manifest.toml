@@ -17,7 +17,7 @@ code = "https://github.com/rdarocha-bcg/book-review-blog_ynh"
 
 [integration]
 yunohost = ">= 12.0"
-helpers_version = "2.1"
+helpers_version = "2"
 architectures = "all"
 multi_instance = true
 ldap = true
