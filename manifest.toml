@@ -7,7 +7,7 @@ name = "Book Review Blog"
 description.en = "A book review blog with reviews, YunoHost SSO authentication, and admin panel."
 description.fr = "Un blog de critiques littéraires avec avis, authentification SSO YunoHost et panneau admin."
 
-version = "0.1~ynh1"
+version = "0.1~ynh2"
 
 maintainers = ["rdarocha-bcg"]
 

@@ -35,14 +35,37 @@ function firstHeader(req: FastifyRequest, names: string[]): string | undefined {
   return undefined;
 }
 
+/**
+ * SSOWat (auth_header) always sets Authorization: Basic for logged-in users.
+ * Some nginx builds mishandle underscore header names (YNH_USER); Basic is reliable from 127.0.0.1.
+ */
+function readBasicAuthUsername(req: FastifyRequest): string | null {
+  const auth = req.headers.authorization;
+  if (typeof auth !== 'string' || !auth.startsWith('Basic ')) return null;
+  try {
+    const decoded = Buffer.from(auth.slice(6).trim(), 'base64').toString('utf8');
+    const colon = decoded.indexOf(':');
+    if (colon <= 0) return null;
+    const user = decoded.slice(0, colon).trim();
+    return user || null;
+  } catch {
+    return null;
+  }
+}
+
 export function readYnhIdentity(req: FastifyRequest): YnhIdentity | null {
   if (!isTrustedProxySource(req)) return null;
-  const uid = firstHeader(req, ['ynh-user', 'ynh_user']);
-  if (!uid) return null;
+
   const email =
     firstHeader(req, ['ynh-user-email', 'ynh_user_email', 'ynh-user_email']) ?? null;
   const fullName =
     firstHeader(req, ['ynh-user-fullname', 'ynh_user_fullname', 'ynh-user_fullname']) ?? null;
+
+  const uidFromHeaders = firstHeader(req, ['ynh-user', 'ynh_user']);
+  const uidFromBasic = readBasicAuthUsername(req);
+  const uid = uidFromHeaders ?? uidFromBasic;
+  if (!uid) return null;
+
   return { uid, email, fullName };
 }
 
