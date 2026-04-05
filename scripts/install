@@ -116,6 +116,10 @@ chown $app:$app "$install_dir/api/run.sh"
 chown -R $app:www-data "$install_dir/www"
 chmod -R 750 "$install_dir/www"
 
+# nginx (www-data) must traverse $install_dir to reach www/ (parent dir was app:app only)
+chown $app:www-data "$install_dir"
+chmod 750 "$install_dir"
+
 #=================================================
 # SYSTEMD
 #=================================================

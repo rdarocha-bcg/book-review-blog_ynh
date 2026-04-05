@@ -137,6 +137,9 @@ chown -R $app:$app "$install_dir/api"
 chown -R $app:www-data "$install_dir/www"
 chmod -R 750 "$install_dir/www"
 
+chown $app:www-data "$install_dir"
+chmod 750 "$install_dir"
+
 #=================================================
 # SYSTEMD & NGINX
 #=================================================
