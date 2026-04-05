@@ -117,7 +117,7 @@ chown -R $app:$app "$install_dir/api"
 #=================================================
 ynh_script_progression --message="Running database migrations..." --weight=2
 
-ynh_exec_as $app "cd \"$install_dir/api\" && node dist/migrate.js"
+ynh_exec_as $app bash -c "cd \"$install_dir/api\" && \"$ynh_node\" dist/migrate.js"
 
 #=================================================
 # RUN WRAPPER
