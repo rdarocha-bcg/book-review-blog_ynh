@@ -13,7 +13,7 @@ maintainers = ["remid"]
 
 [upstream]
 license = "Proprietary"
-code = "https://github.com/remid/book-review-blog"
+code = "https://github.com/rdarocha-bcg/book-review-blog_ynh"
 
 [integration]
 yunohost = ">= 12.0"
