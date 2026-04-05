@@ -40,10 +40,12 @@ git commit -m "chore: initial commit - Book Review Blog frontend"
 2. Add the remote and push:
 
 ```bash
-git remote add origin https://github.com/YOUR_USER/book-review-blog.git
+git remote add origin https://github.com/rdarocha-bcg/book-review-blog.git
 git branch -M main
 git push -u origin main
 ```
+
+Use your own `https://github.com/<user>/book-review-blog.git` if you work from a fork; the canonical upstream is **rdarocha-bcg/book-review-blog**.
 
 ### Semantic versioning (tags)
 

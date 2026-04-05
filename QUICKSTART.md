@@ -7,7 +7,7 @@ For the **full local launch runbook** (Node check, API proxy, Windows port clean
 Run on **Windows natively** (PowerShell or CMD)—WSL is not required and avoids extra RAM/CPU from the Linux VM.
 
 ```powershell
-cd $HOME\source\repos\newdir   # or: cd C:\Users\remid\source\repos\newdir
+cd $HOME\source\repos\newdir   # or: cd "C:\Users\$env:USERNAME\source\repos\newdir"
 npm install   # first time only
 npm start
 # Visit http://127.0.0.1:4200
@@ -208,7 +208,7 @@ npm run build:prod
 On the server, install from this repository (see [YUNOHOST_INTEGRATION.md](./YUNOHOST_INTEGRATION.md)):
 
 ```bash
-yunohost app install https://github.com/remid/book-review-blog
+yunohost app install https://github.com/rdarocha-bcg/book-review-blog_ynh
 ```
 
 The instance builds the Angular app and API on the host; you do not need to run `npm run build:prod` locally for that path.

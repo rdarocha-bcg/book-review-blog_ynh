@@ -9,7 +9,7 @@ description.fr = "Un blog de critiques littéraires avec avis, authentification 
 
 version = "0.1~ynh1"
 
-maintainers = ["remid"]
+maintainers = ["rdarocha-bcg"]
 
 [upstream]
 license = "Proprietary"

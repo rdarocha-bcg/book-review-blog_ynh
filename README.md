@@ -1,6 +1,8 @@
 # Book Review Blog
 
-Angular frontend for a book review blog. Reviews, auth, and admin are implemented; the backend is expected to be provided by a Yunohost REST API.
+Angular frontend for a book review blog. Reviews, auth, and admin are implemented; the backend is expected to be provided by a YunoHost REST API.
+
+**Source:** [github.com/rdarocha-bcg/book-review-blog](https://github.com/rdarocha-bcg/book-review-blog) · **YunoHost install:** [github.com/rdarocha-bcg/book-review-blog_ynh](https://github.com/rdarocha-bcg/book-review-blog_ynh) (see [YUNOHOST_INTEGRATION.md](./YUNOHOST_INTEGRATION.md)).
 
 ## Quick start
 

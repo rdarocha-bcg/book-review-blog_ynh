@@ -2,7 +2,7 @@
 
 ## YunoHost (recommended)
 
-Use the package at the **repo root** (`manifest.toml`, `scripts/`, `conf/`). One install provides:
+Use the package at the **repo root** (`manifest.toml`, `scripts/`, `conf/`), or install from **`https://github.com/rdarocha-bcg/book-review-blog_ynh`** on the server. One install provides:
 
 - Production build of the Angular app (correct `base-href` and `apiUrl`)
 - Fastify API as a `systemd` service

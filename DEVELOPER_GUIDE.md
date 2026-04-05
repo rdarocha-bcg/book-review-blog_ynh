@@ -422,7 +422,7 @@ ngOnDestroy(): void {
 ```
 
 ### Issue: CORS errors
-**Solution**: Configure CORS in Yunohost API or use proxy
+**Solution**: Configure CORS in YunoHost API or use proxy
 ```typescript
 // In environment.ts
 apiUrl: 'http://localhost:3000/api', // Dev with proxy

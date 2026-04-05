@@ -6,12 +6,21 @@ The **YunoHost package** lives at the **repository root** (`manifest.toml`, `scr
 
 ---
 
+## Repositories (GitHub)
+
+| Repository | Role |
+|------------|------|
+| [rdarocha-bcg/book-review-blog](https://github.com/rdarocha-bcg/book-review-blog) | Application source (Angular + Fastify API); clone this for development. |
+| [rdarocha-bcg/book-review-blog_ynh](https://github.com/rdarocha-bcg/book-review-blog_ynh) | YunoHost packaging mirror (`main`). **Install and upgrade URLs must use this repo** (name ends with `_ynh`, as required by YunoHost). |
+
+---
+
 ## Install on your instance
 
-From a shell on the server (use your own repository URL if it is not this one):
+From a shell on the server:
 
 ```bash
-yunohost app install https://github.com/remid/book-review-blog
+yunohost app install https://github.com/rdarocha-bcg/book-review-blog_ynh
 ```
 
 | Question | Notes |
@@ -21,7 +30,7 @@ yunohost app install https://github.com/remid/book-review-blog
 | Main permission | Who may open the app (e.g. visitors) |
 | Admin usernames | Comma-separated YunoHost logins → app **admin** (`ADMIN_USERNAMES`) |
 
-Upgrade: `yunohost app upgrade book-review-blog` (or your instance id).
+Upgrade: `yunohost app upgrade book-review-blog -u https://github.com/rdarocha-bcg/book-review-blog_ynh` (replace `book-review-blog` with your instance id if multi-instance).
 
 Logs: `journalctl -u book-review-blog -f` (service name follows the instance).
 
