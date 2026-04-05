@@ -47,8 +47,8 @@ ynh_script_progression --message="Rebuilding Angular app..." --weight=30
 
 pushd "$install_dir/src"
     ynh_use_nodejs
-    ynh_exec_warn_less $ynh_node_load_PATH npm ci --production=false
-    ynh_exec_warn_less $ynh_node_load_PATH npx ng build --configuration production --base-href "$base_href"
+    ynh_exec_warn_less npm ci --production=false
+    ynh_exec_warn_less npx ng build --configuration production --base-href "$base_href"
 popd
 
 #=================================================
@@ -82,8 +82,8 @@ ynh_script_progression --message="Rebuilding API..." --weight=12
 
 pushd "$install_dir/src/api"
     ynh_use_nodejs
-    ynh_exec_warn_less $ynh_node_load_PATH npm ci
-    ynh_exec_warn_less $ynh_node_load_PATH npm run build
+    ynh_exec_warn_less npm ci
+    ynh_exec_warn_less npm run build
 popd
 
 rm -rf "$install_dir/api/node_modules" "$install_dir/api/dist" "$install_dir/api/migrations" "$install_dir/api/package.json" "$install_dir/api/package-lock.json"
@@ -93,7 +93,7 @@ cp -a "$install_dir/src/api/migrations" "$install_dir/api/"
 
 pushd "$install_dir/api"
     ynh_use_nodejs
-    ynh_exec_warn_less $ynh_node_load_PATH npm ci --omit=dev
+    ynh_exec_warn_less npm ci --omit=dev
 popd
 
 cat > "$install_dir/api/.env" <<EOF
