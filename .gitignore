@@ -43,6 +43,7 @@ yarn-error.log
 /libpeerconnection.log
 test-results/
 playwright-report/
+.playwright-mcp/
 testem.js
 /.ws-ok
 /node_modules
