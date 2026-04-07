@@ -54,6 +54,17 @@ Set these in **Repository settings > Secrets and variables > Actions**:
 - Keep CI as the quality gate before deployment.
 - If your YunoHost instance id is not `book-review-blog`, set `YNH_APP_INSTANCE_ID`.
 - For production hardening, prefer setting `YNH_SSH_KNOWN_HOSTS` explicitly.
+- The workflow targets the GitHub **Environment** named `production`.
+
+### Recommended protection (required for manual approval)
+
+In **Repository settings > Environments > production**:
+
+1. Create (or edit) the `production` environment.
+2. Add **Required reviewers** (you and/or trusted maintainers).
+3. Optionally restrict deployable branches (for example `main` only).
+
+With this setup, each deployment run pauses until approved in GitHub Actions.
 
 ---
 
