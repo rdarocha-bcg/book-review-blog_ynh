@@ -1,0 +1,76 @@
+name: Deploy to YunoHost
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-ynh-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Upgrade app on YunoHost
+    runs-on: ubuntu-latest
+    if: >-
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository)
+
+    steps:
+      - name: Resolve deployment configuration
+        env:
+          DEFAULT_APP_ID: book-review-blog
+          DEFAULT_SOURCE_URL: https://github.com/${{ github.repository }}
+          VAR_APP_ID: ${{ vars.YNH_APP_INSTANCE_ID }}
+          VAR_SOURCE_URL: ${{ vars.YNH_APP_SOURCE_URL }}
+          VAR_SSH_PORT: ${{ vars.YNH_SSH_PORT }}
+        run: |
+          APP_ID="${VAR_APP_ID:-$DEFAULT_APP_ID}"
+          SOURCE_URL="${VAR_SOURCE_URL:-$DEFAULT_SOURCE_URL}"
+          SSH_PORT="${VAR_SSH_PORT:-22}"
+
+          echo "APP_ID=$APP_ID" >> "$GITHUB_ENV"
+          echo "SOURCE_URL=$SOURCE_URL" >> "$GITHUB_ENV"
+          echo "SSH_PORT=$SSH_PORT" >> "$GITHUB_ENV"
+
+      - name: Setup SSH private key
+        run: |
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "${{ secrets.YNH_SSH_PRIVATE_KEY }}" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+
+      - name: Configure SSH known hosts
+        env:
+          SSH_HOST: ${{ secrets.YNH_SSH_HOST }}
+          SSH_PORT: ${{ env.SSH_PORT }}
+          KNOWN_HOSTS: ${{ secrets.YNH_SSH_KNOWN_HOSTS }}
+        run: |
+          if [ -n "$KNOWN_HOSTS" ]; then
+            printf '%s\n' "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          else
+            ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" > "$HOME/.ssh/known_hosts"
+          fi
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+      - name: Trigger YunoHost app upgrade
+        env:
+          SSH_HOST: ${{ secrets.YNH_SSH_HOST }}
+          SSH_USER: ${{ secrets.YNH_SSH_USER }}
+          SSH_PORT: ${{ env.SSH_PORT }}
+          APP_ID: ${{ env.APP_ID }}
+          SOURCE_URL: ${{ env.SOURCE_URL }}
+        run: |
+          ssh -i "$HOME/.ssh/id_ed25519" -p "$SSH_PORT" \
+            "$SSH_USER@$SSH_HOST" \
+            "yunohost app upgrade '$APP_ID' -u '$SOURCE_URL'"
