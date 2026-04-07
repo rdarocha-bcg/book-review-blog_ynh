@@ -96,9 +96,28 @@ Typical flow:
 
 ---
 
-## 4. Optional: CI (GitHub Actions)
+## 4. Continuous Integration (GitHub Actions)
 
-You can add a workflow that runs `npm ci`, `npm run lint`, and `npm run build:prod` on each push. Example file name: `.github/workflows/ci.yml` (create when you need it).
+The repository includes `.github/workflows/ci.yml` with two jobs on each `push` / `pull_request`:
+
+- **Frontend:** `npm ci`, `npm run lint`, `npm run test:ci`, `npm run build:prod`
+- **API:** `cd api && npm ci && npm run build`
+
+The workflow also uploads the frontend artifact (`dist/book-review-blog`) for traceability.
+
+### Why this helps for YunoHost
+
+Even if deployment is done by YunoHost install/upgrade scripts, CI validates that:
+
+- Angular production build is still healthy
+- unit tests and linting pass before merge
+- API TypeScript build remains valid
+
+This is the recommended baseline before adding deployment automation.
+
+### Optional next step: deployment automation
+
+For full CD, keep this CI as a quality gate and then trigger deployment from your release process (for example: tag/release-driven sync to `book-review-blog_ynh`, then `yunohost app upgrade` on server).
 
 ---
 
