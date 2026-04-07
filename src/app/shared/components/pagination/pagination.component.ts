@@ -15,9 +15,9 @@ export interface PaginationEvent {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 py-6">
+    <div class="pinterest-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
       <!-- Info -->
-      <div class="text-sm text-gray-600">
+      <div class="text-sm text-[var(--text-muted)]">
         Showing
         <span class="font-semibold">{{ startIndex }}</span>
         to
@@ -33,7 +33,7 @@ export interface PaginationEvent {
         <button
           (click)="onPrevious()"
           [disabled]="currentPage === 1"
-          class="px-3 py-2 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          class="rounded-full border border-[var(--border-light)] px-3 py-2 transition hover:bg-[var(--surface-alt)] disabled:cursor-not-allowed disabled:opacity-50"
           aria-label="Previous page"
         >
           ← Previous
@@ -44,10 +44,10 @@ export interface PaginationEvent {
           <button
             *ngFor="let pageNum of pageNumbers"
             (click)="onPageChange(pageNum)"
-            class="px-3 py-2 rounded border border-gray-300 transition"
+            class="rounded-full border border-[var(--border-light)] px-3 py-2 transition"
             [ngClass]="{
-              'bg-[var(--accent)] text-[var(--primary)] font-semibold': pageNum === currentPage,
-              'hover:bg-gray-100': pageNum !== currentPage
+              'bg-[var(--secondary)] text-white font-semibold border-[var(--secondary)]': pageNum === currentPage,
+              'hover:bg-[var(--surface-alt)]': pageNum !== currentPage
             }"
             [attr.aria-label]="'Go to page ' + pageNum"
           >
@@ -64,7 +64,7 @@ export interface PaginationEvent {
         <button
           (click)="onNext()"
           [disabled]="currentPage === totalPages"
-          class="px-3 py-2 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          class="rounded-full border border-[var(--border-light)] px-3 py-2 transition hover:bg-[var(--surface-alt)] disabled:cursor-not-allowed disabled:opacity-50"
           aria-label="Next page"
         >
           Next →
@@ -73,12 +73,12 @@ export interface PaginationEvent {
 
       <!-- Items Per Page -->
       <div class="flex items-center gap-2">
-        <label for="itemsPerPage" class="text-sm">Items per page:</label>
+        <label for="itemsPerPage" class="text-sm text-[var(--text-muted)]">Items per page:</label>
         <select
           id="itemsPerPage"
           [value]="limit"
           (change)="onLimitChange($event)"
-          class="border rounded px-2 py-1"
+          class="rounded-full border border-[var(--border-light)] bg-white px-3 py-1"
           aria-label="Items per page"
         >
           <option value="5">5</option>

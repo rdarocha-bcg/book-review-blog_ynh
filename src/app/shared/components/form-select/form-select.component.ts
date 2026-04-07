@@ -18,7 +18,7 @@ export interface SelectOption {
     <div class="mb-4">
       <label
         [for]="id"
-        class="block text-sm font-semibold mb-2"
+        class="block text-sm font-semibold mb-2 text-[var(--text-dark)]"
         [attr.aria-label]="label"
       >
         {{ label }}
@@ -30,7 +30,7 @@ export interface SelectOption {
         (change)="onChange($event)"
         [attr.aria-invalid]="isInvalid"
         [attr.aria-describedby]="errorId"
-        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+        class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--secondary)]"
         [class.border-red-600]="isInvalid"
       >
         <option value="">{{ placeholder }}</option>

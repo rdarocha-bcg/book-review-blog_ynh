@@ -19,50 +19,57 @@ import { Subject, takeUntil } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterLink, LoadingSpinnerComponent],
   template: `
-    <div class="container mx-auto px-4 py-8">
-      <a routerLink="/" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">← Back to Reviews</a>
+    <div class="container mx-auto px-4 py-10">
+      <a routerLink="/" class="text-[var(--accent-strong)] hover:text-[var(--primary)] mb-4 inline-block font-semibold">
+        ← Back to Reviews
+      </a>
 
       <app-loading-spinner *ngIf="isLoading$ | async"></app-loading-spinner>
 
-      <div *ngIf="review$ | async as review" class="bg-white rounded-lg shadow-lg p-8">
+      <div *ngIf="review$ | async as review" class="pinterest-panel p-8">
         <div class="mb-6">
-          <h1 class="text-4xl font-bold mb-2">{{ review.title }}</h1>
-          <p class="text-lg text-gray-600">by {{ review.author }}</p>
+          <h1 class="text-4xl font-bold mb-2 text-[var(--primary)]">{{ review.title }}</h1>
+          <p class="text-lg text-[var(--text-muted)]">by {{ review.author }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div class="md:col-span-2">
             <div class="mb-6">
-              <h2 class="text-2xl font-semibold mb-4">{{ review.bookTitle }}</h2>
-              <p class="text-lg text-gray-600 mb-4">Book Author: {{ review.bookAuthor }}</p>
+              <h2 class="text-2xl font-semibold mb-4 text-[var(--primary)]">{{ review.bookTitle }}</h2>
+              <p class="text-lg text-[var(--text-muted)] mb-4">Book Author: {{ review.bookAuthor }}</p>
               <div class="flex items-center gap-4 mb-4">
                 <span class="text-3xl text-[var(--accent)]">★ {{ review.rating }}/5</span>
-                <span class="text-lg bg-blue-100 text-blue-800 px-3 py-1 rounded">{{ review.genre }}</span>
+                <span class="text-sm bg-[var(--surface-alt)] text-[var(--accent-strong)] px-4 py-1 rounded-full font-semibold">
+                  {{ review.genre }}
+                </span>
               </div>
             </div>
 
             <div class="prose max-w-none">
-              <p class="text-gray-700 whitespace-pre-wrap">{{ review.content }}</p>
+              <p class="text-[var(--text-dark)] whitespace-pre-wrap">{{ review.content }}</p>
             </div>
           </div>
 
-          <div class="bg-gray-50 p-6 rounded-lg h-fit">
+          <div class="bg-[var(--surface-alt)] border border-[var(--border-light)] p-6 rounded-2xl h-fit">
             <div class="mb-6">
               <img
                 *ngIf="review.imageUrl"
                 [src]="review.imageUrl"
                 [alt]="review.bookTitle"
-                class="w-full rounded mb-4"
+                class="w-full rounded-2xl mb-4 border border-[var(--border-light)]"
               />
-              <div *ngIf="!review.imageUrl" class="w-full h-64 bg-gray-300 rounded mb-4 flex items-center justify-center">
-                <span class="text-gray-500">No image available</span>
+              <div
+                *ngIf="!review.imageUrl"
+                class="w-full h-64 bg-white rounded-2xl mb-4 flex items-center justify-center border border-[var(--border-light)]"
+              >
+                <span class="text-[var(--text-muted)]">No image available</span>
               </div>
             </div>
 
             <div class="space-y-3 text-sm">
               <div>
                 <span class="font-semibold">Genre:</span>
-                <span class="text-gray-600">{{ review.genre }}</span>
+                <span class="text-[var(--text-muted)]">{{ review.genre }}</span>
               </div>
               <div>
                 <span class="font-semibold">Rating:</span>
@@ -70,11 +77,11 @@ import { Subject, takeUntil } from 'rxjs';
               </div>
               <div>
                 <span class="font-semibold">Published:</span>
-                <span class="text-gray-600">{{ review.publishedAt | date: 'short' }}</span>
+                <span class="text-[var(--text-muted)]">{{ review.publishedAt | date: 'short' }}</span>
               </div>
               <div>
                 <span class="font-semibold">Last Updated:</span>
-                <span class="text-gray-600">{{ review.updatedAt | date: 'short' }}</span>
+                <span class="text-[var(--text-muted)]">{{ review.updatedAt | date: 'short' }}</span>
               </div>
             </div>
           </div>

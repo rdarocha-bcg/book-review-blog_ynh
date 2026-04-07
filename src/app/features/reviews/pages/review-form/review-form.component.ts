@@ -22,22 +22,22 @@ import { Subject, takeUntil } from 'rxjs';
     LoadingSpinnerComponent,
   ],
   template: `
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-4xl font-bold mb-8">
+    <div class="container mx-auto px-4 py-10">
+      <h1 class="text-4xl md:text-5xl font-bold mb-8 text-[var(--primary)]">
         {{ isEditMode ? 'Edit Review' : 'Create New Review' }}
       </h1>
 
-      <div class="max-w-2xl bg-white rounded-lg shadow-lg p-8">
+      <div class="max-w-3xl pinterest-panel p-8 md:p-10">
         <form *ngIf="reviewForm" [formGroup]="reviewForm" (ngSubmit)="onSubmit()" class="space-y-6">
           <!-- Title -->
           <div>
-            <label for="title" class="block text-sm font-semibold mb-2">Review Title *</label>
+            <label for="title" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Review Title *</label>
             <input
               id="title"
               type="text"
               formControlName="title"
               placeholder="Enter review title"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Review Title'"
               [attr.aria-invalid]="isFieldInvalid('title')"
             />
@@ -46,13 +46,13 @@ import { Subject, takeUntil } from 'rxjs';
 
           <!-- Book Title -->
           <div>
-            <label for="bookTitle" class="block text-sm font-semibold mb-2">Book Title *</label>
+            <label for="bookTitle" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Book Title *</label>
             <input
               id="bookTitle"
               type="text"
               formControlName="bookTitle"
               placeholder="Enter book title"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Book Title'"
               [attr.aria-invalid]="isFieldInvalid('bookTitle')"
             />
@@ -61,13 +61,13 @@ import { Subject, takeUntil } from 'rxjs';
 
           <!-- Book Author -->
           <div>
-            <label for="bookAuthor" class="block text-sm font-semibold mb-2">Book Author *</label>
+            <label for="bookAuthor" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Book Author *</label>
             <input
               id="bookAuthor"
               type="text"
               formControlName="bookAuthor"
               placeholder="Enter book author"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Book Author'"
               [attr.aria-invalid]="isFieldInvalid('bookAuthor')"
             />
@@ -76,11 +76,11 @@ import { Subject, takeUntil } from 'rxjs';
 
           <!-- Genre -->
           <div>
-            <label for="genre" class="block text-sm font-semibold mb-2">Genre *</label>
+            <label for="genre" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Genre *</label>
             <select
               id="genre"
               formControlName="genre"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Genre'"
               [attr.aria-invalid]="isFieldInvalid('genre')"
             >
@@ -101,7 +101,7 @@ import { Subject, takeUntil } from 'rxjs';
 
           <!-- Rating -->
           <div>
-            <label for="rating" class="block text-sm font-semibold mb-2">Rating (1-5) *</label>
+            <label for="rating" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Rating (1-5) *</label>
             <input
               id="rating"
               type="number"
@@ -109,7 +109,7 @@ import { Subject, takeUntil } from 'rxjs';
               min="1"
               max="5"
               placeholder="Enter rating"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Rating'"
               [attr.aria-invalid]="isFieldInvalid('rating')"
             />
@@ -120,34 +120,34 @@ import { Subject, takeUntil } from 'rxjs';
 
           <!-- Description (Short Summary) -->
           <div>
-            <label for="description" class="block text-sm font-semibold mb-2">Description *</label>
+            <label for="description" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Description *</label>
             <textarea
               id="description"
               formControlName="description"
               placeholder="Enter a short description (max 300 characters)"
               rows="3"
               maxlength="300"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Description'"
               [attr.aria-invalid]="isFieldInvalid('description')"
             ></textarea>
             <p *ngIf="isFieldInvalid('description')" class="text-red-600 text-sm mt-1">
               Description is required
             </p>
-            <p class="text-gray-500 text-xs mt-1">
+            <p class="text-[var(--text-muted)] text-xs mt-1">
               {{ reviewForm.get('description')?.value?.length || 0 }}/300 characters
             </p>
           </div>
 
           <!-- Content (Full Review) -->
           <div>
-            <label for="content" class="block text-sm font-semibold mb-2">Full Review *</label>
+            <label for="content" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Full Review *</label>
             <textarea
               id="content"
               formControlName="content"
               placeholder="Enter the full review content"
               rows="10"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] font-mono text-sm"
+              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-sm"
               [attr.aria-label]="'Review Content'"
               [attr.aria-invalid]="isFieldInvalid('content')"
             ></textarea>
@@ -156,16 +156,16 @@ import { Subject, takeUntil } from 'rxjs';
 
           <!-- Image URL -->
           <div>
-            <label for="imageUrl" class="block text-sm font-semibold mb-2">Book Cover Image URL</label>
+            <label for="imageUrl" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Book Cover Image URL</label>
             <input
               id="imageUrl"
               type="url"
               formControlName="imageUrl"
               placeholder="Enter image URL (optional)"
-              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-label]="'Image URL'"
             />
-            <p class="text-gray-500 text-xs mt-1">Optional: Paste a URL to a book cover image</p>
+            <p class="text-[var(--text-muted)] text-xs mt-1">Optional: Paste a URL to a book cover image</p>
           </div>
 
           <!-- Published Status -->
@@ -177,7 +177,7 @@ import { Subject, takeUntil } from 'rxjs';
               class="w-4 h-4 cursor-pointer"
               [attr.aria-label]="'Publish this review'"
             />
-            <label for="isPublished" class="text-sm font-semibold cursor-pointer">
+            <label for="isPublished" class="text-sm font-semibold cursor-pointer text-[var(--primary)]">
               Publish this review immediately
             </label>
           </div>

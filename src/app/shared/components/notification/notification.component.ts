@@ -100,13 +100,14 @@ export class NotificationComponent {
    * Get notification classes based on type
    */
   getNotificationClasses(type: string): string {
-    const baseClasses = 'p-4 rounded-lg shadow-lg animate-slideIn text-white flex gap-3';
+    const baseClasses =
+      'p-4 rounded-2xl border shadow-lg animate-slideIn text-white flex gap-3 backdrop-blur-sm';
 
     const typeClasses: Record<string, string> = {
-      success: 'bg-[var(--secondary)]',
-      error: 'bg-red-600',
-      warning: 'bg-yellow-600',
-      info: 'bg-blue-600',
+      success: 'bg-[var(--secondary)] border-[#f4c6dd] text-[#3d2031]',
+      error: 'bg-[#d64f78] border-[#e484a2] text-white',
+      warning: 'bg-[#e98eb5] border-[#f3b9d4] text-[#3d2031]',
+      info: 'bg-[var(--primary)] border-[#a85a84] text-[#fff8fc]',
     };
 
     return `${baseClasses} ${typeClasses[type] || typeClasses['info']}`;
