@@ -25,7 +25,7 @@ import { Subject } from 'rxjs';
         <div class="flex items-center gap-8">
           <a
             routerLink="/"
-            class="text-2xl font-bold text-[var(--primary)]"
+            class="text-2xl font-semibold text-[var(--primary)] luxe-title tracking-[0.01em]"
             [attr.aria-label]="site.config().siteNameShort + ' home'"
             >📚 {{ site.config().siteNameShort }}</a
           >

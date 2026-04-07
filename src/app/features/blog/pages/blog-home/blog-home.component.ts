@@ -11,7 +11,7 @@ import { RouterLink } from '@angular/router';
   template: `
     <div class="container mx-auto px-4 py-10">
       <header class="mb-8">
-        <h1 class="text-4xl md:text-5xl font-bold text-[var(--primary)] mb-3">Blog</h1>
+        <h1 class="luxe-title text-4xl md:text-5xl font-bold text-[var(--primary)] mb-3">Blog</h1>
         <p class="text-lg text-[var(--text-muted)]">
           Discover our editorial world and join the community of readers.
         </p>

@@ -34,7 +34,7 @@ import { Subject, takeUntil } from 'rxjs';
   template: `
     <div class="page-container">
       <div class="mb-8">
-        <h1 class="text-4xl font-bold mb-2 text-[var(--primary)]">Book Reviews</h1>
+        <h1 class="text-4xl font-bold mb-2 text-[var(--primary)] luxe-title">Book Reviews</h1>
         <p class="text-[var(--text-muted)]">
           Explore stylish, curated reviews in a clean Pinterest-inspired layout.
         </p>
@@ -42,7 +42,7 @@ import { Subject, takeUntil } from 'rxjs';
 
       <!-- Filters -->
       <div class="mb-8 pinterest-panel p-6">
-        <h2 class="text-xl font-semibold mb-4 text-[var(--primary)]">Filters</h2>
+        <h2 class="text-xl font-semibold mb-4 text-[var(--primary)] luxe-title">Filters</h2>
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <input
             type="text"

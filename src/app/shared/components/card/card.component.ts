@@ -22,10 +22,9 @@ export class CardComponent {
   @Input() hoverable: boolean = false;
 
   getClasses(): string {
-    let classes = 'bg-white/95 border border-[var(--border-light)] rounded-2xl shadow-[0_14px_35px_-24px_rgba(122,54,95,0.65)] p-5';
+    let classes = 'bg-white/95 border border-[var(--border-light)] rounded-2xl shadow-[0_12px_24px_-24px_rgba(122,54,95,0.55)] p-5';
     if (this.hoverable) {
-      classes +=
-        ' hover:-translate-y-1 hover:shadow-[0_18px_40px_-22px_rgba(122,54,95,0.75)] transition-all duration-200 cursor-pointer';
+      classes += ' hover:shadow-[0_15px_28px_-24px_rgba(122,54,95,0.62)] transition-shadow duration-200 cursor-pointer';
     }
     return classes;
   }

@@ -28,14 +28,14 @@ import { Subject, takeUntil } from 'rxjs';
 
       <div *ngIf="review$ | async as review" class="pinterest-panel p-8">
         <div class="mb-6">
-          <h1 class="text-4xl font-bold mb-2 text-[var(--primary)]">{{ review.title }}</h1>
+          <h1 class="text-4xl font-semibold tracking-tight mb-2 text-[var(--primary)]">{{ review.title }}</h1>
           <p class="text-lg text-[var(--text-muted)]">by {{ review.author }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div class="md:col-span-2">
             <div class="mb-6">
-              <h2 class="text-2xl font-semibold mb-4 text-[var(--primary)]">{{ review.bookTitle }}</h2>
+              <h2 class="text-2xl font-semibold tracking-tight mb-4 text-[var(--primary)]">{{ review.bookTitle }}</h2>
               <p class="text-lg text-[var(--text-muted)] mb-4">Book Author: {{ review.bookAuthor }}</p>
               <div class="flex items-center gap-4 mb-4">
                 <span class="text-3xl text-[var(--accent)]">★ {{ review.rating }}/5</span>
