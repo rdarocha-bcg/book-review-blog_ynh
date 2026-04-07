@@ -11,7 +11,7 @@ import { SiteConfigService } from '@core/services/site-config.service';
   standalone: true,
   imports: [RouterLink],
   template: `
-    <footer class="mt-16 border-t border-[var(--border-light)] bg-[var(--surface-alt)]/80 backdrop-blur-sm" role="contentinfo">
+    <footer class="mt-16 border-t border-[var(--border-light)] bg-[color:var(--surface-alt)] backdrop-blur-sm" role="contentinfo">
       <div class="container mx-auto px-4 py-12 text-[var(--text-dark)]">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
@@ -26,21 +26,21 @@ import { SiteConfigService } from '@core/services/site-config.service';
             <h3 class="font-bold mb-4 text-[var(--primary)]">Resources</h3>
             <ul class="space-y-2">
               <li><a routerLink="/blog" class="hover:text-[var(--primary)] transition">Blog</a></li>
-              <li><a href="#" class="hover:text-[var(--primary)] transition">FAQ</a></li>
+              <li><span class="text-[var(--text-muted)] cursor-not-allowed" aria-disabled="true">FAQ</span></li>
             </ul>
           </div>
           <div>
             <h3 class="font-bold mb-4 text-[var(--primary)]">Legal</h3>
             <ul class="space-y-2">
-              <li><a href="#" class="hover:text-[var(--primary)] transition">Privacy Policy</a></li>
-              <li><a href="#" class="hover:text-[var(--primary)] transition">Terms of Service</a></li>
+              <li><span class="text-[var(--text-muted)] cursor-not-allowed" aria-disabled="true">Privacy Policy</span></li>
+              <li><span class="text-[var(--text-muted)] cursor-not-allowed" aria-disabled="true">Terms of Service</span></li>
             </ul>
           </div>
           <div>
             <h3 class="font-bold mb-4 text-[var(--primary)]">Follow Us</h3>
             <ul class="space-y-2">
-              <li><a href="#" class="hover:text-[var(--primary)] transition">Twitter</a></li>
-              <li><a href="#" class="hover:text-[var(--primary)] transition">Facebook</a></li>
+              <li><span class="text-[var(--text-muted)] cursor-not-allowed" aria-disabled="true">Twitter</span></li>
+              <li><span class="text-[var(--text-muted)] cursor-not-allowed" aria-disabled="true">Facebook</span></li>
             </ul>
           </div>
         </div>

@@ -40,7 +40,7 @@ export class ButtonComponent {
 
   getClasses(): string {
     const baseClasses =
-      'rounded-full font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md';
+      'rounded-full font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md disabled:hover:shadow-none';
 
     const variantClasses: Record<ButtonVariant, string> = {
       primary: 'bg-[var(--primary)] text-[var(--text-light)] hover:brightness-110',

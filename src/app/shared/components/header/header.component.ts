@@ -27,7 +27,7 @@ import { Subject } from 'rxjs';
             routerLink="/"
             class="text-2xl font-semibold text-[var(--primary)] luxe-title tracking-[0.01em]"
             [attr.aria-label]="site.config().siteNameShort + ' home'"
-            >📚 {{ site.config().siteNameShort }}</a
+            ><span aria-hidden="true">📚</span> {{ site.config().siteNameShort }}</a
           >
           <ul class="hidden md:flex gap-6" role="menubar">
             <li role="none">

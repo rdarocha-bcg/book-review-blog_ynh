@@ -101,7 +101,7 @@ export class NotificationComponent {
    */
   getNotificationClasses(type: string): string {
     const baseClasses =
-      'p-4 rounded-2xl border shadow-lg animate-slideIn text-white flex gap-3 backdrop-blur-sm';
+      'p-4 rounded-2xl border shadow-lg flex gap-3 backdrop-blur-sm';
 
     const typeClasses: Record<string, string> = {
       success: 'bg-[var(--secondary)] border-[#f4c6dd] text-[#3d2031]',
