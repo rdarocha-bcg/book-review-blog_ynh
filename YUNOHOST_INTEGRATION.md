@@ -32,7 +32,7 @@ yunohost app install https://github.com/rdarocha-bcg/book-review-blog_ynh
 
 Upgrade: `yunohost app upgrade book-review-blog -u https://github.com/rdarocha-bcg/book-review-blog_ynh` (replace `book-review-blog` with your instance id if multi-instance).
 
-Continuous deployment via GitHub Actions is available in `.github/workflows/deploy-ynh.yml`. It connects over SSH and runs the same `yunohost app upgrade ...` command on your server after CI succeeds on `main` (or manually via workflow dispatch).
+Continuous deployment via GitHub Actions is available in `.github/workflows/deploy-ynh.yml`. It connects over SSH and runs the same `yunohost app upgrade ...` command on your server after CI succeeds on `main` (or manually via workflow dispatch), with `-u https://github.com/rdarocha-bcg/book-review-blog_ynh` as default source URL.
 
 Logs: `journalctl -u book-review-blog -f` (service name follows the instance).
 

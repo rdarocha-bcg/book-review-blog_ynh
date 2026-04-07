@@ -32,7 +32,7 @@ jobs:
       - name: Resolve deployment configuration
         env:
           DEFAULT_APP_ID: book-review-blog
-          DEFAULT_SOURCE_URL: https://github.com/${{ github.repository }}
+          DEFAULT_SOURCE_URL: https://github.com/rdarocha-bcg/book-review-blog_ynh
           VAR_APP_ID: ${{ vars.YNH_APP_INSTANCE_ID }}
           VAR_SOURCE_URL: ${{ vars.YNH_APP_SOURCE_URL }}
           VAR_SSH_PORT: ${{ vars.YNH_SSH_PORT }}
@@ -41,28 +41,38 @@ jobs:
           SOURCE_URL="${VAR_SOURCE_URL:-$DEFAULT_SOURCE_URL}"
           SSH_PORT="${VAR_SSH_PORT:-22}"
 
+          case "$SOURCE_URL" in
+            *_ynh|*_ynh.git)
+              ;;
+            *)
+              echo "::error::SOURCE_URL must target a YunoHost packaging repository ending with '_ynh'."
+              exit 1
+              ;;
+          esac
+
           echo "APP_ID=$APP_ID" >> "$GITHUB_ENV"
           echo "SOURCE_URL=$SOURCE_URL" >> "$GITHUB_ENV"
           echo "SSH_PORT=$SSH_PORT" >> "$GITHUB_ENV"
 
       - name: Setup SSH private key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.YNH_SSH_PRIVATE_KEY }}
         run: |
           mkdir -p "$HOME/.ssh"
           chmod 700 "$HOME/.ssh"
-          printf '%s\n' "${{ secrets.YNH_SSH_PRIVATE_KEY }}" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 600 "$HOME/.ssh/id_ed25519"
 
       - name: Configure SSH known hosts
         env:
           SSH_HOST: ${{ secrets.YNH_SSH_HOST }}
-          SSH_PORT: ${{ env.SSH_PORT }}
           KNOWN_HOSTS: ${{ secrets.YNH_SSH_KNOWN_HOSTS }}
         run: |
-          if [ -n "$KNOWN_HOSTS" ]; then
-            printf '%s\n' "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
-          else
-            ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" > "$HOME/.ssh/known_hosts"
+          if [ -z "$KNOWN_HOSTS" ]; then
+            echo "::error::Missing required secret YNH_SSH_KNOWN_HOSTS."
+            exit 1
           fi
+          printf '%s\n' "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/known_hosts"
 
       - name: Trigger YunoHost app upgrade
@@ -74,5 +84,9 @@ jobs:
           SOURCE_URL: ${{ env.SOURCE_URL }}
         run: |
           ssh -i "$HOME/.ssh/id_ed25519" -p "$SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            -o IdentitiesOnly=yes \
             "$SSH_USER@$SSH_HOST" \
             "yunohost app upgrade '$APP_ID' -u '$SOURCE_URL'"
