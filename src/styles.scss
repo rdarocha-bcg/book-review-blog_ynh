@@ -5,6 +5,8 @@
 
 /* Global CSS Variables */
 :root {
+  /* Approximate sticky header + nav pill height; keeps fixed toasts below the bar */
+  --header-height: 5.5rem;
   --primary: #7a365f;
   --secondary: #d56fa1;
   --accent: #f3b9d4;
@@ -65,6 +67,10 @@ html, body {
 }
 
 @media (min-width: 768px) {
+  :root {
+    --header-height: 5.75rem;
+  }
+
   html, body {
     background-attachment: fixed;
   }
