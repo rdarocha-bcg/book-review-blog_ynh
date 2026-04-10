@@ -3,20 +3,24 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-/* Global CSS Variables */
+/* Global CSS Variables
+ * Contrast (WCAG 2.1 AA, normal text ~4.5:1 on --surface / white):
+ * - --text-muted was ~3.3:1 on #fff8fc; darkened for body/supporting copy.
+ * - --accent-strong link/hover color darkened for use on light surfaces.
+ * - --border-light slightly deeper for 3:1 non-text UI where applicable. */
 :root {
   /* Approximate sticky header + nav pill height; keeps fixed toasts below the bar */
   --header-height: 5.5rem;
   --primary: #7a365f;
   --secondary: #d56fa1;
   --accent: #f3b9d4;
-  --accent-strong: #c24d83;
+  --accent-strong: #9e2f62;
   --surface: #fff8fc;
   --surface-alt: #ffeef7;
   --text-dark: #3d2031;
   --text-light: #fff8fc;
-  --text-muted: #8f667c;
-  --border-light: #f0cfdf;
+  --text-muted: #5c4150;
+  --border-light: #e8b8d0;
   --font-sans: "Inter", "Avenir Next", "Avenir", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-luxe: "Cormorant Garamond", "Times New Roman", Georgia, serif;
 }
