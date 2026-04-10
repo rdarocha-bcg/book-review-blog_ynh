@@ -57,22 +57,22 @@ import { Subject } from 'rxjs';
           <div *ngIf="currentUser$ | async as user" class="text-sm text-[var(--text-muted)]">
             Welcome, {{ user.name || user.email }}
           </div>
-          <button
+          <a
             *ngIf="isAuthenticated$ | async"
             routerLink="/reviews/new"
-            class="bg-[var(--secondary)] text-white px-4 py-2 rounded-full font-semibold hover:brightness-95 transition"
+            class="inline-flex items-center justify-center bg-[var(--secondary)] text-white px-4 py-2 rounded-full font-semibold hover:brightness-95 transition no-underline"
             aria-label="Create new review"
           >
             + New Review
-          </button>
-          <button
+          </a>
+          <a
             *ngIf="(isAuthenticated$ | async) === false"
             routerLink="/login"
-            class="bg-[var(--accent)] text-[var(--primary)] px-4 py-2 rounded-full font-semibold hover:brightness-95 transition"
+            class="inline-flex items-center justify-center bg-[var(--accent)] text-[var(--primary)] px-4 py-2 rounded-full font-semibold hover:brightness-95 transition no-underline"
             aria-label="Login"
           >
             Login
-          </button>
+          </a>
           <button
             *ngIf="isAuthenticated$ | async"
             (click)="logout()"
