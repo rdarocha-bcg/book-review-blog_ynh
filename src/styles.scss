@@ -5,6 +5,7 @@
 
 /* Global CSS Variables */
 :root {
+  color-scheme: light;
   --primary: #7a365f;
   --secondary: #d56fa1;
   --accent: #f3b9d4;
@@ -15,8 +16,34 @@
   --text-light: #fff8fc;
   --text-muted: #8f667c;
   --border-light: #f0cfdf;
+  --header-bg: rgb(255 249 252 / 0.85);
+  --nav-bg: rgb(255 255 255 / 0.95);
+  --card-bg: rgb(255 255 255 / 0.95);
+  --input-bg: #ffffff;
+  --panel-bg-start: #ffffff;
+  --panel-bg-end: var(--surface-alt);
   --font-sans: "Inter", "Avenir Next", "Avenir", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-luxe: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+}
+
+html.theme-dark {
+  color-scheme: dark;
+  --primary: #f0cfe0;
+  --secondary: #e07aaa;
+  --accent: #5c3d52;
+  --accent-strong: #f3b9d4;
+  --surface: #1a1218;
+  --surface-alt: #261a22;
+  --text-dark: #f5eaf1;
+  --text-light: #fdf5f9;
+  --text-muted: #c9a9bc;
+  --border-light: #4a3545;
+  --header-bg: rgb(26 18 24 / 0.92);
+  --nav-bg: rgb(38 26 34 / 0.96);
+  --card-bg: rgb(42 30 40 / 0.94);
+  --panel-bg-start: #2d2029;
+  --panel-bg-end: #241a22;
+  --input-bg: #2a2029;
 }
 
 /* Accessibility: skip link (hidden until focused) */
@@ -62,6 +89,11 @@ html, body {
   background-color: var(--surface);
   background-image: radial-gradient(circle at 15% 20%, #ffe0ee 0%, transparent 32%),
     radial-gradient(circle at 85% 0%, #ffd3e8 0%, transparent 28%), linear-gradient(180deg, #fff9fc 0%, #fff2f8 100%);
+}
+
+html.theme-dark body {
+  background-image: radial-gradient(circle at 15% 20%, #3d2435 0%, transparent 35%),
+    radial-gradient(circle at 85% 0%, #2a1c28 0%, transparent 30%), linear-gradient(180deg, #1a1218 0%, #140f14 100%);
 }
 
 @media (min-width: 768px) {
@@ -125,7 +157,7 @@ select {
   border: 1px solid var(--border-light);
   border-radius: 0.85rem;
   padding: 0.625rem 0.75rem;
-  background: #ffffff;
+  background: var(--input-bg);
   transition: border-color 0.3s ease;
 
   &:focus {
@@ -190,14 +222,51 @@ select {
 }
 
 .pinterest-panel {
-  background: linear-gradient(160deg, #ffffff 0%, var(--surface-alt) 100%);
+  background: linear-gradient(160deg, var(--panel-bg-start) 0%, var(--panel-bg-end) 100%);
   border: 1px solid var(--border-light);
   border-radius: 1rem;
   box-shadow: 0 12px 28px -24px rgb(122 54 95 / 55%);
 }
 
+html.theme-dark .pinterest-panel {
+  box-shadow: 0 12px 28px -24px rgb(0 0 0 / 45%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .luxe-title {
   font-family: var(--font-luxe);
   letter-spacing: 0.02em;
+}
+
+/* Map common light-only Tailwind utilities when .theme-dark is on <html> */
+html.theme-dark .bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+html.theme-dark .bg-white\/95 {
+  background-color: color-mix(in srgb, var(--card-bg) 95%, transparent) !important;
+}
+
+html.theme-dark .border-slate-200 {
+  border-color: var(--border-light) !important;
+}
+
+html.theme-dark .text-gray-600,
+html.theme-dark .text-slate-600 {
+  color: var(--text-muted) !important;
+}
+
+html.theme-dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-light) !important;
 }
 

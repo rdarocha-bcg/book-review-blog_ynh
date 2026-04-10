@@ -24,6 +24,7 @@ import { NotificationService, Notification } from '@core/services/notification.s
       <div
         *ngFor="let notification of notifications$ | async; trackBy: trackByNotificationId"
         [@slideIn]
+        [@slideIn.disabled]="prefersReducedMotion()"
         [class]="getNotificationClasses(notification.type)"
         role="alert"
         [attr.aria-live]="'polite'"
@@ -93,6 +94,13 @@ import { NotificationService, Notification } from '@core/services/notification.s
 })
 export class NotificationComponent {
   notifications$ = this.notificationService.getNotifications();
+
+  prefersReducedMotion(): boolean {
+    if (typeof matchMedia === 'undefined') {
+      return false;
+    }
+    return matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
 
   constructor(private notificationService: NotificationService) {}
 

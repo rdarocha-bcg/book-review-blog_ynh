@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { SiteConfigService } from '@core/services/site-config.service';
+import { ThemeService } from '@core/services/theme.service';
 import { SSO_LOGOUT_REDIRECT } from '@core/tokens/sso-redirect.token';
 import { environment } from '@environments/environment';
 import { Subject } from 'rxjs';
@@ -16,10 +17,13 @@ import { Subject } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <header class="sticky top-0 z-40 border-b border-[var(--border-light)] bg-[#fff9fc]/85 backdrop-blur-md" role="banner">
+    <header
+      class="sticky top-0 z-40 border-b border-[var(--border-light)] bg-[color:var(--header-bg)] backdrop-blur-md"
+      role="banner"
+    >
       <a href="#main-content" class="skip-link">Skip to main content</a>
       <nav
-        class="container mx-auto my-3 flex items-center justify-between gap-4 rounded-full border border-[var(--border-light)] bg-white/95 px-5 py-3 shadow-[0_10px_24px_-20px_rgba(122,54,95,0.8)]"
+        class="container mx-auto my-3 flex items-center justify-between gap-4 rounded-full border border-[var(--border-light)] bg-[color:var(--nav-bg)] px-5 py-3 shadow-[0_10px_24px_-20px_rgba(122,54,95,0.8)]"
         aria-label="Main navigation"
       >
         <div class="flex items-center gap-8">
@@ -54,13 +58,21 @@ import { Subject } from 'rxjs';
           </ul>
         </div>
         <div class="flex items-center gap-4">
+          <button
+            type="button"
+            class="rounded-full border border-[var(--border-light)] bg-[var(--surface-alt)] px-3 py-2 text-sm font-semibold text-[var(--primary)] hover:brightness-95"
+            [attr.aria-label]="'Color theme: ' + theme.labelForPreference()"
+            (click)="theme.cyclePreference()"
+          >
+            {{ theme.preference() === 'system' ? 'Auto' : theme.preference() === 'dark' ? 'Dark' : 'Light' }}
+          </button>
           <div *ngIf="currentUser$ | async as user" class="text-sm text-[var(--text-muted)]">
             Welcome, {{ user.name || user.email }}
           </div>
           <button
             *ngIf="isAuthenticated$ | async"
             routerLink="/reviews/new"
-            class="bg-[var(--secondary)] text-white px-4 py-2 rounded-full font-semibold hover:brightness-95 transition"
+            class="bg-[var(--secondary)] text-[var(--text-light)] px-4 py-2 rounded-full font-semibold hover:brightness-95 transition"
             aria-label="Create new review"
           >
             + New Review
@@ -89,6 +101,7 @@ import { Subject } from 'rxjs';
 })
 export class HeaderComponent implements OnDestroy {
   readonly site = inject(SiteConfigService);
+  readonly theme = inject(ThemeService);
   isAuthenticated$ = this.authService.isAuthenticated();
   currentUser$ = this.authService.getCurrentUser$();
   private destroy$ = new Subject<void>();

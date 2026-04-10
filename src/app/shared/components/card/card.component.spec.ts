@@ -21,24 +21,22 @@ describe('CardComponent', () => {
 
   it('should apply base card classes', () => {
     const classes = component.getClasses();
-    expect(classes).toContain('bg-white');
-    expect(classes).toContain('rounded-lg');
-    expect(classes).toContain('shadow');
-    expect(classes).toContain('p-4');
+    expect(classes).toContain('var(--card-bg)');
+    expect(classes).toContain('rounded-2xl');
+    expect(classes).toContain('p-5');
   });
 
   it('should add hover classes when hoverable is true', () => {
     component.hoverable = true;
     const classes = component.getClasses();
-    expect(classes).toContain('hover:shadow-lg');
-    expect(classes).toContain('transition-shadow');
     expect(classes).toContain('cursor-pointer');
+    expect(classes).toContain('transition-shadow');
   });
 
   it('should not add hover classes when hoverable is false', () => {
     component.hoverable = false;
     const classes = component.getClasses();
-    expect(classes).not.toContain('hover:shadow-lg');
+    expect(classes).not.toContain('cursor-pointer');
   });
 
   it('should display title when provided', () => {

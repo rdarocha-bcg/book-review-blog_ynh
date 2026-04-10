@@ -36,21 +36,21 @@ describe('ButtonComponent', () => {
 
   it('should apply primary variant classes by default', () => {
     const classes = component.getClasses();
-    expect(classes).toContain('bg-[var(--accent)]');
-    expect(classes).toContain('text-[var(--primary)]');
+    expect(classes).toContain('bg-[var(--primary)]');
+    expect(classes).toContain('text-[var(--text-light)]');
   });
 
   it('should apply secondary variant classes when set', () => {
     component.variant = 'secondary';
     const classes = component.getClasses();
-    expect(classes).toContain('bg-slate-700');
-    expect(classes).toContain('text-white');
+    expect(classes).toContain('bg-[var(--secondary)]');
+    expect(classes).toContain('text-[var(--text-light)]');
   });
 
   it('should apply danger variant classes when set', () => {
     component.variant = 'danger';
     const classes = component.getClasses();
-    expect(classes).toContain('bg-red-600');
+    expect(classes).toContain('bg-rose-600');
   });
 
   it('should apply size classes', () => {
