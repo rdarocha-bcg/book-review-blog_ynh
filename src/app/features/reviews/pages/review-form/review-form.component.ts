@@ -22,7 +22,7 @@ import { Subject, takeUntil } from 'rxjs';
     LoadingSpinnerComponent,
   ],
   template: `
-    <div class="container mx-auto px-4 py-10">
+    <div class="page-container">
       <h1 class="text-4xl md:text-5xl font-bold mb-8 text-[var(--primary)]">
         {{ isEditMode ? 'Edit Review' : 'Create New Review' }}
       </h1>

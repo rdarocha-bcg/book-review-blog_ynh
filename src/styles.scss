@@ -170,7 +170,13 @@ select {
   margin-bottom: 1rem;
 }
 
-/* Page layout consistency */
+/* Page layout consistency
+ * Use `.page-container` for primary page content (shared max-width and horizontal padding).
+ * Modifiers:
+ * - `.page-container--narrow` — prose/forms (max-width ~48rem).
+ * - `.page-container--roomy-y` — extra vertical padding (e.g. auth screens, footer block).
+ * - `.page-container--tight-y` — less vertical padding (dense admin views).
+ * Header and footer nav rows may keep Tailwind `container` where they define their own chrome. */
 .page-container {
   max-width: 1240px;
   margin-left: auto;
@@ -179,6 +185,20 @@ select {
   padding-right: 1rem;
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+
+.page-container--narrow {
+  max-width: 48rem;
+}
+
+.page-container--roomy-y {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.page-container--tight-y {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 .card-container {

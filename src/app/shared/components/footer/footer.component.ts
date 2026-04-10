@@ -12,7 +12,7 @@ import { SiteConfigService } from '@core/services/site-config.service';
   imports: [RouterLink],
   template: `
     <footer class="mt-16 border-t border-[var(--border-light)] bg-[color:var(--surface-alt)] backdrop-blur-sm" role="contentinfo">
-      <div class="container mx-auto px-4 py-12 text-[var(--text-dark)]">
+      <div class="page-container page-container--roomy-y text-[var(--text-dark)]">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
             <h3 class="font-bold mb-4 text-[var(--primary)]">About</h3>
