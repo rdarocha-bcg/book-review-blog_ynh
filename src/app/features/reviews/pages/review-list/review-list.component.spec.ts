@@ -51,6 +51,19 @@ describe('ReviewListComponent', () => {
     expect(mockReviewService.getReviews).toHaveBeenCalled();
   });
 
+  it('should show skeleton placeholders and aria-busy while loading', () => {
+    loadingSubject.next(true);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelectorAll('app-review-card-skeleton').length).toBe(6);
+    const region = el.querySelector('[aria-live="polite"]');
+    expect(region?.getAttribute('aria-busy')).toBe('true');
+    loadingSubject.next(false);
+    fixture.detectChanges();
+    expect(el.querySelectorAll('app-review-card-skeleton').length).toBe(0);
+    expect(region?.getAttribute('aria-busy')).toBe('false');
+  });
+
   it('should call loadReviews when onFilterChange is called', () => {
     mockReviewService.getReviews.calls.reset();
     component.onFilterChange();
