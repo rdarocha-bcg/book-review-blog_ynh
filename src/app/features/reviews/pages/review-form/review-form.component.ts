@@ -6,6 +6,7 @@ import { ReviewService } from '../../services/review.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
+import { StarRatingInputComponent } from '@shared/components/star-rating-input/star-rating-input.component';
 import { Subject, takeUntil } from 'rxjs';
 
 /**
@@ -20,6 +21,7 @@ import { Subject, takeUntil } from 'rxjs';
     ReactiveFormsModule,
     ButtonComponent,
     LoadingSpinnerComponent,
+    StarRatingInputComponent,
   ],
   template: `
     <div class="container mx-auto px-4 py-10">
@@ -100,23 +102,15 @@ import { Subject, takeUntil } from 'rxjs';
           </div>
 
           <!-- Rating -->
-          <div>
-            <label for="rating" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Rating (1-5) *</label>
-            <input
-              id="rating"
-              type="number"
-              formControlName="rating"
-              min="1"
-              max="5"
-              placeholder="Enter rating"
-              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-              [attr.aria-label]="'Rating'"
-              [attr.aria-invalid]="isFieldInvalid('rating')"
-            />
-            <p *ngIf="isFieldInvalid('rating')" class="text-red-600 text-sm mt-1">
+          <fieldset class="border-0 p-0 m-0">
+            <legend id="rating-legend" class="block text-sm font-semibold mb-2 text-[var(--primary)]">
+              Rating (1–5) <span class="text-red-600" aria-hidden="true">*</span>
+            </legend>
+            <app-star-rating-input formControlName="rating" labelledBy="rating-legend" />
+            <p *ngIf="isFieldInvalid('rating')" class="text-red-600 text-sm mt-1" role="alert">
               Rating must be between 1 and 5
             </p>
-          </div>
+          </fieldset>
 
           <!-- Description (Short Summary) -->
           <div>
