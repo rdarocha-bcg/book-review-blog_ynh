@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of, BehaviorSubject } from 'rxjs';
 import { Review } from '../../models/review.model';
@@ -62,6 +62,17 @@ describe('ReviewListComponent', () => {
     component.onFilterChange();
     expect(mockReviewService.getReviews).toHaveBeenCalled();
   });
+
+  it('should debounce search input and reset to page 1 before loading', fakeAsync(() => {
+    mockReviewService.getReviews.calls.reset();
+    component.currentPage = 3;
+    component.searchQuery = 'novel';
+    component.onSearchQueryInput();
+    expect(mockReviewService.getReviews).not.toHaveBeenCalled();
+    tick(350);
+    expect(component.currentPage).toBe(1);
+    expect(mockReviewService.getReviews).toHaveBeenCalled();
+  }));
 
   it('should reset filters and reload when resetFilters is called', () => {
     component.searchQuery = 'test';

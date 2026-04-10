@@ -14,6 +14,7 @@ import { ReviewCardSkeletonComponent } from '@shared/components/review-card-skel
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
 import { Subject, takeUntil } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 /**
  * Review List Component
@@ -48,7 +49,7 @@ import { Subject, takeUntil } from 'rxjs';
             type="text"
             placeholder="Search reviews..."
             [(ngModel)]="searchQuery"
-            (change)="onFilterChange()"
+            (ngModelChange)="onSearchQueryInput()"
             class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
             aria-label="Search reviews"
           />
@@ -184,10 +185,18 @@ export class ReviewListComponent implements OnInit, OnDestroy {
   totalPages = 0;
 
   private destroy$ = new Subject<void>();
+  /** Emits when the search field changes; loads are debounced to limit API calls */
+  private searchInput$ = new Subject<void>();
 
   constructor(private reviewService: ReviewService) {}
 
   ngOnInit(): void {
+    this.searchInput$
+      .pipe(debounceTime(350), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.currentPage = 1;
+        this.loadReviews();
+      });
     this.loadReviews();
   }
 
@@ -225,6 +234,10 @@ export class ReviewListComponent implements OnInit, OnDestroy {
 
   onFilterChange(): void {
     this.loadReviews();
+  }
+
+  onSearchQueryInput(): void {
+    this.searchInput$.next();
   }
 
   resetFilters(): void {
