@@ -15,6 +15,55 @@ See [YUNOHOST_INTEGRATION.md](YUNOHOST_INTEGRATION.md) and [doc/PRE_INSTALL.md](
 
 ---
 
+## Continuous deployment to YunoHost (GitHub Actions)
+
+This repository includes `.github/workflows/deploy-ynh.yml`.
+
+Deployment triggers:
+
+- automatically after the `CI` workflow succeeds on branch `main`
+- manually with **Actions > Deploy to YunoHost > Run workflow**
+
+The workflow connects over SSH and runs:
+
+```bash
+yunohost app upgrade <app_id> -u <source_url>
+```
+
+### Required GitHub secrets
+
+Set these in **Repository settings > Secrets and variables > Actions**:
+
+- `YNH_SSH_HOST`: server hostname or IP
+- `YNH_SSH_USER`: SSH user allowed to run `yunohost app upgrade` (usually with sudo/root rights)
+- `YNH_SSH_PRIVATE_KEY`: private key matching the public key installed on the server
+- `YNH_SSH_KNOWN_HOSTS`: full known_hosts line(s) for strict host key pinning
+
+### Optional repository variables
+
+- `YNH_APP_INSTANCE_ID` (default: `book-review-blog`)
+- `YNH_APP_SOURCE_URL` (default: `https://github.com/rdarocha-bcg/book-review-blog_ynh`)
+- `YNH_SSH_PORT` (default: `22`)
+
+### Notes
+
+- Keep CI as the quality gate before deployment.
+- If your YunoHost instance id is not `book-review-blog`, set `YNH_APP_INSTANCE_ID`.
+- The workflow enforces strict host key checking using `YNH_SSH_KNOWN_HOSTS`.
+- The workflow targets the GitHub **Environment** named `production`.
+
+### Recommended protection (required for manual approval)
+
+In **Repository settings > Environments > production**:
+
+1. Create (or edit) the `production` environment.
+2. Add **Required reviewers** (you and/or trusted maintainers).
+3. Optionally restrict deployable branches (for example `main` only).
+
+With this setup, each deployment run pauses until approved in GitHub Actions.
+
+---
+
 ## Manual / generic hosting
 
 ### Frontend only

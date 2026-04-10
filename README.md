@@ -43,6 +43,17 @@ Use **Node for Windows** and a normal terminal if you want to avoid WSL.
 | `npm run test:coverage` | Tests with coverage report |
 | `npm run lint` | Lint (ESLint) |
 
+## Continuous integration (GitHub Actions)
+
+A CI workflow is available in `.github/workflows/ci.yml`.
+
+It runs on each push (all branches) and on pull requests to `main`, and executes:
+
+1. Frontend: `npm ci`, `npm run lint`, `npm run test:ci`, `npm run build:prod`
+2. API: `cd api && npm ci && npm run build`
+
+When frontend checks pass, the production build is uploaded as a GitHub artifact (`frontend-dist`).
+
 ## Documentation
 
 | Document | Purpose |
