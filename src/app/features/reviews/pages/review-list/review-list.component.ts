@@ -5,15 +5,16 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../services/review.service';
 import { Review } from '../../models/review.model';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
 import { CardComponent } from '@shared/components/card/card.component';
+import { ReviewCardSkeletonComponent } from '@shared/components/review-card-skeleton/review-card-skeleton.component';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
 import { Subject, takeUntil } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 /**
  * Review List Component
@@ -26,8 +27,8 @@ import { Subject, takeUntil } from 'rxjs';
     CommonModule,
     RouterLink,
     FormsModule,
-    LoadingSpinnerComponent,
     CardComponent,
+    ReviewCardSkeletonComponent,
     ButtonComponent,
     PaginationComponent,
   ],
@@ -48,7 +49,7 @@ import { Subject, takeUntil } from 'rxjs';
             type="text"
             placeholder="Search reviews..."
             [(ngModel)]="searchQuery"
-            (change)="onFilterChange()"
+            (ngModelChange)="onSearchQueryInput()"
             class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
             aria-label="Search reviews"
           />
@@ -96,42 +97,56 @@ import { Subject, takeUntil } from 'rxjs';
         </div>
       </div>
 
-      <!-- Loading State -->
-      <app-loading-spinner *ngIf="isLoading$ | async"></app-loading-spinner>
+      <div [attr.aria-busy]="(isLoading$ | async) === true" aria-live="polite">
+        <!-- Loading placeholders (filters/pagination stay usable) -->
+        <div
+          *ngIf="isLoading$ | async"
+          class="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6"
+        >
+          <app-review-card-skeleton
+            *ngFor="let s of skeletonSlots; trackBy: trackBySkeletonSlot"
+          ></app-review-card-skeleton>
+        </div>
 
-      <!-- Reviews List -->
-      <div
-        *ngIf="(isLoading$ | async) === false"
-        class="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6"
-      >
+        <!-- Reviews List -->
+        <div
+          *ngIf="(isLoading$ | async) === false"
+          class="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6"
+        >
         <app-card
           *ngFor="let review of reviews$ | async; trackBy: trackByReviewId"
           [hoverable]="true"
           class="break-inside-avoid block mb-6"
-          (click)="goToReview(review.id)"
         >
-          <h3 class="text-xl font-semibold mb-2 text-[var(--primary)]">{{ review.title }}</h3>
-          <p class="text-sm text-[var(--text-muted)] mb-3">by {{ review.author }}</p>
-          <p class="text-sm mb-2">
-            <strong class="text-[var(--primary)]">Book:</strong> {{ review.bookTitle }} by {{ review.bookAuthor }}
-          </p>
-          <p class="text-sm mb-2">
-            <strong class="text-[var(--primary)]">Genre:</strong>
-            <span class="inline-block px-2 py-1 rounded-full bg-[var(--surface-alt)] text-[var(--accent-strong)]">
-              {{ review.genre }}
-            </span>
-          </p>
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-[var(--accent-strong)] font-semibold">★ {{ review.rating }}/5</span>
-          </div>
-          <p class="text-sm text-[var(--text-dark)] line-clamp-3 mb-4">{{ review.description }}</p>
+          <!-- Single block link (option A): one focus target per card, no nested links -->
           <a
             [routerLink]="['/reviews', review.id]"
-            class="text-[var(--accent-strong)] hover:text-[var(--primary)] font-semibold"
+            class="group -m-1 block rounded-xl p-1 no-underline outline-none ring-[var(--accent)] transition focus-visible:ring-2"
+            [attr.aria-label]="'Open review: ' + review.title"
           >
-            Read Full Review →
+            <h3 class="text-xl font-semibold mb-2 text-[var(--primary)] group-hover:text-[var(--accent-strong)]">
+              {{ review.title }}
+            </h3>
+            <p class="text-sm text-[var(--text-muted)] mb-3">by {{ review.author }}</p>
+            <p class="text-sm mb-2 text-[var(--text-dark)]">
+              <strong class="text-[var(--primary)]">Book:</strong> {{ review.bookTitle }} by {{ review.bookAuthor }}
+            </p>
+            <p class="text-sm mb-2 text-[var(--text-dark)]">
+              <strong class="text-[var(--primary)]">Genre:</strong>
+              <span class="inline-block px-2 py-1 rounded-full bg-[var(--surface-alt)] text-[var(--accent-strong)]">
+                {{ review.genre }}
+              </span>
+            </p>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-[var(--accent-strong)] font-semibold">★ {{ review.rating }}/5</span>
+            </div>
+            <p class="text-sm text-[var(--text-dark)] line-clamp-3 mb-3">{{ review.description }}</p>
+            <span class="font-semibold text-[var(--accent-strong)] group-hover:text-[var(--primary)]">
+              Read full review →
+            </span>
           </a>
         </app-card>
+        </div>
       </div>
 
       <!-- No Results -->
@@ -153,6 +168,9 @@ import { Subject, takeUntil } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReviewListComponent implements OnInit, OnDestroy {
+  /** Shown while any review list request is in flight (initial load, filters, pagination) */
+  readonly skeletonSlots = [0, 1, 2, 3, 4, 5] as const;
+
   reviews$ = this.reviewService.getReviews$();
   isLoading$ = this.reviewService.getLoading$();
 
@@ -167,13 +185,18 @@ export class ReviewListComponent implements OnInit, OnDestroy {
   totalPages = 0;
 
   private destroy$ = new Subject<void>();
+  /** Emits when the search field changes; loads are debounced to limit API calls */
+  private searchInput$ = new Subject<void>();
 
-  constructor(
-    private reviewService: ReviewService,
-    private router: Router
-  ) {}
+  constructor(private reviewService: ReviewService) {}
 
   ngOnInit(): void {
+    this.searchInput$
+      .pipe(debounceTime(350), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.currentPage = 1;
+        this.loadReviews();
+      });
     this.loadReviews();
   }
 
@@ -213,6 +236,10 @@ export class ReviewListComponent implements OnInit, OnDestroy {
     this.loadReviews();
   }
 
+  onSearchQueryInput(): void {
+    this.searchInput$.next();
+  }
+
   resetFilters(): void {
     this.searchQuery = '';
     this.selectedGenre = '';
@@ -222,12 +249,12 @@ export class ReviewListComponent implements OnInit, OnDestroy {
     this.loadReviews();
   }
 
-  goToReview(id: string | number): void {
-    this.router.navigate(['/reviews', id]);
-  }
-
   trackByReviewId(index: number, review: Review): string {
     return review.id;
+  }
+
+  trackBySkeletonSlot(index: number, slot: number): number {
+    return slot;
   }
 }
 

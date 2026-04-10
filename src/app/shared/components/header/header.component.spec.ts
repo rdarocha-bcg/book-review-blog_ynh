@@ -86,4 +86,20 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
     expect(theme.preference()).not.toBe(start);
   });
+
+  it('should toggle mobile menu and set aria-expanded', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const toggle = el.querySelector('#mobile-nav-toggle') as HTMLButtonElement | null;
+    expect(toggle).toBeTruthy();
+    expect(toggle!.getAttribute('aria-expanded')).toBe('false');
+    toggle!.click();
+    fixture.detectChanges();
+    expect(toggle!.getAttribute('aria-expanded')).toBe('true');
+    const panel = el.querySelector('#mobile-nav-panel');
+    expect(panel).toBeTruthy();
+    toggle!.click();
+    fixture.detectChanges();
+    expect(toggle!.getAttribute('aria-expanded')).toBe('false');
+    expect(el.querySelector('#mobile-nav-panel')).toBeFalsy();
+  });
 });

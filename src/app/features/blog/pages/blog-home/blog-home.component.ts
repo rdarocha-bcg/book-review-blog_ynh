@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [RouterLink],
   template: `
-    <div class="container mx-auto px-4 py-10">
+    <div class="page-container">
       <header class="mb-8">
         <h1 class="luxe-title text-4xl md:text-5xl font-bold text-[var(--primary)] mb-3">Blog</h1>
         <p class="text-lg text-[var(--text-muted)]">

@@ -3,19 +3,25 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-/* Global CSS Variables */
+/* Global CSS Variables
+ * Contrast (WCAG 2.1 AA, normal text ~4.5:1 on --surface / white):
+ * - --text-muted was ~3.3:1 on #fff8fc; darkened for body/supporting copy.
+ * - --accent-strong link/hover color darkened for use on light surfaces.
+ * - --border-light slightly deeper for 3:1 non-text UI where applicable. */
 :root {
   color-scheme: light;
+  /* Approximate sticky header + nav pill height; keeps fixed toasts below the bar */
+  --header-height: 5.5rem;
   --primary: #7a365f;
   --secondary: #d56fa1;
   --accent: #f3b9d4;
-  --accent-strong: #c24d83;
+  --accent-strong: #9e2f62;
   --surface: #fff8fc;
   --surface-alt: #ffeef7;
   --text-dark: #3d2031;
   --text-light: #fff8fc;
-  --text-muted: #8f667c;
-  --border-light: #f0cfdf;
+  --text-muted: #5c4150;
+  --border-light: #e8b8d0;
   --header-bg: rgb(255 249 252 / 0.85);
   --nav-bg: rgb(255 255 255 / 0.95);
   --card-bg: rgb(255 255 255 / 0.95);
@@ -97,6 +103,10 @@ html.theme-dark body {
 }
 
 @media (min-width: 768px) {
+  :root {
+    --header-height: 5.75rem;
+  }
+
   html, body {
     background-attachment: fixed;
   }
@@ -202,7 +212,13 @@ select {
   margin-bottom: 1rem;
 }
 
-/* Page layout consistency */
+/* Page layout consistency
+ * Use `.page-container` for primary page content (shared max-width and horizontal padding).
+ * Modifiers:
+ * - `.page-container--narrow` — prose/forms (max-width ~48rem).
+ * - `.page-container--roomy-y` — extra vertical padding (e.g. auth screens, footer block).
+ * - `.page-container--tight-y` — less vertical padding (dense admin views).
+ * Header and footer nav rows may keep Tailwind `container` where they define their own chrome. */
 .page-container {
   max-width: 1240px;
   margin-left: auto;
@@ -211,6 +227,20 @@ select {
   padding-right: 1rem;
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+
+.page-container--narrow {
+  max-width: 48rem;
+}
+
+.page-container--roomy-y {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.page-container--tight-y {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 .card-container {

@@ -12,7 +12,7 @@ import { SiteConfigService } from '@core/services/site-config.service';
   imports: [RouterLink],
   template: `
     <footer class="mt-16 border-t border-[var(--border-light)] bg-[color:var(--surface-alt)] backdrop-blur-sm" role="contentinfo">
-      <div class="container mx-auto px-4 py-12 text-[var(--text-dark)]">
+      <div class="page-container page-container--roomy-y text-[var(--text-dark)]">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
             <h3 class="font-bold mb-4 text-[var(--primary)]">About</h3>
@@ -26,21 +26,35 @@ import { SiteConfigService } from '@core/services/site-config.service';
             <h3 class="font-bold mb-4 text-[var(--primary)]">Resources</h3>
             <ul class="space-y-2">
               <li><a routerLink="/blog" class="hover:text-[var(--primary)] transition">Blog</a></li>
-              <li><span class="text-[var(--text-muted)] cursor-not-allowed" aria-disabled="true">FAQ</span></li>
+              <li>
+                <span class="text-sm text-[var(--text-muted)]">FAQ <span class="text-xs font-normal opacity-80">(coming soon)</span></span>
+              </li>
             </ul>
           </div>
           <div>
             <h3 class="font-bold mb-4 text-[var(--primary)]">Legal</h3>
             <ul class="space-y-2">
-              <li><span class="text-[var(--text-muted)] cursor-not-allowed" aria-disabled="true">Privacy Policy</span></li>
-              <li><span class="text-[var(--text-muted)] cursor-not-allowed" aria-disabled="true">Terms of Service</span></li>
+              <li>
+                <span class="text-sm text-[var(--text-muted)]"
+                  >Privacy Policy <span class="text-xs font-normal opacity-80">(coming soon)</span></span
+                >
+              </li>
+              <li>
+                <span class="text-sm text-[var(--text-muted)]"
+                  >Terms of Service <span class="text-xs font-normal opacity-80">(coming soon)</span></span
+                >
+              </li>
             </ul>
           </div>
           <div>
             <h3 class="font-bold mb-4 text-[var(--primary)]">Follow Us</h3>
             <ul class="space-y-2">
-              <li><span class="text-[var(--text-muted)] cursor-not-allowed" aria-disabled="true">Twitter</span></li>
-              <li><span class="text-[var(--text-muted)] cursor-not-allowed" aria-disabled="true">Facebook</span></li>
+              <li>
+                <span class="text-sm text-[var(--text-muted)]">Twitter <span class="text-xs font-normal opacity-80">(coming soon)</span></span>
+              </li>
+              <li>
+                <span class="text-sm text-[var(--text-muted)]">Facebook <span class="text-xs font-normal opacity-80">(coming soon)</span></span>
+              </li>
             </ul>
           </div>
         </div>

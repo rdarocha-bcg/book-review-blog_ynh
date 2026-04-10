@@ -20,7 +20,9 @@ import { NotificationService, Notification } from '@core/services/notification.s
     ]),
   ],
   template: `
-    <div class="fixed top-4 right-4 z-50 space-y-2 max-w-md">
+    <div
+      class="fixed right-4 z-50 max-w-md space-y-2 top-[calc(var(--header-height)+env(safe-area-inset-top,0px))]"
+    >
       <div
         *ngFor="let notification of notifications$ | async; trackBy: trackByNotificationId"
         [@slideIn]

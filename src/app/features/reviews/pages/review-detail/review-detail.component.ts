@@ -19,7 +19,7 @@ import { Subject, takeUntil } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterLink, LoadingSpinnerComponent],
   template: `
-    <div class="container mx-auto px-4 py-10">
+    <div class="page-container">
       <a routerLink="/" class="text-[var(--accent-strong)] hover:text-[var(--primary)] mb-4 inline-block font-semibold">
         ← Back to Reviews
       </a>

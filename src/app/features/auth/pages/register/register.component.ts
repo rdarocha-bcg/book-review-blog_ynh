@@ -13,7 +13,7 @@ import { Subject, takeUntil } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="container mx-auto px-4 py-12">
+    <div class="page-container page-container--roomy-y">
       <div class="max-w-md mx-auto pinterest-panel p-8 text-center">
         <span class="inline-block px-3 py-1 rounded-full bg-[var(--surface-alt)] text-[var(--primary)] text-xs font-semibold mb-4">
           Join the community
