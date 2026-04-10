@@ -11,7 +11,7 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="page-container max-w-3xl">
+    <div class="page-container page-container--narrow">
       <a
         routerLink="/blog"
         class="inline-flex items-center rounded-full border border-[var(--border-light)] bg-white px-4 py-2 text-sm font-semibold text-[var(--accent-strong)] shadow-sm transition hover:border-[var(--secondary)]"

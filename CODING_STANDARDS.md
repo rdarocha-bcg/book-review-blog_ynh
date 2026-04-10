@@ -51,6 +51,13 @@ export class ReviewCardComponent {
 }
 ```
 
+## Page layout
+
+- Wrap primary page content in **`page-container`** (see `src/styles.scss`) for a consistent max width (`1240px`) and horizontal padding (`1rem`).
+- Use **`page-container page-container--narrow`** for form-heavy or long-form pages that should read like a single column (~`48rem` max width).
+- Use **`page-container--roomy-y`** when a screen needs more vertical breathing room (e.g. auth flows); use **`page-container--tight-y`** for dense admin lists.
+- Keep **header** and **footer** layout rows on their existing `container` wrappers when they define navigation chrome; align the **main** page body with `page-container` as above.
+
 ## Services
 
 - Use **providedIn: 'root'** unless the service is truly feature-scoped.

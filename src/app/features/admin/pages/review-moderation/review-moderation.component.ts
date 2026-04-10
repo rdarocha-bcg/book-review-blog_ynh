@@ -22,7 +22,7 @@ import { Review } from '../../../reviews/models/review.model';
   standalone: true,
   imports: [CommonModule, RouterLink, LoadingSpinnerComponent],
   template: `
-    <div class="container mx-auto px-4 py-8">
+    <div class="page-container page-container--tight-y">
       <div class="mb-8">
         <a routerLink="/admin" class="text-blue-600 hover:underline mb-2 inline-block">← Back to Dashboard</a>
         <h1 class="text-4xl font-bold">Review Moderation</h1>
