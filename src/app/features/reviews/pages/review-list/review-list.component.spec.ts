@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of, BehaviorSubject } from 'rxjs';
 import { Review } from '../../models/review.model';
 import { ReviewListComponent } from './review-list.component';
@@ -9,8 +9,6 @@ describe('ReviewListComponent', () => {
   let component: ReviewListComponent;
   let fixture: ComponentFixture<ReviewListComponent>;
   let mockReviewService: jasmine.SpyObj<ReviewService>;
-  let mockRouter: jasmine.SpyObj<Router>;
-
   const reviewsSubject = new BehaviorSubject<Review[]>([]);
   const loadingSubject = new BehaviorSubject<boolean>(false);
 
@@ -26,14 +24,9 @@ describe('ReviewListComponent', () => {
       totalPages: 0,
     }));
 
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-
     await TestBed.configureTestingModule({
-      imports: [ReviewListComponent],
-      providers: [
-        { provide: ReviewService, useValue: mockReviewService },
-        { provide: Router, useValue: mockRouter },
-      ],
+      imports: [ReviewListComponent, RouterTestingModule],
+      providers: [{ provide: ReviewService, useValue: mockReviewService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReviewListComponent);
@@ -49,6 +42,19 @@ describe('ReviewListComponent', () => {
 
   it('should call getReviews on init', () => {
     expect(mockReviewService.getReviews).toHaveBeenCalled();
+  });
+
+  it('should show skeleton placeholders and aria-busy while loading', () => {
+    loadingSubject.next(true);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelectorAll('app-review-card-skeleton').length).toBe(6);
+    const region = el.querySelector('[aria-live="polite"]');
+    expect(region?.getAttribute('aria-busy')).toBe('true');
+    loadingSubject.next(false);
+    fixture.detectChanges();
+    expect(el.querySelectorAll('app-review-card-skeleton').length).toBe(0);
+    expect(region?.getAttribute('aria-busy')).toBe('false');
   });
 
   it('should call loadReviews when onFilterChange is called', () => {
@@ -79,11 +85,6 @@ describe('ReviewListComponent', () => {
     expect(mockReviewService.getReviews).toHaveBeenCalled();
   });
 
-  it('should navigate to review when goToReview is called', () => {
-    component.goToReview('123');
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/reviews', '123']);
-  });
-
   it('should update page and limit on pagination change and reload', () => {
     mockReviewService.getReviews.calls.reset();
     component.onPaginationChange({ page: 2, limit: 20 });
@@ -93,6 +94,30 @@ describe('ReviewListComponent', () => {
       page: 2,
       limit: 20,
     }));
+  });
+
+  it('should render one routerLink per review card (no duplicate navigation targets)', () => {
+    reviewsSubject.next([
+      {
+        id: '1',
+        title: 'T',
+        author: 'A',
+        bookTitle: 'B',
+        bookAuthor: 'C',
+        rating: 4,
+        genre: 'fiction',
+        description: 'd',
+        content: 'c',
+        publishedAt: new Date(),
+        updatedAt: new Date(),
+        createdBy: 'u',
+        isPublished: true,
+      },
+    ]);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const links = el.querySelectorAll('a[href="/reviews/1"]');
+    expect(links.length).toBe(1);
   });
 
   it('should track reviews by id', () => {

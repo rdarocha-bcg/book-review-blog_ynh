@@ -44,4 +44,10 @@ describe('FooterComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toMatch(/©|2026|Book Review Blog/);
   });
+
+  it('should label placeholder footer items as coming soon without disabled link semantics', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('coming soon');
+    expect(el.querySelector('[aria-disabled="true"]')).toBeFalsy();
+  });
 });

@@ -19,7 +19,7 @@ export interface AdminUser {
   standalone: true,
   imports: [CommonModule, RouterLink, LoadingSpinnerComponent],
   template: `
-    <div class="container mx-auto px-4 py-8">
+    <div class="page-container page-container--tight-y">
       <a routerLink="/admin" class="text-blue-600 hover:underline mb-2 inline-block">← Back to Dashboard</a>
       <h1 class="text-4xl font-bold">User Management</h1>
       <p class="text-gray-600 mt-1 mb-8">View and manage registered users.</p>
