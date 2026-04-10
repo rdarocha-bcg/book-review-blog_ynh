@@ -16,32 +16,51 @@ import { Subject } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <header class="bg-[var(--primary)] text-white shadow-lg" role="banner">
+    <header class="sticky top-0 z-40 border-b border-[var(--border-light)] bg-[#fff9fc]/85 backdrop-blur-md" role="banner">
       <a href="#main-content" class="skip-link">Skip to main content</a>
-      <nav class="container mx-auto px-4 py-4 flex items-center justify-between" aria-label="Main navigation">
+      <nav
+        class="container mx-auto my-3 flex items-center justify-between gap-4 rounded-full border border-[var(--border-light)] bg-white/95 px-5 py-3 shadow-[0_10px_24px_-20px_rgba(122,54,95,0.8)]"
+        aria-label="Main navigation"
+      >
         <div class="flex items-center gap-8">
           <a
             routerLink="/"
-            class="text-2xl font-bold"
+            class="text-2xl font-semibold text-[var(--primary)] luxe-title tracking-[0.01em]"
             [attr.aria-label]="site.config().siteNameShort + ' home'"
-            >📚 {{ site.config().siteNameShort }}</a
+            ><span aria-hidden="true">📚</span> {{ site.config().siteNameShort }}</a
           >
           <ul class="hidden md:flex gap-6" role="menubar">
-            <li role="none"><a routerLink="/" class="hover:text-[var(--accent)] transition" role="menuitem">Home</a></li>
-            <li role="none"><a routerLink="/blog" class="hover:text-[var(--accent)] transition" role="menuitem">Blog</a></li>
+            <li role="none">
+              <a routerLink="/" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] transition" role="menuitem"
+                >Home</a
+              >
+            </li>
+            <li role="none">
+              <a
+                routerLink="/blog"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] transition"
+                role="menuitem"
+                >Blog</a
+              >
+            </li>
             <li *ngIf="(currentUser$ | async)?.role === 'admin'" role="none">
-              <a routerLink="/admin" class="hover:text-[var(--accent)] transition" role="menuitem">Admin</a>
+              <a
+                routerLink="/admin"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] transition"
+                role="menuitem"
+                >Admin</a
+              >
             </li>
           </ul>
         </div>
         <div class="flex items-center gap-4">
-          <div *ngIf="currentUser$ | async as user" class="text-sm">
+          <div *ngIf="currentUser$ | async as user" class="text-sm text-[var(--text-muted)]">
             Welcome, {{ user.name || user.email }}
           </div>
           <button
             *ngIf="isAuthenticated$ | async"
             routerLink="/reviews/new"
-            class="bg-[var(--secondary)] text-white px-4 py-2 rounded font-semibold hover:brightness-90 transition"
+            class="bg-[var(--secondary)] text-white px-4 py-2 rounded-full font-semibold hover:brightness-95 transition"
             aria-label="Create new review"
           >
             + New Review
@@ -49,7 +68,7 @@ import { Subject } from 'rxjs';
           <button
             *ngIf="(isAuthenticated$ | async) === false"
             routerLink="/login"
-            class="bg-[var(--accent)] text-[var(--primary)] px-4 py-2 rounded font-semibold hover:brightness-95 transition"
+            class="bg-[var(--accent)] text-[var(--primary)] px-4 py-2 rounded-full font-semibold hover:brightness-95 transition"
             aria-label="Login"
           >
             Login
@@ -57,7 +76,7 @@ import { Subject } from 'rxjs';
           <button
             *ngIf="isAuthenticated$ | async"
             (click)="logout()"
-            class="bg-red-600 px-4 py-2 rounded font-semibold hover:bg-red-700 transition"
+            class="bg-[#bc4a79] px-4 py-2 rounded-full font-semibold text-white hover:brightness-95 transition"
             aria-label="Logout"
           >
             Logout

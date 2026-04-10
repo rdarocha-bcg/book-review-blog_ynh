@@ -40,13 +40,13 @@ export class ButtonComponent {
 
   getClasses(): string {
     const baseClasses =
-      'rounded font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+      'rounded-full font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md disabled:hover:shadow-none';
 
     const variantClasses: Record<ButtonVariant, string> = {
-      primary: 'bg-[var(--accent)] text-[var(--primary)] hover:brightness-95',
-      secondary: 'bg-slate-700 text-white hover:bg-slate-600',
-      danger: 'bg-red-600 text-white hover:bg-red-700',
-      ghost: 'bg-transparent border border-current text-current hover:bg-slate-100',
+      primary: 'bg-[var(--primary)] text-[var(--text-light)] hover:brightness-110',
+      secondary: 'bg-[var(--secondary)] text-white hover:brightness-105',
+      danger: 'bg-rose-600 text-white hover:bg-rose-700',
+      ghost: 'bg-white/80 border border-[var(--border-light)] text-[var(--text-dark)] hover:bg-[var(--surface-alt)]',
     };
 
     const sizeClasses: Record<ButtonSize, string> = {

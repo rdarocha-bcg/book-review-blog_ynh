@@ -27,7 +27,7 @@ import { ReactiveFormsModule } from '@angular/forms';
         (input)="onInput($event)"
         [attr.aria-invalid]="isInvalid"
         [attr.aria-describedby]="errorId"
-        class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+        class="w-full border border-[var(--border-light)] bg-white rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--secondary)]"
         [class.border-red-600]="isInvalid"
       ></textarea>
       <p *ngIf="isInvalid && errorMessage" [id]="errorId" class="text-red-600 text-sm mt-1">

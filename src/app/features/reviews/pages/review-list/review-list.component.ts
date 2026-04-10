@@ -32,25 +32,30 @@ import { Subject, takeUntil } from 'rxjs';
     PaginationComponent,
   ],
   template: `
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-4xl font-bold mb-8">Book Reviews</h1>
+    <div class="page-container">
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-2 text-[var(--primary)] luxe-title">Book Reviews</h1>
+        <p class="text-[var(--text-muted)]">
+          Explore stylish, curated reviews in a clean Pinterest-inspired layout.
+        </p>
+      </div>
 
       <!-- Filters -->
-      <div class="mb-8 bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4">Filters</h2>
+      <div class="mb-8 pinterest-panel p-6">
+        <h2 class="text-xl font-semibold mb-4 text-[var(--primary)] luxe-title">Filters</h2>
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <input
             type="text"
             placeholder="Search reviews..."
             [(ngModel)]="searchQuery"
             (change)="onFilterChange()"
-            class="border rounded px-3 py-2"
+            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
             aria-label="Search reviews"
           />
           <select
             [(ngModel)]="selectedGenre"
             (change)="onFilterChange()"
-            class="border rounded px-3 py-2"
+            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
             aria-label="Filter by genre"
           >
             <option value="">All Genres</option>
@@ -62,7 +67,7 @@ import { Subject, takeUntil } from 'rxjs';
           <select
             [(ngModel)]="selectedRating"
             (change)="onFilterChange()"
-            class="border rounded px-3 py-2"
+            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
             aria-label="Filter by rating"
           >
             <option value="">All Ratings</option>
@@ -73,7 +78,7 @@ import { Subject, takeUntil } from 'rxjs';
           <select
             [(ngModel)]="selectedSort"
             (change)="onFilterChange()"
-            class="border rounded px-3 py-2"
+            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
             aria-label="Sort reviews"
           >
             <option value="">Sort by</option>
@@ -84,7 +89,7 @@ import { Subject, takeUntil } from 'rxjs';
           </select>
           <button
             (click)="resetFilters()"
-            class="bg-slate-500 text-white rounded px-3 py-2 hover:bg-slate-600"
+            class="bg-white text-[var(--primary)] border border-[var(--border-light)] rounded-full px-3 py-2 hover:bg-[var(--surface-alt)]"
           >
             Reset
           </button>
@@ -97,28 +102,32 @@ import { Subject, takeUntil } from 'rxjs';
       <!-- Reviews List -->
       <div
         *ngIf="(isLoading$ | async) === false"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        class="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6"
       >
         <app-card
           *ngFor="let review of reviews$ | async; trackBy: trackByReviewId"
           [hoverable]="true"
+          class="break-inside-avoid block mb-6"
           (click)="goToReview(review.id)"
         >
-          <h3 class="text-lg font-semibold mb-2">{{ review.title }}</h3>
-          <p class="text-sm text-gray-600 mb-2">by {{ review.author }}</p>
+          <h3 class="text-xl font-semibold mb-2 text-[var(--primary)]">{{ review.title }}</h3>
+          <p class="text-sm text-[var(--text-muted)] mb-3">by {{ review.author }}</p>
           <p class="text-sm mb-2">
-            <strong>Book:</strong> {{ review.bookTitle }} by {{ review.bookAuthor }}
+            <strong class="text-[var(--primary)]">Book:</strong> {{ review.bookTitle }} by {{ review.bookAuthor }}
           </p>
           <p class="text-sm mb-2">
-            <strong>Genre:</strong> {{ review.genre }}
+            <strong class="text-[var(--primary)]">Genre:</strong>
+            <span class="inline-block px-2 py-1 rounded-full bg-[var(--surface-alt)] text-[var(--accent-strong)]">
+              {{ review.genre }}
+            </span>
           </p>
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-[var(--accent)]">★ {{ review.rating }}/5</span>
+            <span class="text-[var(--accent-strong)] font-semibold">★ {{ review.rating }}/5</span>
           </div>
-          <p class="text-sm text-gray-700 line-clamp-3 mb-4">{{ review.description }}</p>
+          <p class="text-sm text-[var(--text-dark)] line-clamp-3 mb-4">{{ review.description }}</p>
           <a
             [routerLink]="['/reviews', review.id]"
-            class="text-blue-600 hover:text-blue-800 font-semibold"
+            class="text-[var(--accent-strong)] hover:text-[var(--primary)] font-semibold"
           >
             Read Full Review →
           </a>
@@ -127,7 +136,7 @@ import { Subject, takeUntil } from 'rxjs';
 
       <!-- No Results -->
       <div *ngIf="(reviews$ | async)?.length === 0 && (isLoading$ | async) === false" class="text-center py-12">
-        <p class="text-xl text-gray-500">No reviews found. Try adjusting your filters.</p>
+        <p class="text-xl text-[var(--text-muted)]">No reviews found. Try adjusting your filters.</p>
       </div>
 
       <!-- Pagination -->

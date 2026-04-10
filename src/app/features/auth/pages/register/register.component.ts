@@ -14,24 +14,27 @@ import { Subject, takeUntil } from 'rxjs';
   imports: [CommonModule, RouterLink],
   template: `
     <div class="container mx-auto px-4 py-12">
-      <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
-        <h1 class="text-3xl font-bold mb-4">Create an account</h1>
-        <p class="text-slate-600 mb-6">
+      <div class="max-w-md mx-auto pinterest-panel p-8 text-center">
+        <span class="inline-block px-3 py-1 rounded-full bg-[var(--surface-alt)] text-[var(--primary)] text-xs font-semibold mb-4">
+          Join the community
+        </span>
+        <h1 class="text-3xl font-bold mb-4 text-[var(--text-dark)]">Create an account</h1>
+        <p class="text-[var(--text-muted)] mb-6">
           User accounts are managed by <strong>YunoHost</strong>. Ask your server administrator to create a user, or use
           the admin tools on your server.
         </p>
         <a
-          class="inline-block w-full bg-[var(--accent)] text-[var(--primary)] py-3 rounded font-semibold hover:brightness-95 transition mb-4"
+          class="inline-block w-full bg-[var(--secondary)] text-white py-3 rounded-full font-semibold hover:brightness-95 transition mb-4"
           [href]="ssoLoginUrl"
         >
           Open YunoHost portal
         </a>
-        <p class="text-sm">
+        <p class="text-sm text-[var(--text-muted)]">
           Already have an account?
-          <a routerLink="/auth/login" class="text-blue-600 hover:underline font-semibold">Sign in</a>
+          <a routerLink="/auth/login" class="text-[var(--accent-strong)] hover:underline font-semibold">Sign in</a>
         </p>
         <p class="mt-4 text-sm">
-          <a routerLink="/" class="text-blue-600 hover:underline">Back to home</a>
+          <a routerLink="/" class="text-[var(--accent-strong)] hover:underline">Back to home</a>
         </p>
       </div>
     </div>

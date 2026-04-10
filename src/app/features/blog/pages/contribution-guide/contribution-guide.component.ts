@@ -11,40 +11,51 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="container mx-auto px-4 py-8 max-w-3xl">
-      <a routerLink="/blog" class="text-blue-600 hover:text-blue-800 mb-6 inline-block">← Back to Blog</a>
+    <div class="page-container max-w-3xl">
+      <a
+        routerLink="/blog"
+        class="inline-flex items-center rounded-full border border-[var(--border-light)] bg-white px-4 py-2 text-sm font-semibold text-[var(--accent-strong)] shadow-sm transition hover:border-[var(--secondary)]"
+      >
+        ← Back to Blog
+      </a>
 
-      <h1 class="text-4xl font-bold mb-6">Contribution Guide</h1>
-      <p class="text-lg text-gray-600 mb-8">
-        We welcome book reviews from all readers. Here’s how to contribute.
-      </p>
-
-      <section class="space-y-6">
-        <h2 class="text-2xl font-semibold">How to submit a review</h2>
-        <ol class="list-decimal list-inside space-y-3 text-gray-700">
-          <li>Create an account or log in.</li>
-          <li>Go to <a routerLink="/reviews/new" class="text-blue-600 hover:underline">New Review</a>.</li>
-          <li>Fill in the book title, author, genre, and your review text.</li>
-          <li>Add a rating from 1 to 5 stars.</li>
-          <li>Submit. Reviews may be moderated before publication.</li>
-        </ol>
-      </section>
-
-      <section class="mt-8 space-y-4">
-        <h2 class="text-2xl font-semibold">Guidelines</h2>
-        <ul class="list-disc list-inside space-y-2 text-gray-700">
-          <li>Be respectful and avoid spoilers without warning.</li>
-          <li>Focus on the book: style, plot, characters, and your opinion.</li>
-          <li>Original content only; do not copy from elsewhere.</li>
-        </ul>
-      </section>
-
-      <section class="mt-8">
-        <h2 class="text-2xl font-semibold mb-4">Questions?</h2>
-        <p class="text-gray-700">
-          <a routerLink="/blog/contact" class="text-blue-600 hover:underline">Contact us</a> for any questions about contributing.
+      <div class="pinterest-panel mt-6 p-8">
+        <h1 class="text-4xl font-bold text-[var(--text-dark)]">Contribution Guide</h1>
+        <p class="mt-4 text-lg text-[var(--text-muted)]">
+          We welcome book reviews from all readers. Here is how to contribute in a clean and consistent way.
         </p>
-      </section>
+
+        <section class="mt-8 space-y-4">
+          <h2 class="text-2xl font-semibold text-[var(--text-dark)]">How to submit a review</h2>
+          <ol class="list-decimal list-inside space-y-3 text-[var(--text-muted)]">
+            <li>Create an account or log in.</li>
+            <li>
+              Go to
+              <a routerLink="/reviews/new" class="font-semibold text-[var(--accent-strong)] hover:underline">New Review</a>.
+            </li>
+            <li>Fill in the book title, author, genre, and your review text.</li>
+            <li>Add a rating from 1 to 5 stars.</li>
+            <li>Submit. Reviews may be moderated before publication.</li>
+          </ol>
+        </section>
+
+        <section class="mt-8 space-y-4">
+          <h2 class="text-2xl font-semibold text-[var(--text-dark)]">Guidelines</h2>
+          <ul class="list-disc list-inside space-y-2 text-[var(--text-muted)]">
+            <li>Be respectful and avoid spoilers without warning.</li>
+            <li>Focus on the book: style, plot, characters, and your opinion.</li>
+            <li>Original content only; do not copy from elsewhere.</li>
+          </ul>
+        </section>
+
+        <section class="mt-8">
+          <h2 class="text-2xl font-semibold text-[var(--text-dark)]">Questions?</h2>
+          <p class="mt-3 text-[var(--text-muted)]">
+            <a routerLink="/blog/contact" class="font-semibold text-[var(--accent-strong)] hover:underline">Contact us</a>
+            for any questions about contributing.
+          </p>
+        </section>
+      </div>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -14,23 +14,23 @@ import { Subject, takeUntil } from 'rxjs';
   imports: [CommonModule, RouterLink],
   template: `
     <div class="container mx-auto px-4 py-12">
-      <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
-        <h1 class="text-3xl font-bold mb-4">Sign in</h1>
-        <p class="text-slate-600 mb-6">
+      <div class="max-w-md mx-auto pinterest-panel p-8 text-center">
+        <h1 class="text-3xl font-bold mb-4 text-[var(--primary)]">Sign in</h1>
+        <p class="text-[var(--text-muted)] mb-6">
           This app uses <strong>YunoHost single sign-on</strong>. Open the user portal and sign in there, then return
           to this site.
         </p>
         <a
-          class="inline-block w-full bg-[var(--accent)] text-[var(--primary)] py-3 rounded font-semibold hover:brightness-95 transition"
+          class="inline-block w-full bg-[var(--secondary)] text-white py-3 rounded-full font-semibold hover:brightness-95 transition shadow-sm"
           [href]="ssoLoginUrl"
         >
           Open YunoHost portal
         </a>
-        <p class="mt-6 text-sm text-slate-500">
+        <p class="mt-6 text-sm text-[var(--text-muted)]">
           After signing in at the portal, reload this page or navigate home.
         </p>
         <p class="mt-4 text-sm">
-          <a routerLink="/" class="text-blue-600 hover:underline">Back to home</a>
+          <a routerLink="/" class="text-[var(--accent-strong)] hover:underline">Back to home</a>
         </p>
       </div>
     </div>
