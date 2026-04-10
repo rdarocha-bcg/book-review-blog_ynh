@@ -5,7 +5,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../services/review.service';
 import { Review } from '../../models/review.model';
@@ -108,28 +108,33 @@ import { Subject, takeUntil } from 'rxjs';
           *ngFor="let review of reviews$ | async; trackBy: trackByReviewId"
           [hoverable]="true"
           class="break-inside-avoid block mb-6"
-          (click)="goToReview(review.id)"
         >
-          <h3 class="text-xl font-semibold mb-2 text-[var(--primary)]">{{ review.title }}</h3>
-          <p class="text-sm text-[var(--text-muted)] mb-3">by {{ review.author }}</p>
-          <p class="text-sm mb-2">
-            <strong class="text-[var(--primary)]">Book:</strong> {{ review.bookTitle }} by {{ review.bookAuthor }}
-          </p>
-          <p class="text-sm mb-2">
-            <strong class="text-[var(--primary)]">Genre:</strong>
-            <span class="inline-block px-2 py-1 rounded-full bg-[var(--surface-alt)] text-[var(--accent-strong)]">
-              {{ review.genre }}
-            </span>
-          </p>
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-[var(--accent-strong)] font-semibold">★ {{ review.rating }}/5</span>
-          </div>
-          <p class="text-sm text-[var(--text-dark)] line-clamp-3 mb-4">{{ review.description }}</p>
+          <!-- Single block link (option A): one focus target per card, no nested links -->
           <a
             [routerLink]="['/reviews', review.id]"
-            class="text-[var(--accent-strong)] hover:text-[var(--primary)] font-semibold"
+            class="group -m-1 block rounded-xl p-1 no-underline outline-none ring-[var(--accent)] transition focus-visible:ring-2"
+            [attr.aria-label]="'Open review: ' + review.title"
           >
-            Read Full Review →
+            <h3 class="text-xl font-semibold mb-2 text-[var(--primary)] group-hover:text-[var(--accent-strong)]">
+              {{ review.title }}
+            </h3>
+            <p class="text-sm text-[var(--text-muted)] mb-3">by {{ review.author }}</p>
+            <p class="text-sm mb-2 text-[var(--text-dark)]">
+              <strong class="text-[var(--primary)]">Book:</strong> {{ review.bookTitle }} by {{ review.bookAuthor }}
+            </p>
+            <p class="text-sm mb-2 text-[var(--text-dark)]">
+              <strong class="text-[var(--primary)]">Genre:</strong>
+              <span class="inline-block px-2 py-1 rounded-full bg-[var(--surface-alt)] text-[var(--accent-strong)]">
+                {{ review.genre }}
+              </span>
+            </p>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-[var(--accent-strong)] font-semibold">★ {{ review.rating }}/5</span>
+            </div>
+            <p class="text-sm text-[var(--text-dark)] line-clamp-3 mb-3">{{ review.description }}</p>
+            <span class="font-semibold text-[var(--accent-strong)] group-hover:text-[var(--primary)]">
+              Read full review →
+            </span>
           </a>
         </app-card>
       </div>
@@ -168,10 +173,7 @@ export class ReviewListComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private reviewService: ReviewService,
-    private router: Router
-  ) {}
+  constructor(private reviewService: ReviewService) {}
 
   ngOnInit(): void {
     this.loadReviews();
@@ -220,10 +222,6 @@ export class ReviewListComponent implements OnInit, OnDestroy {
     this.selectedSort = '';
     this.currentPage = 1;
     this.loadReviews();
-  }
-
-  goToReview(id: string | number): void {
-    this.router.navigate(['/reviews', id]);
   }
 
   trackByReviewId(index: number, review: Review): string {
