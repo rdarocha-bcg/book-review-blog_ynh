@@ -85,22 +85,22 @@ import { filter, Subject, takeUntil } from 'rxjs';
           <div *ngIf="currentUser$ | async as user" class="hidden text-sm text-[var(--text-muted)] sm:block">
             Welcome, {{ user.name || user.email }}
           </div>
-          <button
+          <a
             *ngIf="isAuthenticated$ | async"
             routerLink="/reviews/new"
-            class="bg-[var(--secondary)] text-white px-3 py-2 sm:px-4 rounded-full text-sm font-semibold hover:brightness-95 transition sm:text-base"
+            class="inline-flex items-center justify-center bg-[var(--secondary)] text-white px-3 py-2 sm:px-4 rounded-full text-sm font-semibold hover:brightness-95 transition sm:text-base no-underline"
             aria-label="Create new review"
           >
             + New Review
-          </button>
-          <button
+          </a>
+          <a
             *ngIf="(isAuthenticated$ | async) === false"
             routerLink="/login"
-            class="bg-[var(--accent)] text-[var(--primary)] px-3 py-2 sm:px-4 rounded-full text-sm font-semibold hover:brightness-95 transition sm:text-base"
+            class="inline-flex items-center justify-center bg-[var(--accent)] text-[var(--primary)] px-3 py-2 sm:px-4 rounded-full text-sm font-semibold hover:brightness-95 transition sm:text-base no-underline"
             aria-label="Login"
           >
             Login
-          </button>
+          </a>
           <button
             *ngIf="isAuthenticated$ | async"
             (click)="logout()"
