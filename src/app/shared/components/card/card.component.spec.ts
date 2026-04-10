@@ -21,7 +21,7 @@ describe('CardComponent', () => {
 
   it('should apply base card classes', () => {
     const classes = component.getClasses();
-    expect(classes).toContain('bg-white/95');
+    expect(classes).toContain('var(--card-bg)');
     expect(classes).toContain('rounded-2xl');
     expect(classes).toContain('p-5');
   });

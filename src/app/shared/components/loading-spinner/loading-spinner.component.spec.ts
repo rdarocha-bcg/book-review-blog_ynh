@@ -25,12 +25,19 @@ describe('LoadingSpinnerComponent', () => {
     expect(container).toBeTruthy();
   });
 
-  it('should render a spinner element with animation classes', () => {
+  it('should render a spinner ring with size and border classes', () => {
     const el = fixture.nativeElement as HTMLElement;
-    const spinner = el.querySelector('.animate-spin.rounded-full');
+    const spinner = el.querySelector('.spinner-ring');
     expect(spinner).toBeTruthy();
     expect(spinner?.classList.contains('h-12')).toBe(true);
     expect(spinner?.classList.contains('w-12')).toBe(true);
     expect(spinner?.classList.contains('border-b-2')).toBe(true);
+  });
+
+  it('should expose status for assistive technologies', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const region = el.querySelector('[role="status"]');
+    expect(region).toBeTruthy();
+    expect(el.textContent).toContain('Loading');
   });
 });

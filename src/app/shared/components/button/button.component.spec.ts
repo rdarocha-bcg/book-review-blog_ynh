@@ -44,7 +44,7 @@ describe('ButtonComponent', () => {
     component.variant = 'secondary';
     const classes = component.getClasses();
     expect(classes).toContain('bg-[var(--secondary)]');
-    expect(classes).toContain('text-white');
+    expect(classes).toContain('text-[var(--text-light)]');
   });
 
   it('should apply danger variant classes when set', () => {

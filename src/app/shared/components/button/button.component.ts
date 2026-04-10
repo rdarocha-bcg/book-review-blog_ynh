@@ -21,11 +21,31 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
     >
       <span *ngIf="!isLoading">{{ label }}</span>
       <span *ngIf="isLoading" class="flex items-center gap-2">
-        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+        <div class="app-btn-spinner h-4 w-4 rounded-full border-b-2 border-current"></div>
         Loading...
       </span>
     </button>
   `,
+  styles: [
+    `
+      @keyframes app-btn-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .app-btn-spinner {
+        animation: app-btn-spin 0.75s linear infinite;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .app-btn-spinner {
+          animation: none;
+          border-width: 2px;
+          border-style: solid;
+          border-color: currentColor;
+        }
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonComponent {
@@ -44,7 +64,7 @@ export class ButtonComponent {
 
     const variantClasses: Record<ButtonVariant, string> = {
       primary: 'bg-[var(--primary)] text-[var(--text-light)] hover:brightness-110',
-      secondary: 'bg-[var(--secondary)] text-white hover:brightness-105',
+      secondary: 'bg-[var(--secondary)] text-[var(--text-light)] hover:brightness-105',
       danger: 'bg-rose-600 text-white hover:bg-rose-700',
       ghost: 'bg-white/80 border border-[var(--border-light)] text-[var(--text-dark)] hover:bg-[var(--surface-alt)]',
     };

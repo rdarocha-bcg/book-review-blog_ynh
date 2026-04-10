@@ -7,6 +7,7 @@ import { AuthService } from '@core/services/auth.service';
 import { SiteConfigService } from '@core/services/site-config.service';
 import { DEFAULT_SITE_CONFIG } from '@core/models/site-config.model';
 import { SSO_LOGOUT_REDIRECT } from '@core/tokens/sso-redirect.token';
+import { ThemeService } from '@core/services/theme.service';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -71,6 +72,19 @@ describe('HeaderComponent', () => {
     const nav = el.querySelector('nav[aria-label="Main navigation"]');
     expect(skip).toBeTruthy();
     expect(nav).toBeTruthy();
+  });
+
+  it('should cycle theme preference when theme control is activated', () => {
+    const theme = TestBed.inject(ThemeService);
+    const start = theme.preference();
+    const el = fixture.nativeElement as HTMLElement;
+    const btn = Array.from(el.querySelectorAll('button')).find((b) =>
+      b.getAttribute('aria-label')?.startsWith('Color theme'),
+    ) as HTMLButtonElement | undefined;
+    expect(btn).toBeTruthy();
+    btn!.click();
+    fixture.detectChanges();
+    expect(theme.preference()).not.toBe(start);
   });
 
   it('should toggle mobile menu and set aria-expanded', () => {

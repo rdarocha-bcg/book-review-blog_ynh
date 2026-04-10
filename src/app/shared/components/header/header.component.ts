@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { SiteConfigService } from '@core/services/site-config.service';
+import { ThemeService } from '@core/services/theme.service';
 import { SSO_LOGOUT_REDIRECT } from '@core/tokens/sso-redirect.token';
 import { environment } from '@environments/environment';
 import { filter, Subject, takeUntil } from 'rxjs';
@@ -27,12 +28,12 @@ import { filter, Subject, takeUntil } from 'rxjs';
   imports: [CommonModule, RouterLink],
   template: `
     <header
-      class="relative sticky top-0 z-40 border-b border-[var(--border-light)] bg-[#fff9fc]/85 backdrop-blur-md"
+      class="relative sticky top-0 z-40 border-b border-[var(--border-light)] bg-[color:var(--header-bg)] backdrop-blur-md"
       role="banner"
     >
       <a href="#main-content" class="skip-link">Skip to main content</a>
       <nav
-        class="container mx-auto my-3 flex items-center justify-between gap-4 rounded-full border border-[var(--border-light)] bg-white/95 px-5 py-3 shadow-[0_10px_24px_-20px_rgba(122,54,95,0.8)]"
+        class="container mx-auto my-3 flex items-center justify-between gap-4 rounded-full border border-[var(--border-light)] bg-[color:var(--nav-bg)] px-5 py-3 shadow-[0_10px_24px_-20px_rgba(122,54,95,0.8)]"
         aria-label="Main navigation"
       >
         <div class="flex min-w-0 flex-1 items-center gap-3 md:gap-8">
@@ -82,13 +83,21 @@ import { filter, Subject, takeUntil } from 'rxjs';
           </ul>
         </div>
         <div class="flex shrink-0 items-center gap-2 sm:gap-4">
+          <button
+            type="button"
+            class="rounded-full border border-[var(--border-light)] bg-[var(--surface-alt)] px-3 py-2 text-sm font-semibold text-[var(--primary)] hover:brightness-95"
+            [attr.aria-label]="'Color theme: ' + theme.labelForPreference()"
+            (click)="theme.cyclePreference()"
+          >
+            {{ theme.preference() === 'system' ? 'Auto' : theme.preference() === 'dark' ? 'Dark' : 'Light' }}
+          </button>
           <div *ngIf="currentUser$ | async as user" class="hidden text-sm text-[var(--text-muted)] sm:block">
             Welcome, {{ user.name || user.email }}
           </div>
           <a
             *ngIf="isAuthenticated$ | async"
             routerLink="/reviews/new"
-            class="inline-flex items-center justify-center bg-[var(--secondary)] text-white px-3 py-2 sm:px-4 rounded-full text-sm font-semibold hover:brightness-95 transition sm:text-base no-underline"
+            class="inline-flex items-center justify-center bg-[var(--secondary)] text-[var(--text-light)] px-3 py-2 sm:px-4 rounded-full text-sm font-semibold hover:brightness-95 transition sm:text-base no-underline"
             aria-label="Create new review"
           >
             + New Review
@@ -191,6 +200,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
 })
 export class HeaderComponent implements OnDestroy {
   readonly site = inject(SiteConfigService);
+  readonly theme = inject(ThemeService);
   private readonly router = inject(Router);
 
   readonly mobileNavOpen = signal(false);
