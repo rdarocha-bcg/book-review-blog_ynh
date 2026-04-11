@@ -27,13 +27,11 @@ In **Cursor/VS Code**: open the folder from the Windows path (e.g. `C:\Users\...
 ## 📁 Project Structure
 
 ### Core Layer (`src/app/core/`)
-Services and guards for cross-cutting concerns:
+Services for cross-cutting concerns:
 - **ApiService**: All HTTP requests
-- **AuthService**: Authentication state and operations
 - **StorageService**: localStorage wrapper
 - **NotificationService**: Toast notifications
-- **ErrorInterceptor**: Global error handling
-- **AuthGuard**: Route protection
+- **ErrorInterceptor**: Global error handling (logging only)
 
 ### Shared Layer (`src/app/shared/`)
 Reusable components and pages:
@@ -41,11 +39,9 @@ Reusable components and pages:
 - **Pages**: 404, 500, 401 error pages
 
 ### Features Layer (`src/app/features/`)
-Feature-specific modules:
+Feature-specific areas:
 - **reviews/**: Book review CRUD
-- **auth/**: Login and registration
-- **blog/**: Blog pages
-- **admin/**: Admin dashboard (WIP)
+- **admin/**: Moderation and statistics
 
 ---
 
@@ -173,29 +169,9 @@ ngOnDestroy(): void {
 
 ---
 
-## 🔐 Authentication
+## 🔐 Access control
 
-### Protected Routes
-
-```typescript
-// In your routes
-{
-  path: 'admin',
-  canActivate: [AuthGuard],
-  loadComponent: () => AdminComponent,
-}
-```
-
-### Check Authentication in Component
-
-```typescript
-isAuthenticated$ = this.authService.isAuthenticated();
-currentUser$ = this.authService.getCurrentUser$();
-
-// In template
-<div *ngIf="isAuthenticated$ | async">Logged in</div>
-<button *ngIf="!(isAuthenticated$ | async)" routerLink="/login">Login</button>
-```
+The UI is aimed at a single operator. Sign-in is not implemented in the Angular app; use YunoHost SSO or your reverse proxy to protect the site and API if the instance is exposed.
 
 ---
 

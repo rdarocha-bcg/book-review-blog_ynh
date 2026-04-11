@@ -46,7 +46,5 @@ All require `role === admin'` (from `ADMIN_USERNAMES`).
 
 ## Angular impact
 
-- `AuthService` loads session via `GET /api/auth/me` on startup and after navigation; no `localStorage` tokens.
-- `ApiService` sends `withCredentials: true` on all requests.
-- Logout redirects to `environment.ssoLogoutUrl` (YunoHost SSO logout URL).
-- Login / Register routes show instructions or redirect to the portal URL (`environment.ssoLoginUrl`).
+- The SPA does not call `GET /api/auth/me` on startup or expose login/logout/register UI; identity is enforced by YunoHost / nginx in front of the app.
+- `ApiService` still sends `withCredentials: true` on all requests so cookies reach the API when the host is SSO-protected.

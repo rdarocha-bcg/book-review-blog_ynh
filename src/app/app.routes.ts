@@ -40,34 +40,9 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'auth',
-    loadChildren: () =>
-      import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
-  },
-  {
-    path: 'login',
-    redirectTo: '/auth/login',
-    pathMatch: 'full',
-  },
-  {
-    path: 'register',
-    redirectTo: '/auth/register',
-    pathMatch: 'full',
-  },
-  {
-    path: 'forgot-password',
-    redirectTo: '/auth/forgot-password',
-    pathMatch: 'full',
-  },
-  {
     path: 'admin',
     loadChildren: () =>
       import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
-  },
-  {
-    path: 'blog',
-    loadChildren: () =>
-      import('./features/blog/blog.routes').then((m) => m.BLOG_ROUTES),
   },
   {
     path: '404',
@@ -84,4 +59,3 @@ export const routes: Routes = [
       ),
   },
 ];
-

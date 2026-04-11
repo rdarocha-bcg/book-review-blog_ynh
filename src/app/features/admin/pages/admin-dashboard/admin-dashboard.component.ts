@@ -1,67 +1,49 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 /**
- * Admin Dashboard Component
- * Overview and quick links for admin actions
+ * Admin hub: moderation and stats only (single-operator setup).
  */
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   template: `
     <div class="page-container page-container--tight-y">
-      <h1 class="text-4xl font-bold mb-2">Admin Dashboard</h1>
-      <p class="text-gray-600 mb-8">Manage reviews, users, and content.</p>
+      <h1 class="mb-2 text-3xl font-bold text-[var(--primary)]">Admin</h1>
+      <p class="mb-8 text-[var(--text-muted)]">Tools for managing reviews.</p>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
         <a
           routerLink="/reviews/new"
-          class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition border border-slate-200"
+          class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
         >
-          <span class="text-3xl mb-3 block">📝</span>
-          <h2 class="text-xl font-semibold mb-2">Create Review</h2>
-          <p class="text-sm text-gray-600">Add a new book review.</p>
+          <h2 class="mb-1 font-semibold text-[var(--primary)]">New review</h2>
+          <p class="text-sm text-[var(--text-muted)]">Create a review.</p>
         </a>
 
         <a
           routerLink="/"
-          class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition border border-slate-200"
+          class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
         >
-          <span class="text-3xl mb-3 block">📚</span>
-          <h2 class="text-xl font-semibold mb-2">All Reviews</h2>
-          <p class="text-sm text-gray-600">View and manage all reviews.</p>
-        </a>
-
-        <a
-          routerLink="/admin/users"
-          class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition border border-slate-200"
-          aria-label="User Management"
-        >
-          <span class="text-3xl mb-3 block">👥</span>
-          <h2 class="text-xl font-semibold mb-2">User Management</h2>
-          <p class="text-sm text-gray-600">View and manage users.</p>
+          <h2 class="mb-1 font-semibold text-[var(--primary)]">All reviews</h2>
+          <p class="text-sm text-[var(--text-muted)]">Browse the list.</p>
         </a>
 
         <a
           routerLink="/admin/moderation"
-          class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition border border-slate-200"
-          aria-label="Review Moderation"
+          class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
         >
-          <span class="text-3xl mb-3 block">✓</span>
-          <h2 class="text-xl font-semibold mb-2">Moderation</h2>
-          <p class="text-sm text-gray-600">Approve or reject pending reviews.</p>
+          <h2 class="mb-1 font-semibold text-[var(--primary)]">Moderation</h2>
+          <p class="text-sm text-[var(--text-muted)]">Pending reviews.</p>
         </a>
 
         <a
           routerLink="/admin/stats"
-          class="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition border border-slate-200"
-          aria-label="Statistics"
+          class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
         >
-          <span class="text-3xl mb-3 block">📊</span>
-          <h2 class="text-xl font-semibold mb-2">Statistics</h2>
-          <p class="text-sm text-gray-600">Overview and analytics.</p>
+          <h2 class="mb-1 font-semibold text-[var(--primary)]">Statistics</h2>
+          <p class="text-sm text-[var(--text-muted)]">Overview.</p>
         </a>
       </div>
     </div>
@@ -69,4 +51,3 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminDashboardComponent {}
-

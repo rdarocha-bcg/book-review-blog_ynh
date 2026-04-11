@@ -5,6 +5,4 @@
 export const environment = {
   production: true,
   apiUrl: '__API_PATH__',
-  ssoLoginUrl: 'https://__DOMAIN__/yunohost/sso/',
-  ssoLogoutUrl: 'https://__DOMAIN__/yunohost/sso/?action=logout',
 };
