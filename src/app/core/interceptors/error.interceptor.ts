@@ -14,18 +14,20 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
-        notifications.warning('Session expired — please sign in from the server portal.');
-        router.navigate(['/401']);
-      }
-      if (error.status === 403) {
-        notifications.warning('You do not have permission to perform this action.');
-      }
-      if (error.status === 404) {
-        console.error('Resource not found');
-      }
-      if (error.status === 500) {
-        notifications.error('A server error occurred. Please try again later.');
+      switch (error.status) {
+        case 401:
+          notifications.warning('Session expired — please sign in from the server portal.');
+          router.navigate(['/401']);
+          break;
+        case 403:
+          notifications.warning('You do not have permission to perform this action.');
+          break;
+        case 404:
+          console.error('Resource not found');
+          break;
+        case 500:
+          notifications.error('A server error occurred. Please try again later.');
+          break;
       }
       return throwError(() => error);
     }),
