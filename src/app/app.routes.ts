@@ -45,6 +45,13 @@ export const routes: Routes = [
       import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
   },
   {
+    path: '401',
+    loadComponent: () =>
+      import('./shared/pages/unauthorized/unauthorized.component').then(
+        (m) => m.UnauthorizedComponent
+      ),
+  },
+  {
     path: '404',
     loadComponent: () =>
       import('./shared/pages/not-found/not-found.component').then(
