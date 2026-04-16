@@ -8,8 +8,5 @@
 export const environment = {
   production: false,
   apiUrl: '/api',
-  /** YunoHost user portal — used for login / logout redirects in production. */
-  ssoLoginUrl: 'https://localhost/yunohost/sso/',
-  ssoLogoutUrl: 'https://localhost/yunohost/sso/?action=logout',
 };
 

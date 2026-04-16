@@ -1,43 +1,35 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
+import { NotificationService } from '@core/services/notification.service';
 
 /**
  * HTTP Error Interceptor
- * Handles HTTP errors globally
+ * Handles HTTP errors globally (no in-app login flow; auth is outside this UI).
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
+  const notifications = inject(NotificationService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Handle 401 Unauthorized
-      if (error.status === 401) {
-        router.navigate(['/auth/login']);
-        console.error('Unauthorized: Please login');
+      switch (error.status) {
+        case 401:
+          notifications.warning('Session expired — please sign in from the server portal.');
+          router.navigate(['/401']);
+          break;
+        case 403:
+          notifications.warning('You do not have permission to perform this action.');
+          break;
+        case 404:
+          console.error('Resource not found');
+          break;
+        case 500:
+          notifications.error('A server error occurred. Please try again later.');
+          break;
       }
-
-      // Handle 403 Forbidden
-      if (error.status === 403) {
-        console.error('Access denied');
-      }
-
-      // Handle 404 Not Found
-      if (error.status === 404) {
-        console.error('Resource not found');
-      }
-
-      // Handle 500 Server Error
-      if (error.status === 500) {
-        console.error('Server error occurred');
-      }
-
-      // Log error
-      console.error('HTTP Error:', error);
-
       return throwError(() => error);
-    })
+    }),
   );
 };
-

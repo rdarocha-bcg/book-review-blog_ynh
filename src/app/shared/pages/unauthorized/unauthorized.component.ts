@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 /**
- * 401 Unauthorized Component
+ * 401 — session is managed outside this app (e.g. YunoHost portal).
  */
 @Component({
   selector: 'app-unauthorized',
@@ -10,28 +10,19 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <section class="container mx-auto px-4 py-12 text-center" aria-labelledby="unauthorized-heading">
-      <div class="max-w-md mx-auto">
-        <h1 id="unauthorized-heading" class="text-6xl font-bold text-red-600 mb-4">401</h1>
-        <h2 class="text-3xl font-bold mb-4">Unauthorized</h2>
-        <p class="text-lg text-gray-600 mb-8">
-          You need to be logged in to access this page.
+      <div class="mx-auto max-w-md">
+        <h1 id="unauthorized-heading" class="mb-2 text-4xl font-bold text-[var(--primary)]">401</h1>
+        <h2 class="mb-4 text-xl font-semibold text-[var(--text-dark)]">Unauthorized</h2>
+        <p class="mb-8 text-[var(--text-muted)]">
+          Sign in from your server user portal if this site is protected, then try again.
         </p>
-        <div class="space-x-4">
-          <a
-            routerLink="/login"
-            class="bg-[var(--accent)] text-[var(--primary)] px-6 py-3 rounded font-semibold hover:brightness-95 transition inline-block"
-            aria-label="Go to login page"
-          >
-            Login
-          </a>
-          <a
-            routerLink="/"
-            class="bg-slate-500 text-white px-6 py-3 rounded font-semibold hover:bg-slate-600 transition inline-block"
-            aria-label="Go to home page"
-          >
-            Go Home
-          </a>
-        </div>
+        <a
+          routerLink="/"
+          class="inline-block rounded-full bg-[var(--secondary)] px-6 py-3 font-semibold text-white hover:brightness-95"
+          aria-label="Go to home page"
+        >
+          Home
+        </a>
       </div>
     </section>
   `,

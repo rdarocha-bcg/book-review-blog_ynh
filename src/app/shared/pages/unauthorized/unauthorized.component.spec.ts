@@ -20,11 +20,10 @@ describe('UnauthorizedComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display 401 and Unauthorized with login link', () => {
+  it('should display 401 and Unauthorized with home link', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('401');
     expect(el.textContent).toContain('Unauthorized');
-    expect(el.querySelector('a[routerLink="/login"]')).toBeTruthy();
     expect(el.querySelector('a[routerLink="/"]')).toBeTruthy();
   });
 });

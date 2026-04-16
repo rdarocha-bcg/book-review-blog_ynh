@@ -34,16 +34,12 @@ import { debounceTime } from 'rxjs/operators';
   ],
   template: `
     <div class="page-container">
-      <div class="mb-8">
-        <h1 class="text-4xl font-bold mb-2 text-[var(--primary)] luxe-title">Book Reviews</h1>
-        <p class="text-[var(--text-muted)]">
-          Explore stylish, curated reviews in a clean Pinterest-inspired layout.
-        </p>
+      <div class="mb-6">
+        <h1 class="mb-1 text-3xl font-bold text-[var(--primary)]">Reviews</h1>
       </div>
 
-      <!-- Filters -->
-      <div class="mb-8 pinterest-panel p-6">
-        <h2 class="text-xl font-semibold mb-4 text-[var(--primary)] luxe-title">Filters</h2>
+      <div class="mb-6 pinterest-panel p-4 md:p-5">
+        <h2 class="mb-3 text-lg font-semibold text-[var(--primary)]">Search &amp; filters</h2>
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <input
             type="text"
@@ -141,9 +137,7 @@ import { debounceTime } from 'rxjs/operators';
               <span class="text-[var(--accent-strong)] font-semibold">★ {{ review.rating }}/5</span>
             </div>
             <p class="text-sm text-[var(--text-dark)] line-clamp-3 mb-3">{{ review.description }}</p>
-            <span class="font-semibold text-[var(--accent-strong)] group-hover:text-[var(--primary)]">
-              Read full review →
-            </span>
+            <span class="font-semibold text-[var(--accent-strong)] group-hover:text-[var(--primary)]">Open →</span>
           </a>
         </app-card>
         </div>

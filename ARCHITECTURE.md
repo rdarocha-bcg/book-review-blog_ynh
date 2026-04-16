@@ -5,11 +5,11 @@ This project is a modern Angular application for publishing and consulting book 
 
 ## Implementation Summary
 
-- **Angular**: Standalone components and directives; no NgModules for features. `app.config.ts` provides `provideHttpClient`, `provideRouter`, `provideAnimations`, and HTTP interceptors (`authInterceptor`, `errorInterceptor`).
-- **Routing**: Root routes in `app.routes.ts`; feature routes lazy-loaded (`reviews`, `blog`, `admin`, `auth`). Admin routes protected by `AuthGuard`. Catch-all `**` maps to `NotFoundComponent`.
-- **Core**: `ApiService` (HTTP wrapper), `AuthService` (login, register, logout, token/user state), `StorageService` (localStorage), `NotificationService` (toasts). Interceptors: attach JWT (`auth.interceptor.ts`), global HTTP error handling (`error.interceptor.ts`). Guards: `AuthGuard`, `RoleGuard`.
+- **Angular**: Standalone components and directives; no NgModules for features. `app.config.ts` provides `provideHttpClient`, `provideRouter`, `provideAnimations`, and `errorInterceptor` for global HTTP errors.
+- **Routing**: Root routes in `app.routes.ts`; feature routes lazy-loaded (`reviews`, `admin`). No in-app auth routes; access control is expected at the reverse proxy / YunoHost layer for single-operator use. Catch-all `**` maps to `NotFoundComponent`.
+- **Core**: `ApiService` (HTTP wrapper), `StorageService` (localStorage), `NotificationService` (toasts), `SiteConfigService`, `ThemeService`. Interceptor: `error.interceptor.ts` (log errors; no login redirect).
 - **Shared**: Reusable UI components (Header, Footer, Button, Card, LoadingSpinner, Pagination, Notification, form controls). Shared pages: NotFound, Unauthorized, Error.
-- **Features**: **Reviews** (list with pagination/filters/sort, detail, create/edit form, `ReviewService` with CRUD and state); **Auth** (login, register, password reset); **Admin** (dashboard, user management, moderation, statistics); **Blog** (home, about, contact, contribution guide).
+- **Features**: **Reviews** (list with pagination/filters/sort, detail, create/edit form, `ReviewService` with CRUD and state); **Admin** (dashboard, moderation, statistics).
 - **Styling**: Tailwind CSS; custom palette and animations in `tailwind.config.js`; global styles in `styles.scss`.
 - **Environment**: `environment.ts` / `environment.prod.ts` for API base URL and configuration.
 
@@ -20,14 +20,12 @@ src/
 ├── app/
 │   ├── core/                          # Singleton services, guards, interceptors
 │   │   ├── services/
-│   │   │   ├── auth.service.ts
 │   │   │   ├── api.service.ts
 │   │   │   └── storage.service.ts
 │   │   ├── guards/
-│   │   │   ├── auth.guard.ts
-│   │   │   └── can-deactivate.guard.ts
+│   │   │   └── (route guards optional per deployment)
 │   │   ├── interceptors/
-│   │   │   └── http-error.interceptor.ts
+│   │   │   └── error.interceptor.ts
 │   │   └── core.module.ts
 │   │
 │   ├── shared/                        # Reusable components, directives, pipes
@@ -153,11 +151,6 @@ Feature modules are lazy-loaded via routing to optimize performance.
 
 ## Service Architecture
 
-### AuthService (Core)
-- Authentication
-- Token management
-- Permission verification
-
 ### ReviewService (Reviews Feature)
 - Retrieve reviews
 - CRUD operations on reviews
@@ -203,8 +196,8 @@ Feature modules are lazy-loaded via routing to optimize performance.
 
 - **No NgModules**: The app uses standalone components only. Each feature exposes routes via `loadChildren` / `loadComponent` returning dynamic imports.
 - **Path aliases**: `@core/*`, `@shared/*`, `@features/*`, `@environments/*` in `tsconfig.json` for cleaner imports.
-- **Guards**: `AuthGuard` checks `AuthService.isAuthenticatedSync()` and redirects to `/auth/login`. `RoleGuard` reads `route.data['roles']` and `AuthService.getCurrentUser().role`; redirects to `/` if role not allowed.
-- **Interceptors**: `auth.interceptor.ts` attaches `Authorization: Bearer <token>` when token exists. `error.interceptor.ts` handles 401 (redirect login), 403/404/500 (log).
+- **Guards**: None in the SPA; protect `/admin` and write operations at the server or SSO layer if needed.
+- **Interceptors**: `error.interceptor.ts` logs 401/403/404/500 without navigating to a login page.
 - **ReviewService**: Uses `ApiService.get/post/put/delete`; maintains `reviews$`, `selectedReview$`, `loading$`; `getReviews()` uses `retry(2)` and returns empty pagination on error.
 
 ## Deployment
