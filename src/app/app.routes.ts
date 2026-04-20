@@ -40,6 +40,39 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'academics',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/academics/pages/academic-list/academic-list.component').then(
+            (m) => m.AcademicListComponent
+          ),
+      },
+      {
+        path: 'new',
+        loadComponent: () =>
+          import('./features/academics/pages/academic-form/academic-form.component').then(
+            (m) => m.AcademicFormComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/academics/pages/academic-detail/academic-detail.component').then(
+            (m) => m.AcademicDetailComponent
+          ),
+      },
+      {
+        path: ':id/edit',
+        loadComponent: () =>
+          import('./features/academics/pages/academic-form/academic-form.component').then(
+            (m) => m.AcademicFormComponent
+          ),
+      },
+    ],
+  },
+  {
     path: 'admin',
     loadChildren: () =>
       import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),

@@ -31,6 +31,8 @@ export interface AcademicFilter {
   theme?: string;
   published?: boolean;
   featured?: boolean;
+  search?: string;
+  sort?: 'newest' | 'oldest';
   page?: number;
   limit?: number;
 }

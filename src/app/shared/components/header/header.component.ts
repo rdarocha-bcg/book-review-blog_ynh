@@ -61,6 +61,11 @@ import { filter, Subject, takeUntil } from 'rxjs';
               >
             </li>
             <li>
+              <a routerLink="/academics" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+                >Académiques</a
+              >
+            </li>
+            <li>
               <a routerLink="/admin" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
                 >Admin</a
               >
@@ -98,6 +103,14 @@ import { filter, Subject, takeUntil } from 'rxjs';
                 class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                 (click)="closeMobileNav()"
                 >New review</a
+              >
+            </li>
+            <li>
+              <a
+                routerLink="/academics"
+                class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+                (click)="closeMobileNav()"
+                >Académiques</a
               >
             </li>
             <li>

@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { DbPool } from './db.js';
 import { isAppAdmin, readYnhIdentity, type YnhIdentity } from './sso.js';
 import { rowToReview, type ReviewRow } from './review-mapper.js';
+import { rowToAcademic, type AcademicRow } from './academic-mapper.js';
 import { randomUUID } from 'node:crypto';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 
@@ -292,6 +293,222 @@ export async function registerRoutes(app: FastifyInstance, pool: DbPool): Promis
           return reply.code(403).send({ error: 'Forbidden' });
         }
         await pool.execute('DELETE FROM reviews WHERE id = ?', [id]);
+        return reply.code(204).send();
+      });
+
+      r.get('/academics', async (req, reply) => {
+        const q = req.query as Record<string, string | undefined>;
+        const page = Math.max(1, parseInt(q.page ?? '1', 10) || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(q.limit ?? '10', 10) || 10));
+        const offset = (page - 1) * limit;
+        const identity = readYnhIdentity(req);
+        const includeDrafts = parseBool(q.includeDrafts);
+        const admin = identity ? isAppAdmin(identity.uid) : false;
+
+        const where: string[] = [];
+        const params: unknown[] = [];
+
+        if (!identity || !includeDrafts) {
+          where.push('is_published = 1');
+        } else if (admin) {
+          // all academics
+        } else {
+          where.push('(is_published = 1 OR created_by = ?)');
+          params.push(identity.uid);
+        }
+
+        if (q.workType) {
+          where.push('work_type = ?');
+          params.push(q.workType);
+        }
+        if (q.theme) {
+          where.push('theme = ?');
+          params.push(q.theme);
+        }
+        if (q.search) {
+          where.push('(title LIKE ? OR summary LIKE ? OR content LIKE ?)');
+          const s = `%${q.search}%`;
+          params.push(s, s, s);
+        }
+
+        const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+        const sort = q.sort ?? 'newest';
+        const orderBy =
+          sort === 'oldest'
+            ? 'published_at ASC'
+            : sort === 'year-high'
+              ? 'year DESC, published_at DESC'
+              : sort === 'year-low'
+                ? 'year ASC, published_at DESC'
+                : 'published_at DESC';
+
+        const countSql = `SELECT COUNT(*) AS c FROM academics ${whereSql}`;
+        const [countRows] = await pool.query<RowDataPacket[]>(countSql, params);
+        const total = Number((countRows[0] as { c: number }).c) || 0;
+
+        const dataSql = `SELECT * FROM academics ${whereSql} ORDER BY ${orderBy} LIMIT ? OFFSET ?`;
+        const [rows] = await pool.query<AcademicRow[]>(dataSql, [...params, limit, offset]);
+        const data = rows.map(rowToAcademic);
+        const totalPages = Math.ceil(total / limit) || 1;
+
+        return { data, total, page, limit, totalPages };
+      });
+
+      r.get<{ Params: { id: string } }>('/academics/:id', async (req, reply) => {
+        const { id } = req.params;
+        const [rows] = await pool.query<AcademicRow[]>('SELECT * FROM academics WHERE id = ?', [id]);
+        if (!rows.length) {
+          return reply.code(404).send({ error: 'Not found' });
+        }
+        const row = rows[0]!;
+        const identity = readYnhIdentity(req);
+        const admin = identity ? isAppAdmin(identity.uid) : false;
+        const published = Boolean(row.is_published);
+        if (!published) {
+          if (!identity || (row.created_by !== identity.uid && !admin)) {
+            return reply.code(404).send({ error: 'Not found' });
+          }
+        }
+        return rowToAcademic(row);
+      });
+
+      r.post('/academics', async (req, reply) => {
+        const identity = requireUser(req, reply);
+        if (!identity) return;
+        const body = req.body as Record<string, unknown>;
+        const now = new Date();
+        const id = randomUUID();
+        const title = String(body.title ?? '');
+        const summary = String(body.summary ?? '');
+        const workType = String(body.workType ?? '');
+        const content = body.content != null ? String(body.content) : null;
+        const imageUrl = body.imageUrl != null ? String(body.imageUrl) : null;
+        const context = body.context != null ? String(body.context) : null;
+        const year = body.year != null ? Number(body.year) : null;
+        const theme = body.theme != null ? String(body.theme) : null;
+        const excerpt = body.excerpt != null ? String(body.excerpt) : null;
+        const sourceUrl = body.sourceUrl != null ? String(body.sourceUrl) : null;
+        const isPublished = Boolean(body.isPublished);
+        const featured = Boolean(body.featured);
+
+        if (!title || !summary || !workType) {
+          return reply.code(400).send({ error: 'Validation failed' });
+        }
+
+        await pool.execute(
+          `INSERT INTO academics (
+            id, title, summary, content, image_url, work_type, context, year, theme,
+            excerpt, source_url, published_at, updated_at, created_by, is_published, featured
+          ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          [
+            id, title, summary, content, imageUrl, workType, context, year, theme,
+            excerpt, sourceUrl, now, now, identity.uid, isPublished ? 1 : 0, featured ? 1 : 0,
+          ],
+        );
+
+        const [created] = await pool.query<AcademicRow[]>('SELECT * FROM academics WHERE id = ?', [id]);
+        return rowToAcademic(created[0]!);
+      });
+
+      r.put<{ Params: { id: string } }>('/academics/:id', async (req, reply) => {
+        const identity = requireUser(req, reply);
+        if (!identity) return;
+        const { id } = req.params;
+        const [existing] = await pool.query<AcademicRow[]>('SELECT * FROM academics WHERE id = ?', [id]);
+        if (!existing.length) {
+          return reply.code(404).send({ error: 'Not found' });
+        }
+        const row = existing[0]!;
+        const admin = isAppAdmin(identity.uid);
+        if (row.created_by !== identity.uid && !admin) {
+          return reply.code(403).send({ error: 'Forbidden' });
+        }
+
+        const body = req.body as Record<string, unknown>;
+        const title = body.title != null ? String(body.title) : row.title;
+        const summary = body.summary != null ? String(body.summary) : row.summary;
+        const workType = body.workType != null ? String(body.workType) : row.work_type;
+        const content = body.content !== undefined
+          ? (body.content === null ? null : String(body.content))
+          : row.content;
+        const imageUrl = body.imageUrl !== undefined
+          ? (body.imageUrl === null || body.imageUrl === '' ? null : String(body.imageUrl))
+          : row.image_url;
+        const context = body.context !== undefined
+          ? (body.context === null ? null : String(body.context))
+          : row.context;
+        const year = body.year !== undefined
+          ? (body.year === null ? null : Number(body.year))
+          : row.year;
+        const theme = body.theme !== undefined
+          ? (body.theme === null ? null : String(body.theme))
+          : row.theme;
+        const excerpt = body.excerpt !== undefined
+          ? (body.excerpt === null ? null : String(body.excerpt))
+          : row.excerpt;
+        const sourceUrl = body.sourceUrl !== undefined
+          ? (body.sourceUrl === null || body.sourceUrl === '' ? null : String(body.sourceUrl))
+          : row.source_url;
+        const isPublished = body.isPublished !== undefined ? Boolean(body.isPublished) : Boolean(row.is_published);
+        const featured = body.featured !== undefined ? Boolean(body.featured) : Boolean(row.featured);
+
+        const now = new Date();
+        await pool.execute(
+          `UPDATE academics SET
+            title=?, summary=?, content=?, image_url=?, work_type=?, context=?, year=?, theme=?,
+            excerpt=?, source_url=?, updated_at=?, is_published=?, featured=?
+          WHERE id=?`,
+          [title, summary, content, imageUrl, workType, context, year, theme,
+           excerpt, sourceUrl, now, isPublished ? 1 : 0, featured ? 1 : 0, id],
+        );
+
+        const [updated] = await pool.query<AcademicRow[]>('SELECT * FROM academics WHERE id = ?', [id]);
+        return rowToAcademic(updated[0]!);
+      });
+
+      r.delete<{ Params: { id: string } }>('/academics/:id', async (req, reply) => {
+        if (!requireAdmin(req, reply)) return;
+        const { id } = req.params;
+        const [res] = await pool.execute<ResultSetHeader>('DELETE FROM academics WHERE id = ?', [id]);
+        if (!res.affectedRows) {
+          return reply.code(404).send({ error: 'Not found' });
+        }
+        return reply.code(204).send();
+      });
+
+      r.get('/admin/academics', async (req, reply) => {
+        if (!requireAdmin(req, reply)) return;
+        const [rows] = await pool.query<AcademicRow[]>(
+          'SELECT * FROM academics ORDER BY updated_at DESC',
+        );
+        return rows.map(rowToAcademic);
+      });
+
+      r.patch<{ Params: { id: string } }>('/admin/academics/:id/publish', async (req, reply) => {
+        if (!requireAdmin(req, reply)) return;
+        const { id } = req.params;
+        const body = (req.body as { isPublished?: boolean }) ?? {};
+        const isPublished = Boolean(body.isPublished);
+        const [existing] = await pool.query<AcademicRow[]>('SELECT * FROM academics WHERE id = ?', [id]);
+        if (!existing.length) {
+          return reply.code(404).send({ error: 'Not found' });
+        }
+        await pool.execute('UPDATE academics SET is_published = ?, updated_at = ? WHERE id = ?', [
+          isPublished ? 1 : 0,
+          new Date(),
+          id,
+        ]);
+        const [updated] = await pool.query<AcademicRow[]>('SELECT * FROM academics WHERE id = ?', [id]);
+        return rowToAcademic(updated[0]!);
+      });
+
+      r.delete<{ Params: { id: string } }>('/admin/academics/:id', async (req, reply) => {
+        if (!requireAdmin(req, reply)) return;
+        const { id } = req.params;
+        const [res] = await pool.execute<ResultSetHeader>('DELETE FROM academics WHERE id = ?', [id]);
+        if (!res.affectedRows) {
+          return reply.code(404).send({ error: 'Not found' });
+        }
         return reply.code(204).send();
       });
 

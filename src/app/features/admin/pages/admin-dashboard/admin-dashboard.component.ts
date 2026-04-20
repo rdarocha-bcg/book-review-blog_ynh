@@ -45,6 +45,22 @@ import { RouterLink } from '@angular/router';
           <h2 class="mb-1 font-semibold text-[var(--primary)]">Statistics</h2>
           <p class="text-sm text-[var(--text-muted)]">Overview.</p>
         </a>
+
+        <a
+          routerLink="/academics/new"
+          class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
+        >
+          <h2 class="mb-1 font-semibold text-[var(--primary)]">Nouvel académique</h2>
+          <p class="text-sm text-[var(--text-muted)]">Créer un travail académique.</p>
+        </a>
+
+        <a
+          routerLink="/admin/academics"
+          class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
+        >
+          <h2 class="mb-1 font-semibold text-[var(--primary)]">Tous les académiques</h2>
+          <p class="text-sm text-[var(--text-muted)]">Gérer les travaux académiques.</p>
+        </a>
       </div>
     </div>
   `,

@@ -22,4 +22,11 @@ export const ADMIN_ROUTES: Routes = [
         (m) => m.StatisticsComponent
       ),
   },
+  {
+    path: 'academics',
+    loadComponent: () =>
+      import('./pages/admin-academics/admin-academics.component').then(
+        (m) => m.AdminAcademicsComponent
+      ),
+  },
 ];
