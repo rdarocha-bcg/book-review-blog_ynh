@@ -1,5 +1,36 @@
-/** Academic Work Model */\nexport interface AcademicWork {\n  id: string;\n  title: string;\n  summary: string;\n  content: string;\n  imageUrl?: string;\n  workType: string;\n  context: string;\n  year: number;\n  theme: string;\n  excerpt?: string;\n  sourceUrl?: string;\n  publishedAt: Date;\n  updatedAt: Date;\n  createdBy: string;\n  isPublished: boolean;\n  featured?: boolean;\n}\n\nexport interface AcademicPaginationResponse {\n  data: AcademicWork[];\n  total: number;\n  page: number;\n  limit: number;\n  totalPages: number;\n}\n\nexport interface AcademicFilter {\n  workType?: string;\n  theme?: string;\n  published?: boolean;\n  featured?: boolean;\n  page?: number;\n  limit?: number;\n}"} 
-</xai:function_call]
+/** Academic Work Model */
+export interface AcademicWork {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  imageUrl?: string;
+  workType: string;
+  context: string;
+  year: number;
+  theme: string;
+  excerpt?: string;
+  sourceUrl?: string;
+  publishedAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  isPublished: boolean;
+  featured?: boolean;
+}
 
-<xai:function_call name="write">
-<parameter name="path">book_review_refonte/src/app/features/academics/services/academic.service.ts
+export interface AcademicPaginationResponse {
+  data: AcademicWork[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface AcademicFilter {
+  workType?: string;
+  theme?: string;
+  published?: boolean;
+  featured?: boolean;
+  page?: number;
+  limit?: number;
+}
