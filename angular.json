@@ -29,7 +29,13 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/manifest.webmanifest",
+              {
+                "glob": "**/*",
+                "input": "src/assets/icons",
+                "output": "assets/icons"
+              }
             ],
             "styles": [
               "src/styles.scss"

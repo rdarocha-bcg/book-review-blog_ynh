@@ -1,0 +1,14 @@
+{
+  "name": "Book Review Blog",
+  "short_name": "LitCritiques",
+  "description": "Critiques littéraires et travaux académiques",
+  "start_url": "/blog/",
+  "display": "standalone",
+  "background_color": "#fff8fc",
+  "theme_color": "#7a365f",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
