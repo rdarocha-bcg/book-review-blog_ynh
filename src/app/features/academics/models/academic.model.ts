@@ -1,0 +1,5 @@
+/** Academic Work Model */\nexport interface AcademicWork {\n  id: string;\n  title: string;\n  summary: string;\n  content: string;\n  imageUrl?: string;\n  workType: string;\n  context: string;\n  year: number;\n  theme: string;\n  excerpt?: string;\n  sourceUrl?: string;\n  publishedAt: Date;\n  updatedAt: Date;\n  createdBy: string;\n  isPublished: boolean;\n  featured?: boolean;\n}\n\nexport interface AcademicPaginationResponse {\n  data: AcademicWork[];\n  total: number;\n  page: number;\n  limit: number;\n  totalPages: number;\n}\n\nexport interface AcademicFilter {\n  workType?: string;\n  theme?: string;\n  published?: boolean;\n  featured?: boolean;\n  page?: number;\n  limit?: number;\n}"} 
+</xai:function_call]
+
+<xai:function_call name="write">
+<parameter name="path">book_review_refonte/src/app/features/academics/services/academic.service.ts

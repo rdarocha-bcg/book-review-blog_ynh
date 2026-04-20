@@ -3,6 +3,7 @@
  * Represents a book review
  */
 export interface Review {
+  featured?: boolean;
   id: string;
   title: string;
   author: string;
