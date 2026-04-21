@@ -105,6 +105,10 @@ export async function registerRoutes(app: FastifyInstance, pool: DbPool): Promis
           params.push(identity.uid);
         }
 
+        if (q.featured === 'true') {
+          where.push('featured = 1');
+        }
+
         if (q.genre) {
           where.push('genre = ?');
           params.push(q.genre);
@@ -315,6 +319,10 @@ export async function registerRoutes(app: FastifyInstance, pool: DbPool): Promis
         } else {
           where.push('(is_published = 1 OR created_by = ?)');
           params.push(identity.uid);
+        }
+
+        if (q.featured === 'true') {
+          where.push('featured = 1');
         }
 
         if (q.workType) {

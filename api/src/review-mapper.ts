@@ -15,6 +15,7 @@ export type ReviewRow = RowDataPacket & {
   updated_at: Date;
   created_by: string;
   is_published: number | boolean;
+  featured: number | boolean;
 };
 
 export function rowToReview(row: ReviewRow) {
@@ -33,5 +34,6 @@ export function rowToReview(row: ReviewRow) {
     updatedAt: new Date(row.updated_at).toISOString(),
     createdBy: row.created_by,
     isPublished: Boolean(row.is_published),
+    featured: Boolean(row.featured),
   };
 }

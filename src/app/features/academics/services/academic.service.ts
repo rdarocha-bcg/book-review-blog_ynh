@@ -108,6 +108,7 @@ export class AcademicService {
       if (filters['search']) params['search'] = filters['search'];
       if (filters['page']) params['page'] = filters['page'];
       if (filters['limit']) params['limit'] = filters['limit'];
+      if (filters['featured'] === true) params['featured'] = true;
     }
 
     return params;

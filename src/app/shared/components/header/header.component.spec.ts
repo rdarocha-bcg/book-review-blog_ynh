@@ -27,10 +27,12 @@ describe('HeaderComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should show reviews, new review, and admin links', () => {
+  it('should show primary nav links: Accueil, Critiques, Travaux, À propos, Admin', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Reviews');
-    expect(el.textContent).toContain('New review');
+    expect(el.textContent).toContain('Accueil');
+    expect(el.textContent).toContain('Critiques');
+    expect(el.textContent).toContain('Travaux');
+    expect(el.textContent).toContain('À propos');
     expect(el.textContent).toContain('Admin');
   });
 

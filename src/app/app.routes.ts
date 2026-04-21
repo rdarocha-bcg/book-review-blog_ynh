@@ -3,14 +3,33 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
+    loadChildren: () =>
+      import('./features/home/home.routes').then((m) => m.HOME_ROUTES),
+  },
+  {
+    path: 'about',
     loadComponent: () =>
-      import('./features/reviews/pages/review-list/review-list.component').then(
-        (m) => m.ReviewListComponent
+      import('./features/blog/pages/about-page/about-page.component').then(
+        (m) => m.AboutPageComponent
+      ),
+  },
+  {
+    path: 'contact',
+    loadComponent: () =>
+      import('./features/blog/pages/contact-page/contact-page.component').then(
+        (m) => m.ContactPageComponent
       ),
   },
   {
     path: 'reviews',
     children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/reviews/pages/review-list/review-list.component').then(
+            (m) => m.ReviewListComponent
+          ),
+      },
       {
         path: 'new',
         loadComponent: () =>

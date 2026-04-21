@@ -53,16 +53,21 @@ import { filter, Subject, takeUntil } from 'rxjs';
           </button>
           <ul class="hidden gap-6 md:flex">
             <li>
-              <a routerLink="/" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]">Reviews</a>
+              <a routerLink="/" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]">Accueil</a>
             </li>
             <li>
-              <a routerLink="/reviews/new" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
-                >New review</a
+              <a routerLink="/reviews" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+                >Critiques</a
               >
             </li>
             <li>
               <a routerLink="/academics" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
-                >Académiques</a
+                >Travaux</a
+              >
+            </li>
+            <li>
+              <a routerLink="/about" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+                >À propos</a
               >
             </li>
             <li>
@@ -94,15 +99,15 @@ import { filter, Subject, takeUntil } from 'rxjs';
                 routerLink="/"
                 class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                 (click)="closeMobileNav()"
-                >Reviews</a
+                >Accueil</a
               >
             </li>
             <li>
               <a
-                routerLink="/reviews/new"
+                routerLink="/reviews"
                 class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                 (click)="closeMobileNav()"
-                >New review</a
+                >Critiques</a
               >
             </li>
             <li>
@@ -110,7 +115,15 @@ import { filter, Subject, takeUntil } from 'rxjs';
                 routerLink="/academics"
                 class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                 (click)="closeMobileNav()"
-                >Académiques</a
+                >Travaux</a
+              >
+            </li>
+            <li>
+              <a
+                routerLink="/about"
+                class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+                (click)="closeMobileNav()"
+                >À propos</a
               >
             </li>
             <li>

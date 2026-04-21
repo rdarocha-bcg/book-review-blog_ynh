@@ -28,6 +28,7 @@ export interface ReviewFilter {
   rating?: number;
   search?: string;
   author?: string;
+  featured?: boolean;
   sort?: 'newest' | 'oldest' | 'rating-high' | 'rating-low';
   page?: number;
   limit?: number;

@@ -133,6 +133,7 @@ export class ReviewService {
       if (filters['sort']) params['sort'] = filters['sort'];
       if (filters['page']) params['page'] = filters['page'];
       if (filters['limit']) params['limit'] = filters['limit'];
+      if (filters['featured'] === true) params['featured'] = true;
     }
 
     return params;
