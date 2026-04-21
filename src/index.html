@@ -8,26 +8,6 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#7a365f">
-  <script>
-    (function () {
-      try {
-        var key = "app-color-scheme";
-        var pref = localStorage.getItem(key);
-        var systemDark =
-          window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-        var dark = pref === "dark" || (pref !== "light" && systemDark);
-        var root = document.documentElement;
-        if (dark) {
-          root.classList.add("theme-dark");
-          root.style.colorScheme = "dark";
-        } else {
-          root.style.colorScheme = "light";
-        }
-      } catch (e) {
-        /* ignore */
-      }
-    })();
-  </script>
 </head>
 <body>
   <app-root></app-root>
