@@ -51,6 +51,7 @@ testem.js
 /.env.local
 api/.env
 api/dist/
+api/node_modules/
 
 # Local toolchain (e.g. portable Node from scripts/dev-windows.ps1)
 /.tools/
