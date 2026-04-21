@@ -8,7 +8,7 @@ export interface AcademicWork {
   workType: string;
   context: string;
   year: number;
-  theme: string;
+  theme?: string | null;
   excerpt?: string;
   sourceUrl?: string;
   publishedAt: Date;

@@ -9,13 +9,6 @@ export const ADMIN_ROUTES: Routes = [
       ),
   },
   {
-    path: 'moderation',
-    loadComponent: () =>
-      import('./pages/review-moderation/review-moderation.component').then(
-        (m) => m.ReviewModerationComponent
-      ),
-  },
-  {
     path: 'stats',
     loadComponent: () =>
       import('./pages/statistics/statistics.component').then(

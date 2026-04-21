@@ -1,0 +1,2 @@
+ALTER TABLE academics MODIFY COLUMN theme VARCHAR(100) DEFAULT NULL;
+UPDATE academics SET theme = NULL WHERE theme = '';

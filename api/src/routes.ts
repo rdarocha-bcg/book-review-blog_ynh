@@ -393,7 +393,7 @@ export async function registerRoutes(app: FastifyInstance, pool: DbPool): Promis
         const imageUrl = body.imageUrl != null ? String(body.imageUrl) : null;
         const context = body.context != null ? String(body.context) : null;
         const year = body.year != null ? Number(body.year) : null;
-        const theme = body.theme != null ? String(body.theme) : null;
+        const theme = body.theme ? String(body.theme) : null;
         const excerpt = body.excerpt != null ? String(body.excerpt) : null;
         const sourceUrl = body.sourceUrl != null ? String(body.sourceUrl) : null;
         const isPublished = Boolean(body.isPublished);
@@ -401,6 +401,9 @@ export async function registerRoutes(app: FastifyInstance, pool: DbPool): Promis
 
         if (!title || !summary || !workType) {
           return reply.code(400).send({ error: 'Validation failed' });
+        }
+        if (summary.length > 300) {
+          return reply.code(400).send({ error: 'Résumé trop long (max 300 caractères)' });
         }
 
         await pool.execute(
@@ -449,7 +452,7 @@ export async function registerRoutes(app: FastifyInstance, pool: DbPool): Promis
           ? (body.year === null ? null : Number(body.year))
           : row.year;
         const theme = body.theme !== undefined
-          ? (body.theme === null ? null : String(body.theme))
+          ? (body.theme === null || body.theme === '' ? null : String(body.theme))
           : row.theme;
         const excerpt = body.excerpt !== undefined
           ? (body.excerpt === null ? null : String(body.excerpt))
@@ -459,6 +462,10 @@ export async function registerRoutes(app: FastifyInstance, pool: DbPool): Promis
           : row.source_url;
         const isPublished = body.isPublished !== undefined ? Boolean(body.isPublished) : Boolean(row.is_published);
         const featured = body.featured !== undefined ? Boolean(body.featured) : Boolean(row.featured);
+
+        if (summary.length > 300) {
+          return reply.code(400).send({ error: 'Résumé trop long (max 300 caractères)' });
+        }
 
         const now = new Date();
         await pool.execute(

@@ -1,6 +1,9 @@
 import { APP_INITIALIZER, ApplicationConfig } from '@angular/core';
-import { APP_BASE_HREF } from '@angular/common';
+import { APP_BASE_HREF, registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
 import { provideRouter } from '@angular/router';
+
+registerLocaleData(localeFr);
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { firstValueFrom } from 'rxjs';

@@ -31,14 +31,6 @@ import { RouterLink } from '@angular/router';
         </a>
 
         <a
-          routerLink="/admin/moderation"
-          class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
-        >
-          <h2 class="mb-1 font-semibold text-[var(--primary)]">Moderation</h2>
-          <p class="text-sm text-[var(--text-muted)]">Pending reviews.</p>
-        </a>
-
-        <a
           routerLink="/admin/stats"
           class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
         >
@@ -50,7 +42,7 @@ import { RouterLink } from '@angular/router';
           routerLink="/academics/new"
           class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
         >
-          <h2 class="mb-1 font-semibold text-[var(--primary)]">Nouvel académique</h2>
+          <h2 class="mb-1 font-semibold text-[var(--primary)]">Nouveau travail académique</h2>
           <p class="text-sm text-[var(--text-muted)]">Créer un travail académique.</p>
         </a>
 

@@ -29,7 +29,7 @@ export function rowToAcademic(row: AcademicRow) {
     workType: row.work_type,
     context: row.context ?? undefined,
     year: row.year ?? undefined,
-    theme: row.theme ?? undefined,
+    theme: row.theme ?? null,
     excerpt: row.excerpt ?? undefined,
     sourceUrl: row.source_url ?? undefined,
     publishedAt: new Date(row.published_at).toISOString(),
