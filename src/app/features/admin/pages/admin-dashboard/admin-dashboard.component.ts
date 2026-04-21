@@ -34,8 +34,8 @@ import { RouterLink } from '@angular/router';
           routerLink="/admin/stats"
           class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
         >
-          <h2 class="mb-1 font-semibold text-[var(--primary)]">Statistics</h2>
-          <p class="text-sm text-[var(--text-muted)]">Overview.</p>
+          <h2 class="mb-1 font-semibold text-[var(--primary)]">Audience</h2>
+          <p class="text-sm text-[var(--text-muted)]">Statistiques de visite (Umami).</p>
         </a>
 
         <a
