@@ -20,7 +20,7 @@ import { Subject, takeUntil } from 'rxjs';
   template: `
     <div class="page-container">
       <h1 class="text-4xl md:text-5xl font-bold mb-8 text-[var(--primary)]">
-        {{ isEditMode ? 'Modifier le travail académique' : 'Nouveau travail académique' }}
+        {{ isEditMode ? 'Modifier le travail' : 'Nouveau travail académique' }}
       </h1>
 
       <div class="max-w-3xl pinterest-panel p-8 md:p-10">
@@ -51,7 +51,14 @@ import { Subject, takeUntil } from 'rxjs';
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               [attr.aria-invalid]="isFieldInvalid('summary')"
             ></textarea>
-            <p *ngIf="isFieldInvalid('summary')" class="text-red-600 text-sm mt-1">Le résumé est requis</p>
+            <p
+              [class]="(academicForm.get('summary')?.value?.length || 0) > 300
+                ? 'text-sm text-red-500 text-right mt-1'
+                : 'text-sm text-[var(--text-muted)] text-right mt-1'"
+              aria-live="polite"
+            >{{ academicForm.get('summary')?.value?.length || 0 }} / 300</p>
+            <p *ngIf="isFieldInvalid('summary') && academicForm.get('summary')?.hasError('required')" class="text-red-600 text-sm mt-1">Le résumé est requis</p>
+            <p *ngIf="isFieldInvalid('summary') && academicForm.get('summary')?.hasError('maxlength')" class="text-red-600 text-sm mt-1">Résumé trop long (max 300 caractères)</p>
           </div>
 
           <!-- Contenu -->
@@ -76,12 +83,18 @@ import { Subject, takeUntil } from 'rxjs';
               [attr.aria-invalid]="isFieldInvalid('workType')"
             >
               <option value="">Sélectionner un type</option>
-              <option value="mémoire">Mémoire</option>
-              <option value="thèse">Thèse</option>
-              <option value="article">Article</option>
-              <option value="essai">Essai</option>
-              <option value="rapport">Rapport</option>
-              <option value="autre">Autre</option>
+              <option value="Dissertation">Dissertation</option>
+              <option value="Commentaire de texte">Commentaire de texte</option>
+              <option value="Dossier thématique">Dossier thématique</option>
+              <option value="Mémoire">Mémoire</option>
+              <option value="Travail de recherche">Travail de recherche</option>
+              <option value="Synthèse">Synthèse</option>
+              <option value="Note de lecture">Note de lecture</option>
+              <option value="Compte-rendu">Compte-rendu</option>
+              <option value="Communication">Communication</option>
+              <option value="Essai">Essai</option>
+              <option value="Rapport">Rapport</option>
+              <option value="Autre">Autre</option>
             </select>
             <p *ngIf="isFieldInvalid('workType')" class="text-red-600 text-sm mt-1">Le type de travail est requis</p>
           </div>
@@ -124,18 +137,6 @@ import { Subject, takeUntil } from 'rxjs';
               <option value="history">Histoire</option>
               <option value="linguistics">Linguistique</option>
             </select>
-          </div>
-
-          <!-- Extrait -->
-          <div>
-            <label for="excerpt" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Extrait</label>
-            <textarea
-              id="excerpt"
-              formControlName="excerpt"
-              placeholder="Extrait du travail (optionnel)"
-              rows="3"
-              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-            ></textarea>
           </div>
 
           <!-- URL de l'image -->
@@ -249,14 +250,13 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
   private initializeForm(): void {
     this.academicForm = this.fb.group({
       title: ['', [Validators.required]],
-      summary: ['', [Validators.required]],
+      summary: ['', [Validators.required, Validators.maxLength(300)]],
       content: [''],
       imageUrl: [''],
       workType: ['', Validators.required],
       context: [''],
       year: [new Date().getFullYear()],
-      theme: [''],
-      excerpt: [''],
+      theme: [null],
       sourceUrl: [''],
       isPublished: [false],
       featured: [false],
@@ -272,7 +272,10 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (academic) => {
-          this.academicForm.patchValue(academic);
+          this.academicForm.patchValue({
+            ...academic,
+            theme: academic.theme || null,
+          });
           this.isLoading = false;
         },
         error: (error) => {
