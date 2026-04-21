@@ -57,6 +57,8 @@ import { MarkdownComponent } from 'ngx-markdown';
             <span>{{ academic.workType }}</span>
             <span aria-hidden="true" class="text-[var(--border-light)]">·</span>
             <span>{{ academic.year }}</span>
+            <span aria-hidden="true" class="text-[var(--border-light)]">·</span>
+            <span class="normal-case tracking-normal">{{ academic.publishedAt | date:'d MMMM yyyy':'':'fr' }}</span>
             <ng-container *ngIf="academic.theme">
               <span aria-hidden="true" class="text-[var(--border-light)]">·</span>
               <span>{{ academic.theme }}</span>
