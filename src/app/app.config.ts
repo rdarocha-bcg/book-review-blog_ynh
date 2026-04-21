@@ -10,6 +10,7 @@ import { firstValueFrom } from 'rxjs';
 import { routes } from './app.routes';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { SiteConfigService } from './core/services/site-config.service';
+import { provideMarkdown } from 'ngx-markdown';
 
 function appBaseHrefFactory(): string {
   const href = document.querySelector('base')?.getAttribute('href');
@@ -22,6 +23,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptors([errorInterceptor])),
     provideAnimations(),
+    provideMarkdown(),
     {
       provide: APP_INITIALIZER,
       useFactory: (site: SiteConfigService) => () => firstValueFrom(site.load()),
