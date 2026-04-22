@@ -24,7 +24,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
       class="relative sticky top-0 z-40 border-b border-[var(--border-light)] bg-[color:var(--header-bg)] backdrop-blur-md"
       role="banner"
     >
-      <a href="#main-content" class="skip-link">Skip to main content</a>
+      <a href="#main-content" class="skip-link">Aller au contenu principal</a>
       <nav
         class="container mx-auto flex items-center justify-between gap-4 px-4 py-3 md:px-6"
         aria-label="Main navigation"
@@ -42,11 +42,11 @@ import { filter, Subject, takeUntil } from 'rxjs';
             [attr.aria-expanded]="mobileNavOpen()"
             aria-controls="mobile-nav-panel"
             id="mobile-nav-toggle"
-            aria-label="Main menu"
+            aria-label="Menu principal"
             (click)="toggleMobileNav()"
             #menuButton
           >
-            <span class="sr-only">{{ mobileNavOpen() ? 'Close menu' : 'Open menu' }}</span>
+            <span class="sr-only">{{ mobileNavOpen() ? 'Fermer le menu' : 'Ouvrir le menu' }}</span>
             <span class="block h-0.5 w-5 rounded-full bg-current" aria-hidden="true"></span>
             <span class="block h-0.5 w-5 rounded-full bg-current" aria-hidden="true"></span>
             <span class="block h-0.5 w-5 rounded-full bg-current" aria-hidden="true"></span>
@@ -91,7 +91,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
           class="fixed left-4 right-4 top-[4.25rem] z-50 max-h-[min(70vh,calc(100dvh-6rem))] overflow-y-auto rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-4 shadow-lg md:hidden"
           role="dialog"
           aria-modal="true"
-          aria-label="Mobile menu"
+          aria-label="Menu mobile"
         >
           <ul class="flex flex-col gap-1">
             <li>

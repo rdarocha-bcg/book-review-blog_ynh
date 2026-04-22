@@ -26,7 +26,7 @@ import { NotificationService, Notification } from '@core/services/notification.s
       <div
         *ngFor="let notification of notifications$ | async; trackBy: trackByNotificationId"
         [@slideIn]
-        [@slideIn.disabled]="prefersReducedMotion()"
+        [@.disabled]="prefersReducedMotion()"
         [class]="getNotificationClasses(notification.type)"
         role="alert"
         [attr.aria-live]="'polite'"
@@ -51,7 +51,7 @@ import { NotificationService, Notification } from '@core/services/notification.s
           <button
             (click)="removeNotification(notification.id)"
             class="text-lg font-bold opacity-70 hover:opacity-100 transition"
-            [attr.aria-label]="'Close notification'"
+            [attr.aria-label]="'Fermer la notification'"
           >
             ✕
           </button>
@@ -128,9 +128,9 @@ export class NotificationComponent {
    */
   getNotificationTitle(type: string): string {
     const titles: Record<string, string> = {
-      success: 'Success',
-      error: 'Error',
-      warning: 'Warning',
+      success: 'Succès',
+      error: 'Erreur',
+      warning: 'Avertissement',
       info: 'Information',
     };
 

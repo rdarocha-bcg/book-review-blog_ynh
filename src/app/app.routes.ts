@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '@core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -32,6 +33,7 @@ export const routes: Routes = [
       },
       {
         path: 'new',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/reviews/pages/review-form/review-form.component').then(
             (m) => m.ReviewFormComponent
@@ -49,6 +51,7 @@ export const routes: Routes = [
           },
           {
             path: 'edit',
+            canActivate: [authGuard],
             loadComponent: () =>
               import('./features/reviews/pages/review-form/review-form.component').then(
                 (m) => m.ReviewFormComponent
@@ -70,6 +73,7 @@ export const routes: Routes = [
       },
       {
         path: 'new',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/academics/pages/academic-form/academic-form.component').then(
             (m) => m.AcademicFormComponent
@@ -84,6 +88,7 @@ export const routes: Routes = [
       },
       {
         path: ':id/edit',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/academics/pages/academic-form/academic-form.component').then(
             (m) => m.AcademicFormComponent

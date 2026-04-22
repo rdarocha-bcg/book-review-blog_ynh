@@ -39,43 +39,43 @@ import { debounceTime } from 'rxjs/operators';
       </div>
 
       <div class=\"mb-6 pinterest-panel p-4 md:p-5\">
-        <h2 class=\"mb-3 text-lg font-semibold text-[var(--primary)]\">Search & filters</h2>
+        <h2 class=\"mb-3 text-lg font-semibold text-[var(--primary)]\">Recherche &amp; filtres</h2>
         <div class=\"grid grid-cols-1 md:grid-cols-4 gap-4\">
           <input
             type=\"text\"
-            placeholder=\"Search academic works...\"
+            placeholder=\"Rechercher un travail académique...\"
             [(ngModel)]=\"searchQuery\"
             (ngModelChange)=\"onSearchQueryInput()\"
             class=\"border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white\"
-            aria-label=\"Search academic works\"
+            aria-label=\"Rechercher un travail académique\"
           />
           <select
             [(ngModel)]=\"selectedTheme\"
             (change)=\"onFilterChange()\"
             class=\"border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white\"
-            aria-label=\"Filter by theme\"
+            aria-label=\"Filtrer par thème\"
           >
-            <option value=\"\">All Themes</option>
-            <option value=\"literature\">Literature</option>
-            <option value=\"philosophy\">Philosophy</option>
-            <option value=\"history\">History</option>
-            <option value=\"linguistics\">Linguistics</option>
+            <option value=\"\">Tous les thèmes</option>
+            <option value=\"literature\">Littérature</option>
+            <option value=\"philosophy\">Philosophie</option>
+            <option value=\"history\">Histoire</option>
+            <option value=\"linguistics\">Linguistique</option>
           </select>
           <select
             [(ngModel)]=\"selectedSort\"
             (change)=\"onFilterChange()\"
             class=\"border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white\"
-            aria-label=\"Sort academic works\"
+            aria-label=\"Trier les travaux académiques\"
           >
-            <option value=\"\">Sort by</option>
-            <option value=\"newest\">Newest first</option>
-            <option value=\"oldest\">Oldest first</option>
+            <option value=\"\">Trier par</option>
+            <option value=\"newest\">Plus récents</option>
+            <option value=\"oldest\">Plus anciens</option>
           </select>
           <button
             (click)=\"resetFilters()\"
             class=\"bg-white text-[var(--primary)] border border-[var(--border-light)] rounded-full px-3 py-2 hover:bg-[var(--surface-alt)]\"
           >
-            Reset
+            Réinitialiser
           </button>
         </div>
       </div>
@@ -104,20 +104,20 @@ import { debounceTime } from 'rxjs/operators';
             <a
               [routerLink]=\"['/academics', academic.id]\"
               class=\"group -m-1 block rounded-xl p-1 no-underline outline-none ring-[var(--accent)] transition focus-visible:ring-2\"
-              [attr.aria-label]=\"'Open academic work: ' + academic.title\"
+              [attr.aria-label]=\"'Ouvrir le travail : ' + academic.title\"
             >
               <h3 class=\"text-xl font-semibold mb-2 text-[var(--primary)] group-hover:text-[var(--accent-strong)]\">
                 {{ academic.title }}
               </h3>
               <p class=\"text-sm text-[var(--text-muted)] mb-3\">{{ academic.workType }} ({{ academic.year }})</p>
               <p class=\"text-sm mb-2 text-[var(--text-dark)]\">
-                <strong class=\"text-[var(--primary)]\">Theme:</strong>
+                <strong class=\"text-[var(--primary)]\">Thème :</strong>
                 <span class=\"inline-block px-2 py-1 rounded-full bg-[var(--surface-alt)] text-[var(--accent-strong)]\">
                   {{ academic.theme }}
                 </span>
               </p>
               <p class=\"text-sm text-[var(--text-dark)] line-clamp-3 mb-3\">{{ academic.summary }}</p>
-              <span class=\"font-semibold text-[var(--accent-strong)] group-hover:text-[var(--primary)]\">Open →</span>
+              <span class=\"font-semibold text-[var(--accent-strong)] group-hover:text-[var(--primary)]\">Lire →</span>
             </a>
           </app-card>
         </div>
@@ -125,7 +125,7 @@ import { debounceTime } from 'rxjs/operators';
 
       <!-- No Results -->
       <div *ngIf=\"(academics$ | async)?.length === 0 && (isLoading$ | async) === false\" class=\"text-center py-12\">
-        <p class=\"text-xl text-[var(--text-muted)]\">No academic works found. Try adjusting your filters.</p>
+        <p class=\"text-xl text-[var(--text-muted)]\">Aucun travail académique trouvé. Essayez d'ajuster vos filtres.</p>
       </div>
 
       <!-- Pagination -->

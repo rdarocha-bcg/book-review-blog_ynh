@@ -35,60 +35,60 @@ import { debounceTime } from 'rxjs/operators';
   template: `
     <div class="page-container">
       <div class="mb-6">
-        <h1 class="mb-1 text-3xl font-bold text-[var(--primary)]">Reviews</h1>
+        <h1 class="mb-1 text-3xl font-bold text-[var(--primary)]">Critiques</h1>
       </div>
 
       <div class="mb-6 pinterest-panel p-4 md:p-5">
-        <h2 class="mb-3 text-lg font-semibold text-[var(--primary)]">Search &amp; filters</h2>
+        <h2 class="mb-3 text-lg font-semibold text-[var(--primary)]">Recherche &amp; filtres</h2>
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <input
             type="text"
-            placeholder="Search reviews..."
+            placeholder="Rechercher une critique..."
             [(ngModel)]="searchQuery"
             (ngModelChange)="onSearchQueryInput()"
             class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
-            aria-label="Search reviews"
+            aria-label="Rechercher une critique"
           />
           <select
             [(ngModel)]="selectedGenre"
             (change)="onFilterChange()"
             class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
-            aria-label="Filter by genre"
+            aria-label="Filtrer par genre"
           >
-            <option value="">All Genres</option>
+            <option value="">Tous les genres</option>
             <option value="fiction">Fiction</option>
-            <option value="non-fiction">Non-Fiction</option>
-            <option value="mystery">Mystery</option>
+            <option value="non-fiction">Non-fiction</option>
+            <option value="mystery">Policier</option>
             <option value="romance">Romance</option>
           </select>
           <select
             [(ngModel)]="selectedRating"
             (change)="onFilterChange()"
             class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
-            aria-label="Filter by rating"
+            aria-label="Filtrer par note"
           >
-            <option value="">All Ratings</option>
-            <option value="5">5 Stars</option>
-            <option value="4">4+ Stars</option>
-            <option value="3">3+ Stars</option>
+            <option value="">Toutes les notes</option>
+            <option value="5">5 étoiles</option>
+            <option value="4">4+ étoiles</option>
+            <option value="3">3+ étoiles</option>
           </select>
           <select
             [(ngModel)]="selectedSort"
             (change)="onFilterChange()"
             class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
-            aria-label="Sort reviews"
+            aria-label="Trier les critiques"
           >
-            <option value="">Sort by</option>
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="rating-high">Rating: high to low</option>
-            <option value="rating-low">Rating: low to high</option>
+            <option value="">Trier par</option>
+            <option value="newest">Plus récents</option>
+            <option value="oldest">Plus anciens</option>
+            <option value="rating-high">Note : décroissante</option>
+            <option value="rating-low">Note : croissante</option>
           </select>
           <button
             (click)="resetFilters()"
             class="bg-white text-[var(--primary)] border border-[var(--border-light)] rounded-full px-3 py-2 hover:bg-[var(--surface-alt)]"
           >
-            Reset
+            Réinitialiser
           </button>
         </div>
       </div>
@@ -118,17 +118,17 @@ import { debounceTime } from 'rxjs/operators';
           <a
             [routerLink]="['/reviews', review.id]"
             class="group -m-1 block rounded-xl p-1 no-underline outline-none ring-[var(--accent)] transition focus-visible:ring-2"
-            [attr.aria-label]="'Open review: ' + review.title"
+            [attr.aria-label]="'Ouvrir la critique : ' + review.title"
           >
             <h3 class="text-xl font-semibold mb-2 text-[var(--primary)] group-hover:text-[var(--accent-strong)]">
               {{ review.title }}
             </h3>
             <p class="text-sm text-[var(--text-muted)] mb-3">by {{ review.author }}</p>
             <p class="text-sm mb-2 text-[var(--text-dark)]">
-              <strong class="text-[var(--primary)]">Book:</strong> {{ review.bookTitle }} by {{ review.bookAuthor }}
+              <strong class="text-[var(--primary)]">Livre :</strong> {{ review.bookTitle }} par {{ review.bookAuthor }}
             </p>
             <p class="text-sm mb-2 text-[var(--text-dark)]">
-              <strong class="text-[var(--primary)]">Genre:</strong>
+              <strong class="text-[var(--primary)]">Genre :</strong>
               <span class="inline-block px-2 py-1 rounded-full bg-[var(--surface-alt)] text-[var(--accent-strong)]">
                 {{ review.genre }}
               </span>
@@ -137,7 +137,7 @@ import { debounceTime } from 'rxjs/operators';
               <span class="text-[var(--accent-strong)] font-semibold">★ {{ review.rating }}/5</span>
             </div>
             <p class="text-sm text-[var(--text-dark)] line-clamp-3 mb-3">{{ review.description }}</p>
-            <span class="font-semibold text-[var(--accent-strong)] group-hover:text-[var(--primary)]">Open →</span>
+            <span class="font-semibold text-[var(--accent-strong)] group-hover:text-[var(--primary)]">Lire →</span>
           </a>
         </app-card>
         </div>
@@ -145,7 +145,7 @@ import { debounceTime } from 'rxjs/operators';
 
       <!-- No Results -->
       <div *ngIf="(reviews$ | async)?.length === 0 && (isLoading$ | async) === false" class="text-center py-12">
-        <p class="text-xl text-[var(--text-muted)]">No reviews found. Try adjusting your filters.</p>
+        <p class="text-xl text-[var(--text-muted)]">Aucune critique trouvée. Essayez d'ajuster vos filtres.</p>
       </div>
 
       <!-- Pagination -->

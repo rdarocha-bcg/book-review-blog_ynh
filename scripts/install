@@ -43,7 +43,7 @@ ynh_script_progression --message="Building Angular app (this may take a few minu
 
 pushd "$install_dir/src"
     ynh_use_nodejs
-    ynh_exec_warn_less npm ci --production=false
+    ynh_exec_warn_less npm ci
     ynh_exec_warn_less npx ng build --configuration production --base-href "$base_href"
 popd
 

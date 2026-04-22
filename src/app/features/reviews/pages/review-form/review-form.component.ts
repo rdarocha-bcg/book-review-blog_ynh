@@ -26,54 +26,54 @@ import { Subject, takeUntil } from 'rxjs';
   template: `
     <div class="page-container">
       <h1 class="text-4xl md:text-5xl font-bold mb-8 text-[var(--primary)]">
-        {{ isEditMode ? 'Edit Review' : 'Create New Review' }}
+        {{ isEditMode ? 'Modifier la critique' : 'Créer une critique' }}
       </h1>
 
       <div class="max-w-3xl pinterest-panel p-8 md:p-10">
         <form *ngIf="reviewForm" [formGroup]="reviewForm" (ngSubmit)="onSubmit()" class="space-y-6">
-          <!-- Title -->
+          <!-- Titre de la critique -->
           <div>
-            <label for="title" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Review Title *</label>
+            <label for="title" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Titre de la critique *</label>
             <input
               id="title"
               type="text"
               formControlName="title"
-              placeholder="Enter review title"
+              placeholder="Saisir le titre de la critique"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-              [attr.aria-label]="'Review Title'"
+              [attr.aria-label]="'Titre de la critique'"
               [attr.aria-invalid]="isFieldInvalid('title')"
             />
-            <p *ngIf="isFieldInvalid('title')" class="text-red-600 text-sm mt-1">Title is required</p>
+            <p *ngIf="isFieldInvalid('title')" class="text-red-600 text-sm mt-1">Le titre est requis</p>
           </div>
 
-          <!-- Book Title -->
+          <!-- Titre du livre -->
           <div>
-            <label for="bookTitle" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Book Title *</label>
+            <label for="bookTitle" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Titre du livre *</label>
             <input
               id="bookTitle"
               type="text"
               formControlName="bookTitle"
-              placeholder="Enter book title"
+              placeholder="Saisir le titre du livre"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-              [attr.aria-label]="'Book Title'"
+              [attr.aria-label]="'Titre du livre'"
               [attr.aria-invalid]="isFieldInvalid('bookTitle')"
             />
-            <p *ngIf="isFieldInvalid('bookTitle')" class="text-red-600 text-sm mt-1">Book title is required</p>
+            <p *ngIf="isFieldInvalid('bookTitle')" class="text-red-600 text-sm mt-1">Le titre du livre est requis</p>
           </div>
 
-          <!-- Book Author -->
+          <!-- Auteur du livre -->
           <div>
-            <label for="bookAuthor" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Book Author *</label>
+            <label for="bookAuthor" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Auteur du livre *</label>
             <input
               id="bookAuthor"
               type="text"
               formControlName="bookAuthor"
-              placeholder="Enter book author"
+              placeholder="Saisir le nom de l'auteur"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-              [attr.aria-label]="'Book Author'"
+              [attr.aria-label]="'Auteur du livre'"
               [attr.aria-invalid]="isFieldInvalid('bookAuthor')"
             />
-            <p *ngIf="isFieldInvalid('bookAuthor')" class="text-red-600 text-sm mt-1">Book author is required</p>
+            <p *ngIf="isFieldInvalid('bookAuthor')" class="text-red-600 text-sm mt-1">L'auteur du livre est requis</p>
           </div>
 
           <!-- Genre -->
@@ -86,39 +86,39 @@ import { Subject, takeUntil } from 'rxjs';
               [attr.aria-label]="'Genre'"
               [attr.aria-invalid]="isFieldInvalid('genre')"
             >
-              <option value="">Select a genre</option>
+              <option value="">Sélectionner un genre</option>
               <option value="fiction">Fiction</option>
-              <option value="non-fiction">Non-Fiction</option>
-              <option value="mystery">Mystery</option>
+              <option value="non-fiction">Non-fiction</option>
+              <option value="mystery">Policier</option>
               <option value="romance">Romance</option>
-              <option value="science-fiction">Science Fiction</option>
+              <option value="science-fiction">Science-fiction</option>
               <option value="fantasy">Fantasy</option>
-              <option value="biography">Biography</option>
-              <option value="history">History</option>
-              <option value="self-help">Self-Help</option>
-              <option value="other">Other</option>
+              <option value="biography">Biographie</option>
+              <option value="history">Histoire</option>
+              <option value="self-help">Développement personnel</option>
+              <option value="other">Autre</option>
             </select>
-            <p *ngIf="isFieldInvalid('genre')" class="text-red-600 text-sm mt-1">Genre is required</p>
+            <p *ngIf="isFieldInvalid('genre')" class="text-red-600 text-sm mt-1">Le genre est requis</p>
           </div>
 
-          <!-- Rating -->
+          <!-- Note -->
           <fieldset class="border-0 p-0 m-0">
             <legend id="rating-legend" class="block text-sm font-semibold mb-2 text-[var(--primary)]">
-              Rating (1–5) <span class="text-red-600" aria-hidden="true">*</span>
+              Note (1–5) <span class="text-red-600" aria-hidden="true">*</span>
             </legend>
             <app-star-rating-input formControlName="rating" labelledBy="rating-legend" />
             <p *ngIf="isFieldInvalid('rating')" class="text-red-600 text-sm mt-1" role="alert">
-              Rating must be between 1 and 5
+              La note doit être entre 1 et 5
             </p>
           </fieldset>
 
-          <!-- Description (Short Summary) -->
+          <!-- Description courte -->
           <div>
             <label for="description" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Description *</label>
             <textarea
               id="description"
               formControlName="description"
-              placeholder="Enter a short description (max 300 characters)"
+              placeholder="Saisir une courte description (300 caractères max)"
               rows="3"
               maxlength="300"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
@@ -126,66 +126,66 @@ import { Subject, takeUntil } from 'rxjs';
               [attr.aria-invalid]="isFieldInvalid('description')"
             ></textarea>
             <p *ngIf="isFieldInvalid('description')" class="text-red-600 text-sm mt-1">
-              Description is required
+              La description est requise
             </p>
             <p class="text-[var(--text-muted)] text-xs mt-1">
-              {{ reviewForm.get('description')?.value?.length || 0 }}/300 characters
+              {{ reviewForm.get('description')?.value?.length || 0 }}/300 caractères
             </p>
           </div>
 
-          <!-- Content (Full Review) -->
+          <!-- Contenu complet -->
           <div>
-            <label for="content" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Full Review *</label>
+            <label for="content" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Critique complète *</label>
             <textarea
               id="content"
               formControlName="content"
-              placeholder="Enter the full review content"
+              placeholder="Saisir le texte complet de la critique"
               rows="10"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-sm"
-              [attr.aria-label]="'Review Content'"
+              [attr.aria-label]="'Contenu de la critique'"
               [attr.aria-invalid]="isFieldInvalid('content')"
             ></textarea>
-            <p *ngIf="isFieldInvalid('content')" class="text-red-600 text-sm mt-1">Review content is required</p>
+            <p *ngIf="isFieldInvalid('content')" class="text-red-600 text-sm mt-1">Le contenu de la critique est requis</p>
           </div>
 
-          <!-- Image URL -->
+          <!-- URL de couverture -->
           <div>
-            <label for="imageUrl" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Book Cover Image URL</label>
+            <label for="imageUrl" class="block text-sm font-semibold mb-2 text-[var(--primary)]">URL de la couverture</label>
             <input
               id="imageUrl"
               type="url"
               formControlName="imageUrl"
-              placeholder="Enter image URL (optional)"
+              placeholder="URL de l'image (facultatif)"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-              [attr.aria-label]="'Image URL'"
+              [attr.aria-label]="'URL de la couverture'"
             />
-            <p class="text-[var(--text-muted)] text-xs mt-1">Optional: Paste a URL to a book cover image</p>
+            <p class="text-[var(--text-muted)] text-xs mt-1">Facultatif : coller l'URL d'une image de couverture</p>
           </div>
 
-          <!-- Published Status -->
+          <!-- Statut de publication -->
           <div class="flex items-center gap-3">
             <input
               id="isPublished"
               type="checkbox"
               formControlName="isPublished"
               class="w-4 h-4 cursor-pointer"
-              [attr.aria-label]="'Publish this review'"
+              [attr.aria-label]="'Publier cette critique'"
             />
             <label for="isPublished" class="text-sm font-semibold cursor-pointer text-[var(--primary)]">
-              Publish this review immediately
+              Publier cette critique immédiatement
             </label>
           </div>
 
-          <!-- Buttons -->
+          <!-- Boutons -->
           <div class="flex gap-4 pt-4">
             <app-button
-              [label]="isEditMode ? 'Update Review' : 'Create Review'"
+              [label]="isEditMode ? 'Mettre à jour' : 'Créer la critique'"
               [isLoading]="isSubmitting"
               [disabled]="!reviewForm.valid || isSubmitting"
               (onClick)="onSubmit()"
             ></app-button>
             <app-button
-              label="Cancel"
+              label="Annuler"
               variant="secondary"
               [disabled]="isSubmitting"
               (onClick)="onCancel()"
@@ -266,7 +266,7 @@ export class ReviewFormComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error) => {
-          this.notificationService.error('Failed to load review');
+          this.notificationService.error('Impossible de charger la critique');
           console.error('Error loading review:', error);
           this.isLoading = false;
         },
@@ -286,7 +286,7 @@ export class ReviewFormComponent implements OnInit, OnDestroy {
    */
   onSubmit(): void {
     if (!this.reviewForm.valid) {
-      this.notificationService.warning('Please fill out all required fields');
+      this.notificationService.warning('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
@@ -300,13 +300,13 @@ export class ReviewFormComponent implements OnInit, OnDestroy {
     request.pipe(takeUntil(this.destroy$)).subscribe({
       next: (review) => {
         this.notificationService.success(
-          this.isEditMode ? 'Review updated successfully' : 'Review created successfully'
+          this.isEditMode ? 'Critique mise à jour avec succès' : 'Critique créée avec succès'
         );
         this.isSubmitting = false;
         this.router.navigate(['/reviews', review.id]);
       },
       error: (error) => {
-        this.notificationService.error('Failed to save review');
+        this.notificationService.error('Impossible d\'enregistrer la critique');
         console.error('Error saving review:', error);
         this.isSubmitting = false;
       },

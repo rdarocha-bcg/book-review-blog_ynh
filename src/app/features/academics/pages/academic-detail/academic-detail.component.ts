@@ -33,8 +33,26 @@ import { MarkdownComponent } from 'ngx-markdown';
         ← Travaux académiques
       </a>
 
+      <!-- Message erreur : ressource introuvable -->
+      <div
+        *ngIf="!isLoading && notFound"
+        class="pinterest-panel p-8 text-center"
+        role="alert"
+        aria-live="polite"
+      >
+        <p class="text-5xl mb-4" aria-hidden="true">📄</p>
+        <h1 class="text-2xl font-semibold text-[var(--primary)] mb-3">Ce travail académique n'existe pas</h1>
+        <p class="text-[var(--text-muted)] mb-6">L'identifiant demandé ne correspond à aucun travail enregistré.</p>
+        <a
+          routerLink="/academics"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent-strong)] text-white font-semibold hover:brightness-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-strong)]"
+        >
+          ← Retour aux travaux
+        </a>
+      </div>
+
       <!-- Loading skeleton -->
-      <div *ngIf="isLoading$ | async" class="animate-pulse space-y-4" aria-busy="true" aria-label="Chargement en cours">
+      <div *ngIf="isLoading" class="animate-pulse space-y-4" aria-busy="true" aria-label="Chargement en cours">
         <div class="h-10 bg-[var(--surface-alt)] rounded-lg w-3/4"></div>
         <div class="h-5 bg-[var(--surface-alt)] rounded w-1/3"></div>
         <div class="h-4 bg-[var(--surface-alt)] rounded w-full mt-6"></div>
@@ -114,7 +132,8 @@ import { MarkdownComponent } from 'ngx-markdown';
 })
 export class AcademicDetailComponent implements OnInit, OnDestroy {
   academic: AcademicWork | null = null;
-  isLoading$ = this.academicService.getLoading$();
+  isLoading = false;
+  notFound = false;
 
   private destroy$ = new Subject<void>();
 
@@ -128,14 +147,25 @@ export class AcademicDetailComponent implements OnInit, OnDestroy {
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const id = params['id'];
       if (id) {
+        this.isLoading = true;
+        this.notFound = false;
+        this.academic = null;
+        this.cdr.markForCheck();
+
         this.academicService.getAcademicById(id)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: (result) => {
               this.academic = result;
+              this.isLoading = false;
+              this.notFound = false;
               this.cdr.markForCheck();
             },
-            error: (error) => console.error('Error loading academic:', error),
+            error: () => {
+              this.isLoading = false;
+              this.notFound = true;
+              this.cdr.markForCheck();
+            },
           });
       }
     });
