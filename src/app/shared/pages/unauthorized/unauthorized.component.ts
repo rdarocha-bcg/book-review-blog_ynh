@@ -12,16 +12,16 @@ import { RouterLink } from '@angular/router';
     <section class="container mx-auto px-4 py-12 text-center" aria-labelledby="unauthorized-heading">
       <div class="mx-auto max-w-md">
         <h1 id="unauthorized-heading" class="mb-2 text-4xl font-bold text-[var(--primary)]">401</h1>
-        <h2 class="mb-4 text-xl font-semibold text-[var(--text-dark)]">Unauthorized</h2>
+        <h2 class="mb-4 text-xl font-semibold text-[var(--text-dark)]">Non autorisé</h2>
         <p class="mb-8 text-[var(--text-muted)]">
-          Sign in from your server user portal if this site is protected, then try again.
+          Connectez-vous depuis le portail utilisateur de votre serveur si ce site est protégé, puis réessayez.
         </p>
         <a
           routerLink="/"
           class="inline-block rounded-full bg-[var(--secondary)] px-6 py-3 font-semibold text-white hover:brightness-95"
-          aria-label="Go to home page"
+          aria-label="Retourner à l'accueil"
         >
-          Home
+          Accueil
         </a>
       </div>
     </section>
