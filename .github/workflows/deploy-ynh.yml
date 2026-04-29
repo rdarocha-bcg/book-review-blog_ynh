@@ -89,4 +89,4 @@ jobs:
             -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
             -o IdentitiesOnly=yes \
             "$SSH_USER@$SSH_HOST" \
-            "sudo yunohost app install '$SOURCE_URL' --no-remove-on-failure && echo 'App installed' || sudo yunohost app upgrade '$APP_ID' -u '$SOURCE_URL'"
+            "sudo yunohost app install '$SOURCE_URL' --force --no-remove-on-failure -y 2>&1 && echo 'App installed' || sudo yunohost app upgrade '$APP_ID' -u '$SOURCE_URL' -y"
