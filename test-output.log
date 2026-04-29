@@ -1,0 +1,12 @@
+
+Running 72 tests using 1 worker
+
+  ✘   1 [chromium] › e2e/comprehensive-prod.spec.ts:41:7 › Navigation & Routing › home page loads at /blog/ with 200 status (15.6s)
+  ✘   2 [chromium] › e2e/comprehensive-prod.spec.ts:54:7 › Navigation & Routing › nav: Critiques → /blog/reviews (15.7s)
+  ✘   3 [chromium] › e2e/comprehensive-prod.spec.ts:65:7 › Navigation & Routing › nav: Travaux → /blog/academics (15.5s)
+  ✘   4 [chromium] › e2e/comprehensive-prod.spec.ts:76:7 › Navigation & Routing › nav: À propos → /blog/about (15.5s)
+  ✘   5 [chromium] › e2e/comprehensive-prod.spec.ts:87:7 › Navigation & Routing › logo navigates back to home (15.6s)
+  ✘   6 [chromium] › e2e/comprehensive-prod.spec.ts:98:7 › Navigation & Routing › invalid route → 404 page in French (15.5s)
+  ✘   7 [chromium] › e2e/comprehensive-prod.spec.ts:107:7 › Navigation & Routing › direct URL access: /blog/reviews renders review list (15.6s)
+  ✘   8 [chromium] › e2e/comprehensive-prod.spec.ts:115:7 › Navigation & Routing › direct URL access: /blog/academics renders academic list (15.6s)
+  ✘   9 [chromium] › e2e/comprehensive-prod.spec.ts:122:7 › Navigation & Routing › direct URL access: /blog/about renders about page (15.5s)

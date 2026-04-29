@@ -13,7 +13,7 @@ export default defineConfig({
   workers: 1,
   reporter: [['list']],
   use: {
-    baseURL: process.env.E2E_BASE_URL || 'https://remidarocha.fr',
+    baseURL: process.env.E2E_BASE_URL || 'https://remidarocha.fr/blog',
     trace: 'on-first-failure',
   },
   projects: [

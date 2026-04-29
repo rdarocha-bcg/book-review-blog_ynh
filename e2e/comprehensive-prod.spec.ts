@@ -40,7 +40,7 @@ function collectConsoleErrors(page: import('@playwright/test').Page): string[] {
 test.describe('Navigation & Routing', () => {
   test('home page loads at /blog/ with 200 status', async ({ page }) => {
     const errors = collectConsoleErrors(page);
-    const response = await page.goto('/blog/', { waitUntil: 'load', timeout: 45_000 });
+    const response = await page.goto('/', { waitUntil: 'load', timeout: 45_000 });
     expect(response?.status()).toBe(200);
     await expect(page).toHaveTitle(/Book Review Blog/i);
     await expect(page.locator('#main-content')).toBeVisible();
@@ -52,51 +52,51 @@ test.describe('Navigation & Routing', () => {
   });
 
   test('nav: Critiques → /blog/reviews', async ({ page }) => {
-    await page.goto('/blog/');
+    await page.goto('/');
     await expect(page.locator('#main-content')).toBeVisible();
     await page
       .getByRole('navigation', { name: 'Main navigation' })
       .getByRole('link', { name: 'Critiques' })
       .click();
-    await expect(page).toHaveURL(/\/blog\/reviews/);
+    await expect(page).toHaveURL(/\/reviews/);
     await expect(page.locator('#main-content')).toBeVisible();
   });
 
   test('nav: Travaux → /blog/academics', async ({ page }) => {
-    await page.goto('/blog/');
+    await page.goto('/');
     await expect(page.locator('#main-content')).toBeVisible();
     await page
       .getByRole('navigation', { name: 'Main navigation' })
       .getByRole('link', { name: 'Travaux' })
       .click();
-    await expect(page).toHaveURL(/\/blog\/academics/);
+    await expect(page).toHaveURL(/\/academics/);
     await expect(page.locator('#main-content')).toBeVisible();
   });
 
   test('nav: À propos → /blog/about', async ({ page }) => {
-    await page.goto('/blog/');
+    await page.goto('/');
     await expect(page.locator('#main-content')).toBeVisible();
     await page
       .getByRole('navigation', { name: 'Main navigation' })
       .getByRole('link', { name: 'À propos' })
       .click();
-    await expect(page).toHaveURL(/\/blog\/about/);
+    await expect(page).toHaveURL(/\/about/);
     await expect(page.locator('#main-content')).toBeVisible();
   });
 
   test('logo navigates back to home', async ({ page }) => {
-    await page.goto('/blog/reviews');
+    await page.goto('/reviews');
     await expect(page.locator('#main-content')).toBeVisible();
     await page
       .getByRole('navigation', { name: 'Main navigation' })
       .getByRole('link', { name: /home$/i })
       .click();
-    await expect(page).toHaveURL(/\/blog\/?$/);
+    await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('#hero-heading')).toBeVisible();
   });
 
   test('invalid route → 404 page in French', async ({ page }) => {
-    await page.goto('/blog/this-route-does-not-exist-at-all');
+    await page.goto('/this-route-does-not-exist-at-all');
     await expect(page.locator('#main-content')).toBeVisible();
     // The not-found component renders "Page introuvable" in French
     await expect(page.getByRole('heading', { name: /Page introuvable/i })).toBeVisible();
@@ -105,7 +105,7 @@ test.describe('Navigation & Routing', () => {
   });
 
   test('direct URL access: /blog/reviews renders review list', async ({ page }) => {
-    await page.goto('/blog/reviews');
+    await page.goto('/reviews');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.locator('#hero-heading')).not.toBeVisible();
     // Page title heading
@@ -113,26 +113,26 @@ test.describe('Navigation & Routing', () => {
   });
 
   test('direct URL access: /blog/academics renders academic list', async ({ page }) => {
-    await page.goto('/blog/academics');
+    await page.goto('/academics');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.locator('#hero-heading')).not.toBeVisible();
     await expect(page.getByRole('heading', { name: 'Travaux Académiques' })).toBeVisible();
   });
 
   test('direct URL access: /blog/about renders about page', async ({ page }) => {
-    await page.goto('/blog/about');
+    await page.goto('/about');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.locator('#about-heading')).toBeVisible();
   });
 
   test('direct URL access: /blog/contact renders contact page', async ({ page }) => {
-    await page.goto('/blog/contact');
+    await page.goto('/contact');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.locator('#contact-heading')).toBeVisible();
   });
 
   test('/blog/401 page renders Unauthorized content', async ({ page }) => {
-    await page.goto('/blog/401');
+    await page.goto('/401');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.locator('#unauthorized-heading')).toBeVisible();
     // Contains the 401 heading text
@@ -146,7 +146,7 @@ test.describe('Navigation & Routing', () => {
 
 test.describe('Home Page — French UI & structure', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/blog/');
+    await page.goto('/');
     await expect(page.locator('#main-content')).toBeVisible();
   });
 
@@ -213,7 +213,7 @@ test.describe('Home Page — French UI & structure', () => {
 
 test.describe('Reviews List Page', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/blog/reviews');
+    await page.goto('/reviews');
     await expect(page.locator('#main-content')).toBeVisible();
   });
 
@@ -283,7 +283,7 @@ test.describe('Reviews List Page', () => {
 
 test.describe('Academics List Page', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/blog/academics');
+    await page.goto('/academics');
     await expect(page.locator('#main-content')).toBeVisible();
   });
 
@@ -322,22 +322,22 @@ test.describe('Academics List Page', () => {
 
 test.describe('Auth Guard — creation routes require login', () => {
   test('/blog/reviews/new redirects to /blog/401 for unauthenticated users', async ({ page }) => {
-    await page.goto('/blog/reviews/new');
+    await page.goto('/reviews/new');
     await expect(page.locator('#main-content')).toBeVisible();
     // Should land on the 401 unauthorized page
-    await expect(page).toHaveURL(/\/blog\/401/);
+    await expect(page).toHaveURL(/401/);
     await expect(page.locator('#unauthorized-heading')).toBeVisible();
   });
 
   test('/blog/academics/new redirects to /blog/401 for unauthenticated users', async ({ page }) => {
-    await page.goto('/blog/academics/new');
+    await page.goto('/academics/new');
     await expect(page.locator('#main-content')).toBeVisible();
-    await expect(page).toHaveURL(/\/blog\/401/);
+    await expect(page).toHaveURL(/401/);
     await expect(page.locator('#unauthorized-heading')).toBeVisible();
   });
 
   test('401 page has "Go to home page" link', async ({ page }) => {
-    await page.goto('/blog/401');
+    await page.goto('/401');
     await expect(page.locator('#main-content')).toBeVisible();
     // The 401 component renders a button-styled link with aria-label="Go to home page"
     const homeLink = page.getByRole('link', { name: 'Go to home page' });
@@ -345,10 +345,10 @@ test.describe('Auth Guard — creation routes require login', () => {
   });
 
   test('401 "Go to home page" link navigates back to home', async ({ page }) => {
-    await page.goto('/blog/401');
+    await page.goto('/401');
     await expect(page.locator('#main-content')).toBeVisible();
     await page.getByRole('link', { name: 'Go to home page' }).click();
-    await expect(page).toHaveURL(/\/blog\/?$/);
+    await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('#hero-heading')).toBeVisible();
   });
 });
@@ -359,7 +359,7 @@ test.describe('Auth Guard — creation routes require login', () => {
 
 test.describe('Error states — nonexistent resources', () => {
   test('/blog/reviews/999999 shows French not-found error message', async ({ page }) => {
-    await page.goto('/blog/reviews/999999');
+    await page.goto('/reviews/999999');
     await expect(page.locator('#main-content')).toBeVisible();
     // Wait for loading to finish (spinner disappears)
     await expect(page.locator('app-loading-spinner')).not.toBeVisible({ timeout: 20_000 });
@@ -373,7 +373,7 @@ test.describe('Error states — nonexistent resources', () => {
   });
 
   test('/blog/reviews/999999 error state has back link to /reviews', async ({ page }) => {
-    await page.goto('/blog/reviews/999999');
+    await page.goto('/reviews/999999');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.locator('app-loading-spinner')).not.toBeVisible({ timeout: 20_000 });
     await expect(page.getByText(/Cette critique n'existe pas/i)).toBeVisible({ timeout: 20_000 });
@@ -384,7 +384,7 @@ test.describe('Error states — nonexistent resources', () => {
   });
 
   test('/blog/academics/999999 shows French not-found error message', async ({ page }) => {
-    await page.goto('/blog/academics/999999');
+    await page.goto('/academics/999999');
     await expect(page.locator('#main-content')).toBeVisible();
     // Wait for loading
     const loadingSkeleton = page.locator('[aria-busy="true"][aria-label="Chargement en cours"]');
@@ -398,7 +398,7 @@ test.describe('Error states — nonexistent resources', () => {
   });
 
   test('/blog/academics/999999 error state has back link to /academics', async ({ page }) => {
-    await page.goto('/blog/academics/999999');
+    await page.goto('/academics/999999');
     await expect(page.locator('#main-content')).toBeVisible();
     const loadingSkeleton = page.locator('[aria-busy="true"][aria-label="Chargement en cours"]');
     await expect(loadingSkeleton).not.toBeVisible({ timeout: 20_000 });
@@ -494,7 +494,7 @@ test.describe('No console errors on key pages', () => {
 test.describe('Responsive Design', () => {
   test('home page layout at 375px (mobile)', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/blog/');
+    await page.goto('/');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.locator('#hero-heading')).toBeVisible();
     // Check that CTA buttons are visible and not cut off
@@ -503,14 +503,14 @@ test.describe('Responsive Design', () => {
 
   test('home page layout at 768px (tablet)', async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto('/blog/');
+    await page.goto('/');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.locator('#hero-heading')).toBeVisible();
   });
 
   test('reviews page search panel renders at 375px', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/blog/reviews');
+    await page.goto('/reviews');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.getByPlaceholder(/Rechercher une critique/i)).toBeVisible();
   });
@@ -522,57 +522,57 @@ test.describe('Responsive Design', () => {
 
 test.describe('Accessibility', () => {
   test('home page has a single h1 (#hero-heading)', async ({ page }) => {
-    await page.goto('/blog/');
+    await page.goto('/');
     await expect(page.locator('#main-content')).toBeVisible();
     const h1Elements = page.locator('h1');
     await expect(h1Elements).toHaveCount(1);
   });
 
   test('reviews list page has a single h1', async ({ page }) => {
-    await page.goto('/blog/reviews');
+    await page.goto('/reviews');
     await expect(page.locator('#main-content')).toBeVisible();
     const h1Elements = page.locator('h1');
     await expect(h1Elements).toHaveCount(1);
   });
 
   test('academics list page has a single h1', async ({ page }) => {
-    await page.goto('/blog/academics');
+    await page.goto('/academics');
     await expect(page.locator('#main-content')).toBeVisible();
     const h1Elements = page.locator('h1');
     await expect(h1Elements).toHaveCount(1);
   });
 
   test('main navigation has accessible name', async ({ page }) => {
-    await page.goto('/blog/');
+    await page.goto('/');
     await expect(page.locator('#main-content')).toBeVisible();
     const nav = page.getByRole('navigation', { name: 'Main navigation' });
     await expect(nav).toBeVisible();
   });
 
   test('skip-to-main or #main-content landmark present on home', async ({ page }) => {
-    await page.goto('/blog/');
+    await page.goto('/');
     // The app uses id="main-content" as the main landmark target
     await expect(page.locator('#main-content')).toBeVisible();
   });
 
   test('404 page heading has correct id (not-found-heading)', async ({ page }) => {
-    await page.goto('/blog/nonexistent-page-xyz');
+    await page.goto('/nonexistent-page-xyz');
     await expect(page.locator('#not-found-heading')).toBeVisible();
   });
 
   test('401 page heading has correct id (unauthorized-heading)', async ({ page }) => {
-    await page.goto('/blog/401');
+    await page.goto('/401');
     await expect(page.locator('#unauthorized-heading')).toBeVisible();
   });
 
   test('review list search input has aria-label', async ({ page }) => {
-    await page.goto('/blog/reviews');
+    await page.goto('/reviews');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.getByRole('textbox', { name: /Rechercher une critique/i })).toBeVisible();
   });
 
   test('academic list search input has aria-label', async ({ page }) => {
-    await page.goto('/blog/academics');
+    await page.goto('/academics');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(
       page.getByRole('textbox', { name: /Rechercher un travail académique/i }),
@@ -586,7 +586,7 @@ test.describe('Accessibility', () => {
 
 test.describe('Admin Panel — unauthenticated access', () => {
   test('/blog/admin loads or redirects — does not 500', async ({ page }) => {
-    const response = await page.goto('/blog/admin', { waitUntil: 'load', timeout: 45_000 });
+    const response = await page.goto('/admin', { waitUntil: 'load', timeout: 45_000 });
     // Admin may redirect to SSO (3xx) or render the page — it must not 500
     // After redirects, check page is not an error page
     await expect(page.locator('body')).not.toContainText('500 Internal Server Error');
@@ -607,7 +607,7 @@ test.describe('Loading States', () => {
         json: { data: [], total: 0, page: 1, limit: 10, totalPages: 0 },
       });
     });
-    await page.goto('/blog/reviews');
+    await page.goto('/reviews');
     await expect(page.locator('#main-content')).toBeVisible();
     // Skeleton components should be visible during load
     await expect(page.locator('app-review-card-skeleton').first()).toBeVisible({ timeout: 5_000 });
@@ -620,7 +620,7 @@ test.describe('Loading States', () => {
         json: { data: [], total: 0, page: 1, limit: 10, totalPages: 0 },
       });
     });
-    await page.goto('/blog/academics');
+    await page.goto('/academics');
     await expect(page.locator('#main-content')).toBeVisible();
     await expect(page.locator('app-review-card-skeleton').first()).toBeVisible({ timeout: 5_000 });
   });
@@ -632,7 +632,7 @@ test.describe('Loading States', () => {
         json: { data: [], total: 0, page: 1, limit: 6, totalPages: 0 },
       });
     });
-    await page.goto('/blog/');
+    await page.goto('/');
     const reviewsSection = page.locator('[aria-labelledby="reviews-heading"]');
     await expect(reviewsSection).toHaveAttribute('aria-busy', 'true', { timeout: 5_000 });
   });
@@ -644,7 +644,7 @@ test.describe('Loading States', () => {
 
 test.describe('Edge Cases — Filter Combinations', () => {
   test('applying all filters on empty DB still shows no-results message', async ({ page }) => {
-    await page.goto('/blog/reviews');
+    await page.goto('/reviews');
     await expect(page.locator('#main-content')).toBeVisible();
 
     // Apply genre filter
@@ -660,7 +660,7 @@ test.describe('Edge Cases — Filter Combinations', () => {
   });
 
   test('academics: applying theme filter on empty DB shows no-results message', async ({ page }) => {
-    await page.goto('/blog/academics');
+    await page.goto('/academics');
     await expect(page.locator('#main-content')).toBeVisible();
     await page.getByRole('combobox', { name: /Filtrer par thème/i }).selectOption('literature');
     const liveRegion = page.locator('[aria-live="polite"]');

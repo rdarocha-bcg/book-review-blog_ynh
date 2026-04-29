@@ -4,11 +4,11 @@ import { test, expect } from '@playwright/test';
  * Deployed instance smoke (baseURL from config, usually under /blog/).
  * Run: npx playwright test -c playwright.prod.config.ts
  */
-const deployedApiOrigin = (process.env.E2E_BASE_URL || 'https://remidarocha.fr').replace(/\/$/, '');
+const deployedApiOrigin = (process.env.E2E_BASE_URL || 'https://remidarocha.fr/blog').replace(/\/blog\/?$/, '').replace(/\/$/, '');
 
 test.describe('Production /blog', () => {
   test('API auth/me returns JSON (no browser)', async ({ request }) => {
-    const res = await request.get(`${deployedApiOrigin}/blog/api/auth/me`);
+    const res = await request.get(`${deployedApiOrigin}/api/auth/me`);
     expect(res.status(), 'auth/me HTTP status').toBe(200);
     const body = (await res.json()) as { authenticated?: boolean };
     expect(body).toHaveProperty('authenticated');
@@ -21,9 +21,9 @@ test.describe('Production /blog', () => {
     });
     page.on('pageerror', (err) => failures.push(`pageerror: ${err.message}`));
 
-    const response = await page.goto('/blog/', { waitUntil: 'load', timeout: 45_000 });
+    const response = await page.goto('/', { waitUntil: 'load', timeout: 45_000 });
 
-    expect(response?.status(), 'HTTP status for /blog/').toBe(200);
+    expect(response?.status(), 'HTTP status for /').toBe(200);
     await expect(page).toHaveTitle(/Book Review Blog/i);
     await expect(page.locator('#main-content')).toBeVisible();
 

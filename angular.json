@@ -44,6 +44,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/blog/",
               "budgets": [
                 {
                   "type": "initial",
