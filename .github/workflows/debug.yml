@@ -1,0 +1,65 @@
+name: Debug Service Status
+
+on: workflow_dispatch
+
+permissions:
+  contents: read
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.YNH_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.YNH_SSH_HOST }}
+          SSH_KNOWN_HOSTS: ${{ secrets.YNH_SSH_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Check Service Status
+        env:
+          SSH_HOST: ${{ secrets.YNH_SSH_HOST }}
+          SSH_USER: ${{ secrets.YNH_SSH_USER }}
+          SSH_PORT: ${{ secrets.YNH_SSH_PORT || '22' }}
+        run: |
+          echo "=== Service Status ==="
+          ssh -i ~/.ssh/id_ed25519 -p "$SSH_PORT" -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            "$SSH_USER@$SSH_HOST" \
+            "sudo systemctl status book-review-blog" || true
+          
+          echo ""
+          echo "=== Recent Service Logs ==="
+          ssh -i ~/.ssh/id_ed25519 -p "$SSH_PORT" -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            "$SSH_USER@$SSH_HOST" \
+            "sudo journalctl -u book-review-blog -n 50" || true
+          
+          echo ""
+          echo "=== Process Check ==="
+          ssh -i ~/.ssh/id_ed25519 -p "$SSH_PORT" -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            "$SSH_USER@$SSH_HOST" \
+            "ps aux | grep -E 'node|fastify' | grep -v grep" || true
+          
+          echo ""
+          echo "=== Port 3000 Status ==="
+          ssh -i ~/.ssh/id_ed25519 -p "$SSH_PORT" -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            "$SSH_USER@$SSH_HOST" \
+            "sudo netstat -tlnp 2>/dev/null | grep 3000 || echo 'Port 3000 not listening'" || true
+          
+          echo ""
+          echo "=== Nginx Error Logs (last 20 lines) ==="
+          ssh -i ~/.ssh/id_ed25519 -p "$SSH_PORT" -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            "$SSH_USER@$SSH_HOST" \
+            "sudo tail -n 20 /var/log/nginx/error.log 2>/dev/null || echo 'No error log'" || true
