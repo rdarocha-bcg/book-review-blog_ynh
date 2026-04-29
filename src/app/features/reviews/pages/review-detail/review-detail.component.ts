@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MarkdownComponent } from 'ngx-markdown';
 import { ReviewService } from '../../services/review.service';
 import { Review } from '../../models/review.model';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
@@ -19,7 +20,7 @@ import { Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-review-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, LoadingSpinnerComponent],
+  imports: [CommonModule, RouterLink, LoadingSpinnerComponent, MarkdownComponent],
   template: `
     <div class="page-container">
       <a
@@ -68,8 +69,15 @@ import { Subject, takeUntil } from 'rxjs';
               </div>
             </div>
 
-            <div class="prose max-w-none">
-              <p class="text-[var(--text-dark)] whitespace-pre-wrap">{{ review!.content }}</p>
+            <div class="prose prose-sm md:prose max-w-none
+                        prose-headings:font-semibold prose-headings:text-[var(--primary)]
+                        prose-p:text-[var(--text-dark)] prose-p:leading-relaxed
+                        prose-a:text-[var(--accent-strong)] prose-a:underline prose-a:underline-offset-2 hover:prose-a:text-[var(--primary)]
+                        prose-strong:text-[var(--text-dark)]
+                        prose-blockquote:border-l-[var(--accent-strong)] prose-blockquote:text-[var(--text-muted)]
+                        prose-code:text-[var(--accent-strong)] prose-code:bg-[var(--surface-alt)] prose-code:px-1 prose-code:rounded
+                        prose-hr:border-[var(--border-light)]">
+              <markdown [data]="review!.content"></markdown>
             </div>
           </div>
 
