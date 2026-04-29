@@ -84,10 +84,18 @@ jobs:
           SOURCE_URL: ${{ env.SOURCE_URL }}
           YNH_DOMAIN: ${{ secrets.YNH_SSH_HOST }}
         run: |
+          # Try to install (will work if app doesn't exist), fallback to upgrade if it does
+          echo -e "$YNH_DOMAIN\n/blog" | ssh -i "$HOME/.ssh/id_ed25519" -p "$SSH_PORT" \
+            -o BatchMode=no \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            -o IdentitiesOnly=yes \
+            "$SSH_USER@$SSH_HOST" \
+            "sudo yunohost app install '$SOURCE_URL' --no-remove-on-failure 2>&1" && echo 'App installed' || \
           ssh -i "$HOME/.ssh/id_ed25519" -p "$SSH_PORT" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
             -o IdentitiesOnly=yes \
             "$SSH_USER@$SSH_HOST" \
-            "sudo yunohost app install '$SOURCE_URL' --force --no-remove-on-failure --domain '$YNH_DOMAIN' --path '/blog' 2>&1 && echo 'App installed' || sudo yunohost app upgrade '$APP_ID' -u '$SOURCE_URL'"
+            "sudo yunohost app upgrade '$APP_ID' -u '$SOURCE_URL' 2>&1"
