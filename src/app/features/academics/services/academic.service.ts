@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap, catchError, retry } from 'rxjs/operators';
-import { of, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { ApiService } from '@core/services/api.service';
 import { AcademicWork, AcademicFilter, AcademicPaginationResponse } from '../models/academic.model';
 

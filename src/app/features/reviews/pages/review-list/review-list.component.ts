@@ -115,7 +115,7 @@ import { debounceTime } from 'rxjs/operators';
 
         <!-- Reviews List -->
         <div
-          *ngIf="(isLoading$ | async) === false && !(error$ | async)"
+          *ngIf="(isLoading$ | async) === false && (error$ | async) === null"
           class="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6"
         >
         <app-card
@@ -153,7 +153,7 @@ import { debounceTime } from 'rxjs/operators';
       </div>
 
       <!-- No Results -->
-      <div *ngIf="(reviews$ | async)?.length === 0 && (isLoading$ | async) === false && !(error$ | async)" class="text-center py-12">
+      <div *ngIf="(reviews$ | async)?.length === 0 && (isLoading$ | async) === false && (error$ | async) === null" class="text-center py-12">
         <p class="text-xl text-[var(--text-muted)]">Aucune critique trouvée. Essayez d'ajuster vos filtres.</p>
       </div>
 
