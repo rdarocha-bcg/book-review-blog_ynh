@@ -74,7 +74,7 @@ import { MarkdownComponent } from 'ngx-markdown';
 
           <!-- Contenu — Markdown editor with preview toggle -->
           <div>
-            <label class="block text-sm font-semibold mb-2 text-[var(--primary)]">Contenu</label>
+            <label for="content" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Contenu</label>
 
             <!-- Tab bar + image upload button -->
             <div class="flex items-center justify-between mb-0">
