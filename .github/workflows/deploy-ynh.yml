@@ -84,14 +84,41 @@ jobs:
           SOURCE_URL: ${{ env.SOURCE_URL }}
           YNH_DOMAIN: ${{ secrets.YNH_SSH_HOST }}
         run: |
-          # Try to install (will work if app doesn't exist), fallback to upgrade if it does
-          echo -e "$YNH_DOMAIN\n/blog" | ssh -i "$HOME/.ssh/id_ed25519" -p "$SSH_PORT" \
-            -o BatchMode=no \
-            -o StrictHostKeyChecking=yes \
-            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
-            -o IdentitiesOnly=yes \
-            "$SSH_USER@$SSH_HOST" \
-            "sudo yunohost app install '$SOURCE_URL' --no-remove-on-failure 2>&1" && echo 'App installed' || \
+          # Install expect for automating interactive prompts
+          sudo apt-get update && sudo apt-get install -y expect >/dev/null 2>&1 || true
+
+          # Create expect script for app installation
+          cat > /tmp/install_app.exp << 'EOF'
+          #!/usr/bin/expect -f
+          set timeout 300
+          set host [lindex $argv 0]
+          set user [lindex $argv 1]
+          set port [lindex $argv 2]
+          set domain [lindex $argv 3]
+          set path [lindex $argv 4]
+          set source_url [lindex $argv 5]
+          set key_file [lindex $argv 6]
+
+          spawn ssh -i $key_file -p $port -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$::env(HOME)/.ssh/known_hosts $user@$host sudo yunohost app install $source_url
+
+          expect {
+            "Domain" {
+              send "$domain\r"
+              exp_continue
+            }
+            "Path" {
+              send "$path\r"
+              exp_continue
+            }
+            "eof" { }
+            timeout { exit 1 }
+          }
+          EOF
+
+          chmod +x /tmp/install_app.exp
+
+          # Try to install, fallback to upgrade
+          expect /tmp/install_app.exp "$SSH_HOST" "$SSH_USER" "$SSH_PORT" "$YNH_DOMAIN" "/blog" "$SOURCE_URL" "$HOME/.ssh/id_ed25519" 2>&1 && echo "App installed" || \
           ssh -i "$HOME/.ssh/id_ed25519" -p "$SSH_PORT" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
