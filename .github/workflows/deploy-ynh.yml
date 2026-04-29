@@ -102,16 +102,24 @@ jobs:
           spawn ssh -i $key_file -p $port -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$::env(HOME)/.ssh/known_hosts $user@$host sudo yunohost app install $source_url
 
           expect {
-            "Domain" {
+            -re "domain|Domain" {
               send "$domain\r"
               exp_continue
             }
-            "Path" {
+            -re "path|Path" {
               send "$path\r"
               exp_continue
             }
+            -re "permission|Permission" {
+              send "visitors\r"
+              exp_continue
+            }
+            -re "admin|Admin" {
+              send "\r"
+              exp_continue
+            }
             "eof" { }
-            timeout { exit 1 }
+            timeout { puts "Timeout waiting for prompts"; exit 1 }
           }
           EOF
 
