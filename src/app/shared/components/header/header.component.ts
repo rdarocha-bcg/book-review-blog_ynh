@@ -71,6 +71,11 @@ import { filter, Subject, takeUntil } from 'rxjs';
               >
             </li>
             <li>
+              <a routerLink="/contact" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+                >Contact</a
+              >
+            </li>
+            <li>
               <a routerLink="/admin" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
                 >Admin</a
               >
@@ -124,6 +129,14 @@ import { filter, Subject, takeUntil } from 'rxjs';
                 class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                 (click)="closeMobileNav()"
                 >À propos</a
+              >
+            </li>
+            <li>
+              <a
+                routerLink="/contact"
+                class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+                (click)="closeMobileNav()"
+                >Contact</a
               >
             </li>
             <li>
