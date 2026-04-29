@@ -89,4 +89,4 @@ jobs:
             -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
             -o IdentitiesOnly=yes \
             "$SSH_USER@$SSH_HOST" \
-            "yunohost app upgrade '$APP_ID' -u '$SOURCE_URL'"
+            "sudo yunohost app upgrade '$APP_ID' -u '$SOURCE_URL'"
