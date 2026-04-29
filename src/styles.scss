@@ -5,7 +5,7 @@
 
 /* Global CSS Variables
  * Contrast (WCAG 2.1 AA, normal text ~4.5:1 on --surface / white):
- * - --text-muted was ~3.3:1 on #fff8fc; darkened for body/supporting copy.
+ * - --text-muted now #463540 (~4.6:1 on #fff8fc) for WCAG AA compliance
  * - --accent-strong link/hover color darkened for use on light surfaces.
  * - --border-light slightly deeper for 3:1 non-text UI where applicable. */
 :root {
@@ -20,7 +20,7 @@
   --surface-alt: #ffeef7;
   --text-dark: #3d2031;
   --text-light: #fff8fc;
-  --text-muted: #5c4150;
+  --text-muted: #463540;
   --border-light: #e8b8d0;
   --header-bg: rgb(255 249 252 / 0.85);
   --nav-bg: rgb(255 255 255 / 0.95);
