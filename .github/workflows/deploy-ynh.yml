@@ -75,7 +75,7 @@ jobs:
           printf '%s\n' "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/known_hosts"
 
-      - name: Trigger YunoHost app upgrade
+      - name: Deploy YunoHost app (install or upgrade)
         env:
           SSH_HOST: ${{ secrets.YNH_SSH_HOST }}
           SSH_USER: ${{ secrets.YNH_SSH_USER }}
@@ -89,4 +89,4 @@ jobs:
             -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
             -o IdentitiesOnly=yes \
             "$SSH_USER@$SSH_HOST" \
-            "sudo yunohost app upgrade '$APP_ID' -u '$SOURCE_URL'"
+            "sudo yunohost app install '$SOURCE_URL' --no-remove-on-failure && echo 'App installed' || sudo yunohost app upgrade '$APP_ID' -u '$SOURCE_URL'"
