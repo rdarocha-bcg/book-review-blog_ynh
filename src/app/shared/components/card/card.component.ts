@@ -25,7 +25,7 @@ export class CardComponent {
     let classes =
       'bg-[color:var(--card-bg)] border border-[var(--border-light)] rounded-2xl shadow-[0_12px_24px_-24px_rgba(122,54,95,0.55)] p-5';
     if (this.hoverable) {
-      classes += ' hover:shadow-[0_15px_28px_-24px_rgba(122,54,95,0.62)] transition-shadow duration-200 cursor-pointer';
+      classes += ' hover:shadow-[0_20px_36px_-24px_rgba(122,54,95,0.75)] hover:scale-102 transition-all duration-200 cursor-pointer';
     }
     return classes;
   }

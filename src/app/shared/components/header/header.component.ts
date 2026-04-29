@@ -21,7 +21,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
   imports: [RouterLink],
   template: `
     <header
-      class="relative sticky top-0 z-40 border-b border-[var(--border-light)] bg-[color:var(--header-bg)] backdrop-blur-md"
+      class="relative sticky top-0 z-40 border-b border-[var(--border-light)] shadow-sm bg-[color:var(--header-bg)] backdrop-blur-md"
       role="banner"
     >
       <a href="#main-content" class="skip-link">Aller au contenu principal</a>
