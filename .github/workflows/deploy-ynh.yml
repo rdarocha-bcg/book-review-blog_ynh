@@ -82,6 +82,7 @@ jobs:
           SSH_PORT: ${{ env.SSH_PORT }}
           APP_ID: ${{ env.APP_ID }}
           SOURCE_URL: ${{ env.SOURCE_URL }}
+          YNH_DOMAIN: ${{ secrets.YNH_SSH_HOST }}
         run: |
           ssh -i "$HOME/.ssh/id_ed25519" -p "$SSH_PORT" \
             -o BatchMode=yes \
@@ -89,4 +90,4 @@ jobs:
             -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
             -o IdentitiesOnly=yes \
             "$SSH_USER@$SSH_HOST" \
-            "sudo yunohost app install '$SOURCE_URL' --force --no-remove-on-failure -y 2>&1 && echo 'App installed' || sudo yunohost app upgrade '$APP_ID' -u '$SOURCE_URL' -y"
+            "sudo yunohost app install '$SOURCE_URL' --force --no-remove-on-failure --domain '$YNH_DOMAIN' --path '/blog' 2>&1 && echo 'App installed' || sudo yunohost app upgrade '$APP_ID' -u '$SOURCE_URL'"
