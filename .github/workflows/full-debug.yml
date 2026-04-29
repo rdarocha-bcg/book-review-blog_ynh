@@ -1,0 +1,67 @@
+name: Full Debug Investigation
+
+on: workflow_dispatch
+
+permissions:
+  contents: read
+
+jobs:
+  investigate:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.YNH_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.YNH_SSH_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Full Investigation
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            remi@remidarocha.fr bash -s << 'SSHEOF'
+          
+          echo "=== What's listening on port 3000 ==="
+          sudo lsof -i :3000 2>/dev/null || echo "No process on port 3000"
+          
+          echo ""
+          echo "=== All listening ports ==="
+          sudo ss -tulpn | grep LISTEN | head -20
+          
+          echo ""
+          echo "=== Backend process status ==="
+          ps aux | grep -E '[n]ode|[b]ook' | grep -v grep
+          
+          echo ""
+          echo "=== Service detailed status ==="
+          sudo systemctl status book-review-blog
+          
+          echo ""
+          echo "=== Recent service errors ==="
+          sudo journalctl -u book-review-blog -p err -n 20
+          
+          echo ""
+          echo "=== API .env config ==="
+          sudo cat /var/www/book-review-blog/api/.env 2>/dev/null | grep -v PASSWORD || echo "Cannot read config"
+          
+          echo ""
+          echo "=== Try to curl the API directly ==="
+          curl -v http://127.0.0.1:3000/api/reviews?limit=1 2>&1 | head -20
+          
+          echo ""
+          echo "=== Check disk space ==="
+          df -h /var/www/ /tmp /
+          
+          echo ""
+          echo "=== Check memory ==="
+          free -h
+          
+          SSHEOF
