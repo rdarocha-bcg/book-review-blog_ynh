@@ -30,11 +30,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+
       - name: Lint
         run: npm run lint
 
       - name: Unit tests (CI)
         run: npm run test:ci
+        env:
+          CHROME_BIN: /usr/bin/chromium-browser
 
       - name: Production build
         run: npm run build:prod
