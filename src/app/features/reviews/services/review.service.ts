@@ -32,9 +32,9 @@ export class ReviewService {
         this.reviews$.next(response.data);
         this.loading$.next(false);
       }),
-      catchError(() => {
+      catchError((err) => {
         this.loading$.next(false);
-        return of({ data: [], total: 0, page: 1, limit: 10, totalPages: 0 });
+        return throwError(() => err);
       })
     );
   }

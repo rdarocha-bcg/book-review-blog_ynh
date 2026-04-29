@@ -13,7 +13,7 @@ import { CardComponent } from '@shared/components/card/card.component';
 import { ReviewCardSkeletonComponent } from '@shared/components/review-card-skeleton/review-card-skeleton.component';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 /**
@@ -78,6 +78,15 @@ import { debounceTime } from 'rxjs/operators';
             Réinitialiser
           </button>
         </div>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error$ | async as error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
+        <p class="font-bold mb-2">Erreur lors du chargement des travaux académiques. Veuillez réessayer.</p>
+        <p class="text-sm mb-3">{{ error }}</p>
+        <button (click)="retryLoadAcademics()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+          Réessayer
+        </button>
       </div>
 
       <div [attr.aria-busy]=\"(isLoading$ | async) === true\" aria-live=\"polite\">
@@ -147,6 +156,7 @@ export class AcademicListComponent implements OnInit, OnDestroy {
 
   academics$ = this.academicService.getAcademics$();
   isLoading$ = this.academicService.getLoading$();
+  error$ = new BehaviorSubject<string | null>(null);
 
   searchQuery = '';
   selectedTheme = '';
@@ -179,6 +189,7 @@ export class AcademicListComponent implements OnInit, OnDestroy {
   }
 
   loadAcademics(): void {
+    this.error$.next(null);
     const filters = {
       search: this.searchQuery || undefined,
       theme: this.selectedTheme || undefined,
@@ -194,8 +205,14 @@ export class AcademicListComponent implements OnInit, OnDestroy {
           this.totalItems = res.total;
           this.totalPages = res.totalPages || Math.ceil(res.total / this.pageSize) || 1;
         },
-        error: (error) => console.error('Error loading academics:', error),
+        error: (error) => {
+          this.error$.next(error?.message || 'Erreur réseau ou serveur indisponible');
+        },
       });
+  }
+
+  retryLoadAcademics(): void {
+    this.loadAcademics();
   }
 
   onPaginationChange(event: { page: number; limit: number }): void {

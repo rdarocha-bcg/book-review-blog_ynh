@@ -13,7 +13,7 @@ import { CardComponent } from '@shared/components/card/card.component';
 import { ReviewCardSkeletonComponent } from '@shared/components/review-card-skeleton/review-card-skeleton.component';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 /**
@@ -93,6 +93,15 @@ import { debounceTime } from 'rxjs/operators';
         </div>
       </div>
 
+      <!-- Error State -->
+      <div *ngIf="error$ | async as error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
+        <p class="font-bold mb-2">Erreur lors du chargement des critiques. Veuillez réessayer.</p>
+        <p class="text-sm mb-3">{{ error }}</p>
+        <button (click)="retryLoadReviews()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+          Réessayer
+        </button>
+      </div>
+
       <div [attr.aria-busy]="(isLoading$ | async) === true" aria-live="polite">
         <!-- Loading placeholders (filters/pagination stay usable) -->
         <div
@@ -106,7 +115,7 @@ import { debounceTime } from 'rxjs/operators';
 
         <!-- Reviews List -->
         <div
-          *ngIf="(isLoading$ | async) === false"
+          *ngIf="(isLoading$ | async) === false && !(error$ | async)"
           class="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6"
         >
         <app-card
@@ -144,7 +153,7 @@ import { debounceTime } from 'rxjs/operators';
       </div>
 
       <!-- No Results -->
-      <div *ngIf="(reviews$ | async)?.length === 0 && (isLoading$ | async) === false" class="text-center py-12">
+      <div *ngIf="(reviews$ | async)?.length === 0 && (isLoading$ | async) === false && !(error$ | async)" class="text-center py-12">
         <p class="text-xl text-[var(--text-muted)]">Aucune critique trouvée. Essayez d'ajuster vos filtres.</p>
       </div>
 
@@ -167,6 +176,7 @@ export class ReviewListComponent implements OnInit, OnDestroy {
 
   reviews$ = this.reviewService.getReviews$();
   isLoading$ = this.reviewService.getLoading$();
+  error$ = new BehaviorSubject<string | null>(null);
 
   searchQuery = '';
   selectedGenre = '';
@@ -200,6 +210,7 @@ export class ReviewListComponent implements OnInit, OnDestroy {
   }
 
   loadReviews(): void {
+    this.error$.next(null);
     const filters = {
       search: this.searchQuery || undefined,
       genre: this.selectedGenre || undefined,
@@ -216,8 +227,14 @@ export class ReviewListComponent implements OnInit, OnDestroy {
           this.totalItems = res.total;
           this.totalPages = res.totalPages || Math.ceil(res.total / this.pageSize) || 1;
         },
-        error: (error) => console.error('Error loading reviews:', error),
+        error: (error) => {
+          this.error$.next(error?.message || 'Erreur réseau ou serveur indisponible');
+        },
       });
+  }
+
+  retryLoadReviews(): void {
+    this.loadReviews();
   }
 
   onPaginationChange(event: { page: number; limit: number }): void {
