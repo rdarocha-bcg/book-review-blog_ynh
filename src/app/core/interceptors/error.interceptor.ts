@@ -3,10 +3,12 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { NotificationService } from '@core/services/notification.service';
+import { mapHttpError } from '@core/utils/http-error.utils';
 
 /**
  * HTTP Error Interceptor
- * Handles HTTP errors globally (no in-app login flow; auth is outside this UI).
+ * Handles HTTP errors globally with sanitized, user-friendly messages.
+ * Raw server error details (stack traces, SQL errors, etc.) are never exposed.
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -14,21 +16,24 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      const message = mapHttpError(error);
+
       switch (error.status) {
         case 401:
-          notifications.warning('Session expired — please sign in from the server portal.');
+          notifications.warning(message);
           router.navigate(['/401']);
           break;
         case 403:
-          notifications.warning('You do not have permission to perform this action.');
+          notifications.warning(message);
           break;
         case 404:
-          console.error('Resource not found');
+          // 404s are handled per-component; no global toast needed
           break;
-        case 500:
-          notifications.error('A server error occurred. Please try again later.');
+        default:
+          notifications.error(message);
           break;
       }
+
       return throwError(() => error);
     }),
   );
