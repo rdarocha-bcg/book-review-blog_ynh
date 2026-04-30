@@ -2,6 +2,7 @@ import {
   Component,
   OnDestroy,
   ChangeDetectionStrategy,
+  computed,
   inject,
   signal,
   ElementRef,
@@ -9,6 +10,7 @@ import {
   HostListener,
 } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { AuthService } from '@core/services/auth.service';
 import { SiteConfigService } from '@core/services/site-config.service';
 import { filter, Subject, takeUntil } from 'rxjs';
 
@@ -75,11 +77,13 @@ import { filter, Subject, takeUntil } from 'rxjs';
                 >Contact</a
               >
             </li>
-            <li>
-              <a routerLink="/admin" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
-                >Admin</a
-              >
-            </li>
+            @if (isAdmin()) {
+              <li>
+                <a routerLink="/admin" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+                  >Admin</a
+                >
+              </li>
+            }
           </ul>
         </div>
       </nav>
@@ -139,14 +143,16 @@ import { filter, Subject, takeUntil } from 'rxjs';
                 >Contact</a
               >
             </li>
-            <li>
-              <a
-                routerLink="/admin"
-                class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
-                (click)="closeMobileNav()"
-                >Admin</a
-              >
-            </li>
+            @if (isAdmin()) {
+              <li>
+                <a
+                  routerLink="/admin"
+                  class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+                  (click)="closeMobileNav()"
+                  >Admin</a
+                >
+              </li>
+            }
           </ul>
         </div>
       }
@@ -156,7 +162,11 @@ import { filter, Subject, takeUntil } from 'rxjs';
 })
 export class HeaderComponent implements OnDestroy {
   readonly site = inject(SiteConfigService);
+  readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  /** True when the current user holds the admin role. */
+  readonly isAdmin = computed(() => this.auth.state()?.user?.role === 'admin');
 
   readonly mobileNavOpen = signal(false);
   private readonly menuButtonRef = viewChild<ElementRef<HTMLButtonElement>>('menuButton');
