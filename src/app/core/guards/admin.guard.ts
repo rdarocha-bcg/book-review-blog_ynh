@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { CanMatchFn, Router } from '@angular/router';
+import { CanActivateFn, CanMatchFn, Router } from '@angular/router';
 import { map } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 
@@ -8,8 +8,9 @@ import { AuthService } from '@core/services/auth.service';
  * AND holds the 'admin' role.
  * Unauthenticated users are redirected to /login; authenticated non-admins to /401.
  * Uses `canMatch` so the admin chunk is never downloaded for ineligible users.
+ * Also usable as `canActivate` for individual admin-only routes.
  */
-export const adminGuard: CanMatchFn = () => {
+export const adminGuard: CanActivateFn & CanMatchFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
