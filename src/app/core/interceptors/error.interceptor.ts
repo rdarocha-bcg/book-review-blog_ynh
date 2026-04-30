@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { NotificationService } from '@core/services/notification.service';
+import { AuthService } from '@core/services/auth.service';
 
 /**
  * HTTP Error Interceptor
@@ -11,12 +12,14 @@ import { NotificationService } from '@core/services/notification.service';
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const notifications = inject(NotificationService);
+  const auth = inject(AuthService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       switch (error.status) {
         case 401:
-          notifications.warning('Session expired — please sign in from the server portal.');
+          auth.refresh();
+          notifications.warning('Votre session a expiré. Veuillez vous reconnecter.');
           router.navigate(['/401']);
           break;
         case 403:

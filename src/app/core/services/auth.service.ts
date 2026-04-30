@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, shareReplay, catchError, of } from 'rxjs';
+import { Observable, tap, shareReplay, catchError, of, EMPTY } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export interface AuthUser {
@@ -55,6 +55,17 @@ export class AuthService {
     this.pending$ = null;
     this.state.set(null);
     return this.getState();
+  }
+
+  /** Call the server logout endpoint and clear cached auth state. */
+  logout(): Observable<void> {
+    return this.http.get<void>(`${environment.apiUrl}/auth/logout`, { withCredentials: true }).pipe(
+      tap(() => this.refresh()),
+      catchError(() => {
+        this.refresh();
+        return EMPTY;
+      }),
+    );
   }
 
   isAdmin(): boolean {

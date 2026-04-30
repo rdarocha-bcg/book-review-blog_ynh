@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { SiteConfigService } from '@core/services/site-config.service';
+import { AuthService } from '@core/services/auth.service';
 import { filter, Subject, takeUntil } from 'rxjs';
 
 /**
@@ -82,6 +83,16 @@ import { filter, Subject, takeUntil } from 'rxjs';
             </li>
           </ul>
         </div>
+        @if (auth.state()?.authenticated) {
+          <button
+            type="button"
+            class="hidden shrink-0 rounded-md border border-[var(--border-light)] px-3 py-1.5 text-sm font-medium text-[var(--text-dark)] hover:bg-[var(--surface)] md:inline-flex"
+            (click)="onLogout()"
+            aria-label="Se déconnecter"
+          >
+            Se déconnecter
+          </button>
+        }
       </nav>
 
       @if (mobileNavOpen()) {
@@ -147,6 +158,17 @@ import { filter, Subject, takeUntil } from 'rxjs';
                 >Admin</a
               >
             </li>
+            @if (auth.state()?.authenticated) {
+              <li>
+                <button
+                  type="button"
+                  class="block w-full rounded-md px-3 py-3 text-left font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+                  (click)="onLogout(); closeMobileNav()"
+                >
+                  Se déconnecter
+                </button>
+              </li>
+            }
           </ul>
         </div>
       }
@@ -156,6 +178,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
 })
 export class HeaderComponent implements OnDestroy {
   readonly site = inject(SiteConfigService);
+  readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly mobileNavOpen = signal(false);
@@ -176,6 +199,13 @@ export class HeaderComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  onLogout(): void {
+    this.auth
+      .logout()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.router.navigate(['/']));
   }
 
   toggleMobileNav(): void {
