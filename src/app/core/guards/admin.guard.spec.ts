@@ -12,7 +12,8 @@ function runGuard(authState: AuthState) {
     providers: [{ provide: AuthService, useValue: authServiceStub }],
   });
   const router = TestBed.inject(Router);
-  return TestBed.runInInjectionContext(() => adminGuard({} as never, {} as never));
+  const result$ = TestBed.runInInjectionContext(() => adminGuard({} as never, [] as never));
+  return { result$, router };
 }
 
 describe('adminGuard', () => {
@@ -21,7 +22,8 @@ describe('adminGuard', () => {
       authenticated: true,
       user: { id: '1', email: 'admin@example.com', name: 'Admin', role: 'admin' },
     };
-    (runGuard(state) as ReturnType<typeof of>).subscribe((result) => {
+    const { result$ } = runGuard(state);
+    (result$ as ReturnType<typeof of>).subscribe((result) => {
       expect(result).toBe(true);
       done();
     });
@@ -32,16 +34,18 @@ describe('adminGuard', () => {
       authenticated: true,
       user: { id: '2', email: 'user@example.com', name: 'User', role: 'user' },
     };
-    (runGuard(state) as ReturnType<typeof of>).subscribe((result) => {
-      expect(result).not.toBe(true);
+    const { result$, router } = runGuard(state);
+    (result$ as ReturnType<typeof of>).subscribe((result) => {
+      expect(result).toEqual(router.createUrlTree(['/401']));
       done();
     });
   });
 
-  it('should redirect to /401 for an unauthenticated user', (done) => {
+  it('should redirect to /login for an unauthenticated user', (done) => {
     const state: AuthState = { authenticated: false };
-    (runGuard(state) as ReturnType<typeof of>).subscribe((result) => {
-      expect(result).not.toBe(true);
+    const { result$, router } = runGuard(state);
+    (result$ as ReturnType<typeof of>).subscribe((result) => {
+      expect(result).toEqual(router.createUrlTree(['/login']));
       done();
     });
   });
