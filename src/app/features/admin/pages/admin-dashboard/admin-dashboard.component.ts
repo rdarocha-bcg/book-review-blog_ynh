@@ -47,6 +47,14 @@ import { RouterLink } from '@angular/router';
         </a>
 
         <a
+          routerLink="/admin/reviews"
+          class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
+        >
+          <h2 class="mb-1 font-semibold text-[var(--primary)]">Gérer les critiques</h2>
+          <p class="text-sm text-[var(--text-muted)]">Modifier ou supprimer des critiques.</p>
+        </a>
+
+        <a
           routerLink="/admin/academics"
           class="rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-5 transition hover:border-[var(--accent-strong)]"
         >
