@@ -14,6 +14,12 @@ export function mapHttpError(error: HttpErrorResponse): string {
       return 'Accès refusé.';
     case 404:
       return 'Ressource introuvable.';
+    case 422:
+      return 'Les données envoyées sont invalides.';
+    case 429:
+      return 'Trop de requêtes. Veuillez patienter.';
+    case 0:
+      return 'Impossible de joindre le serveur. Vérifiez votre connexion.';
     default:
       if (error.status >= 500) {
         return 'Une erreur serveur est survenue. Veuillez réessayer.';
