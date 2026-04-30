@@ -3,6 +3,7 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
@@ -195,6 +196,7 @@ export class ReviewListComponent implements OnInit, OnDestroy {
     private reviewService: ReviewService,
     private router: Router,
     private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -208,6 +210,7 @@ export class ReviewListComponent implements OnInit, OnDestroy {
         this.selectedSort = (params['sort'] as typeof this.selectedSort) || '';
         this.currentPage = params['page'] ? parseInt(params['page'], 10) : 1;
         this.loadReviews();
+        this.cdr.markForCheck();
       });
 
     // Debounced search: update URL after the user stops typing; queryParams will trigger the load.
@@ -287,7 +290,7 @@ export class ReviewListComponent implements OnInit, OnDestroy {
         sort: this.selectedSort || null,
         page: this.currentPage > 1 ? this.currentPage : null,
       },
-      queryParamsHandling: 'replace',
+      queryParamsHandling: 'merge',
     });
   }
 
