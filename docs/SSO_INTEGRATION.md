@@ -50,7 +50,7 @@ Le backend **n'accepte les en-têtes SSO que si la requête TCP provient de `127
 
 | Valeur | Comportement |
 |--------|-------------|
-| `auto` (défaut) | Fait confiance uniquement à `127.0.0.1` / `::ffff:127.0.0.1` |
+| `auto` (défaut) | Fait confiance uniquement à `127.0.0.1` / `::ffff:127.0.0.1` / `::1` |
 | `always` | Fait toujours confiance (utile en développement avec proxy externe) |
 | `never` | Ignore toujours les en-têtes SSO (mode public forcé) |
 
@@ -189,9 +189,6 @@ Le backend expose `POST /api/auth/logout` qui renvoie `204` (no-op) pour compati
 | Guard | Type | Comportement en cas d'échec |
 |-------|------|------------------------------|
 | `authGuard` | `CanActivateFn` | Redirige vers `/401` si non authentifié |
-| `adminGuard` | `CanMatchFn` | Redirige vers `/login` si non authentifié, vers `/401` si authentifié mais non admin |
-
-Le chunk d'administration n'est jamais téléchargé pour les utilisateurs non admins (`canMatch` empêche le lazy loading).
 
 ---
 
@@ -305,7 +302,7 @@ L'`authGuard` a reçu `{ authenticated: false }` de `GET /api/auth/me`. Voir le 
 
 ### L'utilisateur authentifié ne voit pas les routes admin
 
-Le `adminGuard` vérifie `role === 'admin'`. Vérifier que :
+La vérification du rôle `admin` est effectuée côté backend via `ADMIN_USERNAMES`. Vérifier que :
 - Le login de l'utilisateur figure dans `ADMIN_USERNAMES` dans `api/.env`.
 - L'API a été redémarrée après modification de `api/.env`.
 
