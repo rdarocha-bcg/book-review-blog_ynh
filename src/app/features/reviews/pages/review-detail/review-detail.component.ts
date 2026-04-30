@@ -63,7 +63,7 @@ import { Subject, takeUntil } from 'rxjs';
                 [routerLink]="['/reviews', review!.id, 'edit']"
                 class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent-strong)] text-white font-semibold hover:brightness-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-strong)]"
               >
-                ✏️ Modifier
+                <span aria-hidden="true">✏️</span> Modifier
               </a>
             }
           </div>
