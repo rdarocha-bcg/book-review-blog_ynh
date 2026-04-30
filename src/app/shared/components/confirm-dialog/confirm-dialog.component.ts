@@ -6,6 +6,10 @@ import {
   signal,
   HostListener,
   ElementRef,
+  ViewChild,
+  effect,
+  afterNextRender,
+  Injector,
 } from '@angular/core';
 import { ConfirmService, ConfirmRequest } from '@shared/services/confirm.service';
 import { Subscription } from 'rxjs';
@@ -47,6 +51,7 @@ import { Subscription } from 'rxjs';
               class="px-5 py-2 rounded-lg border border-[var(--border-light)] bg-[var(--surface-alt,#f9f5fb)] text-[var(--text-dark)] font-semibold hover:brightness-95 transition focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
             >Annuler</button>
             <button
+              #confirmBtn
               type="button"
               (click)="confirm()"
               class="px-5 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
@@ -62,10 +67,22 @@ export class ConfirmDialogComponent implements OnInit, OnDestroy {
   protected readonly pending = signal<ConfirmRequest | null>(null);
   private subscription?: Subscription;
 
+  @ViewChild('confirmBtn') confirmBtn?: ElementRef<HTMLButtonElement>;
+
   constructor(
     private confirmService: ConfirmService,
     private el: ElementRef<HTMLElement>,
-  ) {}
+    private injector: Injector,
+  ) {
+    // Bug A fix: auto-focus the confirm button each time the dialog opens
+    effect(() => {
+      if (this.pending()) {
+        afterNextRender(() => {
+          this.confirmBtn?.nativeElement?.focus();
+        }, { injector: this.injector });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.subscription = this.confirmService.confirmation$.subscribe((request) => {
@@ -84,6 +101,8 @@ export class ConfirmDialogComponent implements OnInit, OnDestroy {
     const focusable = this.el.nativeElement.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
+    // Bug B fix: guard against empty focusable list to prevent TypeError
+    if (!focusable.length) return;
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
     if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
