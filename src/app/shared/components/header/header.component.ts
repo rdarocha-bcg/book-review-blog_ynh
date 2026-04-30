@@ -139,6 +139,16 @@ import { filter, Subject, takeUntil } from 'rxjs';
             }
           </ul>
         </div>
+        @if (auth.state()?.authenticated) {
+          <button
+            type="button"
+            class="hidden shrink-0 rounded-md border border-[var(--border-light)] px-3 py-1.5 text-sm font-medium text-[var(--text-dark)] hover:bg-[var(--surface)] md:inline-flex"
+            (click)="onLogout()"
+            aria-label="Se déconnecter"
+          >
+            Se déconnecter
+          </button>
+        }
       </nav>
 
       <!-- Backdrop: always in DOM, fades in/out via .is-open -->
@@ -212,6 +222,17 @@ import { filter, Subject, takeUntil } from 'rxjs';
               >
             </li>
           }
+          @if (auth.state()?.authenticated) {
+            <li>
+              <button
+                type="button"
+                class="block w-full rounded-md px-3 py-3 text-left font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+                (click)="onLogout(); closeMobileNav()"
+              >
+                Se déconnecter
+              </button>
+            </li>
+          }
         </ul>
       </div>
     </header>
@@ -244,6 +265,13 @@ export class HeaderComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  onLogout(): void {
+    this.auth
+      .logout()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.router.navigate(['/']));
   }
 
   toggleMobileNav(): void {

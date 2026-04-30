@@ -1,6 +1,18 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap, shareReplay, catchError, of, finalize, filter, take, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  tap,
+  shareReplay,
+  catchError,
+  of,
+  finalize,
+  filter,
+  take,
+  switchMap,
+  map,
+} from 'rxjs';
 import { environment } from '@environments/environment';
 
 export interface AuthUser {
@@ -84,6 +96,24 @@ export class AuthService {
         this.refreshSubject.next(true);
       }),
     );
+  }
+
+  /**
+   * Calls POST /api/auth/logout (state-changing; avoid GET) and refreshes cached auth state.
+   * Always completes with void so callers can navigate reliably after logout.
+   */
+  logout(): Observable<void> {
+    return this.http
+      .post<void>(`${environment.apiUrl}/auth/logout`, {}, { withCredentials: true })
+      .pipe(
+        switchMap(() => this.refresh()),
+        map(() => void 0),
+        catchError(() =>
+          this.refresh().pipe(
+            map(() => void 0),
+          ),
+        ),
+      );
   }
 
   isAdmin(): boolean {
