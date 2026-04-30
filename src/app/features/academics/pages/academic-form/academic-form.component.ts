@@ -520,6 +520,10 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
   }
 
   onCancel(): void {
-    this.location.back();
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 }

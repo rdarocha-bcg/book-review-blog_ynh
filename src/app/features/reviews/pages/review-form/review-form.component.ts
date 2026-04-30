@@ -315,9 +315,13 @@ export class ReviewFormComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Cancel and go back to the previous page
+   * Cancel and go back to the previous page, with a fallback to home.
    */
   onCancel(): void {
-    this.location.back();
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 }
