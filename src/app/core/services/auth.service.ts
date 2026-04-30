@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, shareReplay, catchError, of, EMPTY } from 'rxjs';
+import { Observable, tap, shareReplay, catchError, of, switchMap, map } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export interface AuthUser {
@@ -59,11 +59,12 @@ export class AuthService {
 
   /** Call the server logout endpoint and clear cached auth state. */
   logout(): Observable<void> {
-    return this.http.get<void>(`${environment.apiUrl}/auth/logout`, { withCredentials: true }).pipe(
-      tap(() => this.refresh()),
+    return this.http.post<void>(`${environment.apiUrl}/auth/logout`, {}, { withCredentials: true }).pipe(
+      switchMap(() => this.refresh()),
+      map(() => void 0),
       catchError(() => {
-        this.refresh();
-        return EMPTY;
+        this.refresh().subscribe();
+        return of(void 0); // always emit so navigation fires
       }),
     );
   }
