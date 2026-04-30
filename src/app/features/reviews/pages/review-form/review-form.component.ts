@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ReviewService } from '../../services/review.service';
@@ -213,7 +213,8 @@ export class ReviewFormComponent implements OnInit, OnDestroy {
     private reviewService: ReviewService,
     private notificationService: NotificationService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private location: Location
   ) {
     this.initializeForm();
   }
@@ -314,9 +315,9 @@ export class ReviewFormComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Cancel and go back
+   * Cancel and go back to the previous page
    */
   onCancel(): void {
-    this.router.navigate(['/']);
+    this.location.back();
   }
 }
