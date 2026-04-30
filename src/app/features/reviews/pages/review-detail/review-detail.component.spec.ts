@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
+import { provideMarkdown } from 'ngx-markdown';
 import { ReviewDetailComponent } from './review-detail.component';
 import { ReviewService } from '../../services/review.service';
 
@@ -38,6 +39,7 @@ describe('ReviewDetailComponent', () => {
       providers: [
         { provide: ReviewService, useValue: reviewService },
         { provide: ActivatedRoute, useValue: { params: of({ id: '1' }) } },
+        provideMarkdown(),
       ],
     }).compileComponents();
 
