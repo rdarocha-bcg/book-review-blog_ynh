@@ -80,14 +80,22 @@ describe('HeaderComponent', () => {
     const toggle = el.querySelector('#mobile-nav-toggle') as HTMLButtonElement | null;
     expect(toggle).toBeTruthy();
     expect(toggle!.getAttribute('aria-expanded')).toBe('false');
+
+    // Panel is always in the DOM (CSS slide-in transition), hidden when closed
+    const panel = el.querySelector('#mobile-nav-panel');
+    expect(panel).toBeTruthy();
+    expect(panel!.getAttribute('aria-hidden')).toBe('true');
+
     toggle!.click();
     fixture.detectChanges();
     expect(toggle!.getAttribute('aria-expanded')).toBe('true');
-    const panel = el.querySelector('#mobile-nav-panel');
-    expect(panel).toBeTruthy();
+    expect(panel!.getAttribute('aria-hidden')).toBeNull();
+
     toggle!.click();
     fixture.detectChanges();
     expect(toggle!.getAttribute('aria-expanded')).toBe('false');
-    expect(el.querySelector('#mobile-nav-panel')).toBeFalsy();
+    // Panel stays in DOM but is marked aria-hidden when closed
+    expect(el.querySelector('#mobile-nav-panel')).toBeTruthy();
+    expect(panel!.getAttribute('aria-hidden')).toBe('true');
   });
 });
