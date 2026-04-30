@@ -24,10 +24,16 @@ jobs:
           chmod 600 ~/.ssh/known_hosts
 
       - name: Full Investigation
+        env:
+          SSH_HOST: ${{ secrets.YNH_SSH_HOST }}
+          SSH_USER: ${{ secrets.YNH_SSH_USER }}
+          SSH_PORT: ${{ vars.YNH_SSH_PORT || '22' }}
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes \
+          ssh -i ~/.ssh/id_ed25519 -p "$SSH_PORT" -o StrictHostKeyChecking=yes \
             -o UserKnownHostsFile=~/.ssh/known_hosts \
-            remi@remidarocha.fr bash -s << 'SSHEOF'
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            "$SSH_USER@$SSH_HOST" bash -s << 'SSHEOF'
           
           echo "=== What's listening on port 3000 ==="
           sudo lsof -i :3000 2>/dev/null || echo "No process on port 3000"

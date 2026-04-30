@@ -33,13 +33,16 @@ jobs:
         env:
           DEFAULT_APP_ID: book-review-blog
           DEFAULT_SOURCE_URL: https://github.com/rdarocha-bcg/book-review-blog_ynh
+          DEFAULT_APP_PATH: /blog
           VAR_APP_ID: ${{ vars.YNH_APP_INSTANCE_ID }}
           VAR_SOURCE_URL: ${{ vars.YNH_APP_SOURCE_URL }}
           VAR_SSH_PORT: ${{ vars.YNH_SSH_PORT }}
+          VAR_APP_PATH: ${{ vars.YNH_APP_PATH }}
         run: |
           APP_ID="${VAR_APP_ID:-$DEFAULT_APP_ID}"
           SOURCE_URL="${VAR_SOURCE_URL:-$DEFAULT_SOURCE_URL}"
           SSH_PORT="${VAR_SSH_PORT:-22}"
+          APP_PATH="${VAR_APP_PATH:-$DEFAULT_APP_PATH}"
 
           case "$SOURCE_URL" in
             *_ynh|*_ynh.git)
@@ -53,6 +56,7 @@ jobs:
           echo "APP_ID=$APP_ID" >> "$GITHUB_ENV"
           echo "SOURCE_URL=$SOURCE_URL" >> "$GITHUB_ENV"
           echo "SSH_PORT=$SSH_PORT" >> "$GITHUB_ENV"
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
 
       - name: Setup SSH private key
         env:
@@ -126,7 +130,7 @@ jobs:
           chmod +x /tmp/install_app.exp
 
           # Try to install, fallback to upgrade
-          expect /tmp/install_app.exp "$SSH_HOST" "$SSH_USER" "$SSH_PORT" "$YNH_DOMAIN" "/blog" "$SOURCE_URL" "$HOME/.ssh/id_ed25519" 2>&1 && echo "App installed" || \
+          expect /tmp/install_app.exp "$SSH_HOST" "$SSH_USER" "$SSH_PORT" "$YNH_DOMAIN" "$APP_PATH" "$SOURCE_URL" "$HOME/.ssh/id_ed25519" 2>&1 && echo "App installed" || \
           ssh -i "$HOME/.ssh/id_ed25519" -p "$SSH_PORT" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
