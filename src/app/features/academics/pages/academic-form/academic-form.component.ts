@@ -6,11 +6,12 @@ import {
   ChangeDetectorRef,
   viewChild,
   ElementRef,
+  signal,
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 import { AcademicService } from '../../services/academic.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
@@ -150,6 +151,38 @@ import { MarkdownComponent } from 'ngx-markdown';
               aria-hidden="true"
               (change)="onImageFileSelected($event)"
             />
+
+            <!-- Image preview and remove button -->
+            <div *ngIf="imagePreview()" class="mt-2 flex items-start gap-3">
+              <img
+                [src]="imagePreview()"
+                alt="Aperçu de l'image sélectionnée"
+                class="h-16 w-16 object-cover rounded-lg border border-[var(--border-light)]"
+              />
+              <button
+                type="button"
+                (click)="clearImagePreview()"
+                [disabled]="isUploading"
+                class="text-sm text-red-600 hover:text-red-800 underline disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Supprimer l'image
+              </button>
+            </div>
+
+            <!-- Upload progress bar -->
+            <div
+              *ngIf="isUploading"
+              class="mt-2 h-2 w-full rounded-full bg-[var(--surface-alt)] overflow-hidden"
+              role="progressbar"
+              [attr.aria-valuenow]="uploadProgress()"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              <div
+                class="h-full bg-[var(--accent)] transition-all duration-300"
+                [style.width.%]="uploadProgress()"
+              ></div>
+            </div>
 
             <!-- Edit panel -->
             <div
@@ -345,6 +378,8 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
   activeTab: 'edit' | 'preview' = 'edit';
   isUploading = false;
   uploadError: string | null = null;
+  imagePreview = signal<string | null>(null);
+  uploadProgress = signal<number>(0);
 
   private readonly imageFileInput = viewChild.required<ElementRef<HTMLInputElement>>('imageFileInput');
   private readonly contentTextarea = viewChild<ElementRef<HTMLTextAreaElement>>('contentTextarea');
@@ -445,29 +480,49 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
     // Reset the input so the same file can be re-selected if needed
     input.value = '';
 
+    // Generate a local preview via FileReader
+    const reader = new FileReader();
+    reader.onload = (e) => this.imagePreview.set(e.target?.result as string);
+    reader.readAsDataURL(file);
+
     this.isUploading = true;
     this.uploadError = null;
+    this.uploadProgress.set(0);
     this.cdr.markForCheck();
 
     const formData = new FormData();
     formData.append('file', file);
 
     this.http
-      .post<{ url: string }>('/blog/api/media/upload', formData)
+      .post<{ url: string }>('/blog/api/media/upload', formData, {
+        reportProgress: true,
+        observe: 'events',
+      })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          this.insertImageMarkdown(response.url);
-          this.isUploading = false;
-          this.cdr.markForCheck();
+        next: (event) => {
+          if (event.type === HttpEventType.UploadProgress && event.total) {
+            this.uploadProgress.set(Math.round((100 * event.loaded) / event.total));
+          } else if (event.type === HttpEventType.Response) {
+            this.insertImageMarkdown((event.body as { url: string }).url);
+            this.isUploading = false;
+            this.uploadProgress.set(0);
+            this.cdr.markForCheck();
+          }
         },
         error: (error) => {
           console.error('Image upload error:', error);
           this.uploadError = "Échec de l'envoi de l'image. Veuillez réessayer.";
           this.isUploading = false;
+          this.uploadProgress.set(0);
           this.cdr.markForCheck();
         },
       });
+  }
+
+  clearImagePreview(): void {
+    this.imagePreview.set(null);
+    this.uploadProgress.set(0);
   }
 
   private insertImageMarkdown(url: string): void {
