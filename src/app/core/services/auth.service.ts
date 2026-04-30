@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, shareReplay, catchError, of } from 'rxjs';
+import { BehaviorSubject, Observable, tap, shareReplay, catchError, of, finalize, filter, take, switchMap } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export interface AuthUser {
@@ -27,6 +27,21 @@ export class AuthService {
 
   private pending$: Observable<AuthState> | null = null;
 
+  /** Tracks whether a session refresh is currently in flight. */
+  private isRefreshing = false;
+  /** Emits `false` when a refresh starts, `true` when it completes. */
+  private refreshSubject = new BehaviorSubject<boolean>(false);
+
+  /** True while a session refresh HTTP call is in flight. */
+  get isRefreshingNow(): boolean {
+    return this.isRefreshing;
+  }
+
+  /** Observable of the refresh completion state (false = in progress, true = done). */
+  get refreshing$(): Observable<boolean> {
+    return this.refreshSubject.asObservable();
+  }
+
   constructor(private http: HttpClient) {}
 
   /**
@@ -50,11 +65,25 @@ export class AuthService {
     return this.pending$;
   }
 
-  /** Force a fresh fetch (e.g. after login/logout). */
+  /** Force a fresh fetch and signal in-flight state so concurrent 401s can queue. */
   refresh(): Observable<AuthState> {
+    if (this.isRefreshing) {
+      return this.refreshSubject.pipe(
+        filter((done) => done),
+        take(1),
+        switchMap(() => this.getState()),
+      );
+    }
     this.pending$ = null;
     this.state.set(null);
-    return this.getState();
+    this.isRefreshing = true;
+    this.refreshSubject.next(false);
+    return this.getState().pipe(
+      finalize(() => {
+        this.isRefreshing = false;
+        this.refreshSubject.next(true);
+      }),
+    );
   }
 
   isAdmin(): boolean {
