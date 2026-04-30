@@ -513,6 +513,7 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
         error: (error) => {
           console.error('Image upload error:', error);
           this.uploadError = "Échec de l'envoi de l'image. Veuillez réessayer.";
+          this.imagePreview.set(null);
           this.isUploading = false;
           this.uploadProgress.set(0);
           this.cdr.markForCheck();
@@ -523,6 +524,8 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
   clearImagePreview(): void {
     this.imagePreview.set(null);
     this.uploadProgress.set(0);
+    this.isUploading = false;
+    this.cdr.markForCheck();
   }
 
   private insertImageMarkdown(url: string): void {
