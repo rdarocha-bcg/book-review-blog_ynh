@@ -5,11 +5,13 @@ import { of } from 'rxjs';
 import { provideMarkdown } from 'ngx-markdown';
 import { ReviewDetailComponent } from './review-detail.component';
 import { ReviewService } from '../../services/review.service';
+import { AuthService } from '@core/services/auth.service';
 
 describe('ReviewDetailComponent', () => {
   let component: ReviewDetailComponent;
   let fixture: ComponentFixture<ReviewDetailComponent>;
   let reviewService: jasmine.SpyObj<ReviewService>;
+  let authService: jasmine.SpyObj<AuthService>;
 
   const mockReview = {
     id: '1',
@@ -34,11 +36,15 @@ describe('ReviewDetailComponent', () => {
     });
     reviewService.getReviewById.and.returnValue(of(mockReview));
 
+    authService = jasmine.createSpyObj('AuthService', ['isAdmin']);
+    authService.isAdmin.and.returnValue(false);
+
     await TestBed.configureTestingModule({
       imports: [ReviewDetailComponent, RouterTestingModule],
       providers: [
         { provide: ReviewService, useValue: reviewService },
         { provide: ActivatedRoute, useValue: { params: of({ id: '1' }) } },
+        { provide: AuthService, useValue: authService },
         provideMarkdown(),
       ],
     }).compileComponents();
@@ -61,5 +67,22 @@ describe('ReviewDetailComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Test Review');
     expect(el.textContent).toContain('Book');
+  });
+
+  it('should show edit button when user is admin', () => {
+    authService.isAdmin.and.returnValue(true);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const editLink = el.querySelector('a[href*="/reviews/1/edit"]') as HTMLAnchorElement | null;
+    expect(editLink).toBeTruthy();
+    expect(editLink?.textContent).toContain('Modifier');
+  });
+
+  it('should hide edit button when user is not admin', () => {
+    authService.isAdmin.and.returnValue(false);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const editLink = el.querySelector('a[href*="/reviews/1/edit"]');
+    expect(editLink).toBeNull();
   });
 });

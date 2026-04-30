@@ -11,6 +11,7 @@ import { MarkdownComponent } from 'ngx-markdown';
 import { ReviewService } from '../../services/review.service';
 import { Review } from '../../models/review.model';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
+import { AuthService } from '@core/services/auth.service';
 import { Subject, takeUntil } from 'rxjs';
 
 /**
@@ -52,8 +53,20 @@ import { Subject, takeUntil } from 'rxjs';
 
       <div *ngIf="!isLoading && review" class="pinterest-panel p-8">
         <div class="mb-6">
-          <h1 class="text-4xl font-semibold tracking-tight mb-2 text-[var(--primary)]">{{ review!.title }}</h1>
-          <p class="text-lg text-[var(--text-muted)]">par {{ review!.author }}</p>
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <h1 class="text-4xl font-semibold tracking-tight mb-2 text-[var(--primary)]">{{ review!.title }}</h1>
+              <p class="text-lg text-[var(--text-muted)]">par {{ review!.author }}</p>
+            </div>
+            @if (auth.isAdmin()) {
+              <a
+                [routerLink]="['/reviews', review!.id, 'edit']"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent-strong)] text-white font-semibold hover:brightness-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-strong)]"
+              >
+                ✏️ Modifier
+              </a>
+            }
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
@@ -132,7 +145,8 @@ export class ReviewDetailComponent implements OnInit, OnDestroy {
   constructor(
     private reviewService: ReviewService,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth: AuthService
   ) {}
 
   ngOnInit(): void {
