@@ -174,6 +174,7 @@ import { MarkdownComponent } from 'ngx-markdown';
               *ngIf="isUploading"
               class="mt-2 h-2 w-full rounded-full bg-[var(--surface-alt)] overflow-hidden"
               role="progressbar"
+              aria-label="Progression de l'envoi de l'image"
               [attr.aria-valuenow]="uploadProgress()"
               aria-valuemin="0"
               aria-valuemax="100"
@@ -507,6 +508,7 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
             this.insertImageMarkdown((event.body as { url: string }).url);
             this.isUploading = false;
             this.uploadProgress.set(0);
+            this.imagePreview.set(null);
             this.cdr.markForCheck();
           }
         },
