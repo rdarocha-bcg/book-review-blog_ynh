@@ -43,6 +43,12 @@ import { filter, Subject, takeUntil } from 'rxjs';
         opacity: 1;
         pointer-events: auto;
       }
+      @media (prefers-reduced-motion: reduce) {
+        .nav-mobile-panel,
+        .nav-mobile-backdrop {
+          transition: none;
+        }
+      }
     `,
   ],
   template: `
