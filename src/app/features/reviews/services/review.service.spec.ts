@@ -139,13 +139,14 @@ describe('ReviewService', () => {
     sub.unsubscribe();
   });
 
-  it('getReviews() on API error should return empty pagination (after retries)', (done) => {
+  it('getReviews() on API error should propagate error after retries', (done) => {
     const errorOpts = { status: 500, statusText: 'Internal Server Error' };
-    service.getReviews().subscribe((res) => {
-      expect(res.data).toEqual([]);
-      expect(res.total).toBe(0);
-      expect(res.totalPages).toBe(0);
-      done();
+    service.getReviews().subscribe({
+      next: () => fail('should have errored'),
+      error: (err) => {
+        expect(err).toBeTruthy();
+        done();
+      },
     });
     // Service uses retry(2): 1 initial + 2 retries = 3 requests
     for (let i = 0; i < 3; i++) {

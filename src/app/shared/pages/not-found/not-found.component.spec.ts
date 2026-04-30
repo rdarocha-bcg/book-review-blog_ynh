@@ -23,7 +23,7 @@ describe('NotFoundComponent', () => {
   it('should display 404 and Page Not Found', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('404');
-    expect(el.textContent).toContain('Page Not Found');
+    expect(el.textContent).toContain('Page introuvable');
     expect(el.querySelector('a[routerLink="/"]')).toBeTruthy();
   });
 });

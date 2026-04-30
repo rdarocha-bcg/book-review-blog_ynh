@@ -30,7 +30,7 @@ describe('CardComponent', () => {
     component.hoverable = true;
     const classes = component.getClasses();
     expect(classes).toContain('cursor-pointer');
-    expect(classes).toContain('transition-shadow');
+    expect(classes).toContain('transition-all');
   });
 
   it('should not add hover classes when hoverable is false', () => {

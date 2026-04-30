@@ -23,7 +23,7 @@ describe('UnauthorizedComponent', () => {
   it('should display 401 and Unauthorized with home link', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('401');
-    expect(el.textContent).toContain('Unauthorized');
+    expect(el.textContent).toContain('Non autorisé');
     expect(el.querySelector('a[routerLink="/"]')).toBeTruthy();
   });
 });

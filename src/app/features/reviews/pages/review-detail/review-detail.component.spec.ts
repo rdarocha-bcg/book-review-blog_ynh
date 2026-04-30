@@ -31,6 +31,7 @@ describe('ReviewDetailComponent', () => {
       getSelectedReview$: () => of(mockReview),
       getLoading$: () => of(false),
     });
+    reviewService.getReviewById.and.returnValue(of(mockReview));
 
     await TestBed.configureTestingModule({
       imports: [ReviewDetailComponent, RouterTestingModule],
