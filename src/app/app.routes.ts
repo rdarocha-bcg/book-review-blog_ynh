@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
+import { adminGuard } from '@core/guards/admin.guard';
+import { canDeactivateGuard } from '@core/guards/can-deactivate.guard';
 
 export const routes: Routes = [
   {
@@ -34,6 +36,7 @@ export const routes: Routes = [
       {
         path: 'new',
         canActivate: [authGuard],
+        canDeactivate: [canDeactivateGuard],
         loadComponent: () =>
           import('./features/reviews/pages/review-form/review-form.component').then(
             (m) => m.ReviewFormComponent
@@ -52,6 +55,7 @@ export const routes: Routes = [
           {
             path: 'edit',
             canActivate: [authGuard],
+            canDeactivate: [canDeactivateGuard],
             loadComponent: () =>
               import('./features/reviews/pages/review-form/review-form.component').then(
                 (m) => m.ReviewFormComponent
@@ -74,6 +78,7 @@ export const routes: Routes = [
       {
         path: 'new',
         canActivate: [authGuard],
+        canDeactivate: [canDeactivateGuard],
         loadComponent: () =>
           import('./features/academics/pages/academic-form/academic-form.component').then(
             (m) => m.AcademicFormComponent
@@ -89,6 +94,7 @@ export const routes: Routes = [
       {
         path: ':id/edit',
         canActivate: [authGuard],
+        canDeactivate: [canDeactivateGuard],
         loadComponent: () =>
           import('./features/academics/pages/academic-form/academic-form.component').then(
             (m) => m.AcademicFormComponent
@@ -98,6 +104,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
+    canMatch: [adminGuard],
     loadChildren: () =>
       import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
   },

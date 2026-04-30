@@ -94,9 +94,8 @@ import { debounceTime } from 'rxjs/operators';
       </div>
 
       <!-- Error State -->
-      <div *ngIf="error$ | async as error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
+      <div *ngIf="error$ | async" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
         <p class="font-bold mb-2">Erreur lors du chargement des critiques. Veuillez réessayer.</p>
-        <p class="text-sm mb-3">{{ error }}</p>
         <button (click)="retryLoadReviews()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
           Réessayer
         </button>
@@ -227,8 +226,8 @@ export class ReviewListComponent implements OnInit, OnDestroy {
           this.totalItems = res.total;
           this.totalPages = res.totalPages || Math.ceil(res.total / this.pageSize) || 1;
         },
-        error: (error) => {
-          this.error$.next(error?.message || 'Erreur réseau ou serveur indisponible');
+        error: () => {
+          this.error$.next('Erreur réseau ou serveur indisponible. Veuillez réessayer.');
         },
       });
   }

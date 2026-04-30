@@ -6,15 +6,17 @@ import {
   ChangeDetectorRef,
   viewChild,
   ElementRef,
+  signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 import { AcademicService } from '../../services/academic.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
+import { HasUnsavedChanges } from '@core/guards/can-deactivate.guard';
 import { Subject, takeUntil } from 'rxjs';
 import { MarkdownComponent } from 'ngx-markdown';
 
@@ -46,6 +48,7 @@ import { MarkdownComponent } from 'ngx-markdown';
               formControlName="title"
               placeholder="Titre du travail"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-invalid]="isFieldInvalid('title')"
             />
             <p *ngIf="isFieldInvalid('title')" class="text-red-600 text-sm mt-1">Le titre est requis</p>
@@ -60,6 +63,7 @@ import { MarkdownComponent } from 'ngx-markdown';
               placeholder="Résumé court du travail"
               rows="3"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-invalid]="isFieldInvalid('summary')"
             ></textarea>
             <p
@@ -148,6 +152,39 @@ import { MarkdownComponent } from 'ngx-markdown';
               (change)="onImageFileSelected($event)"
             />
 
+            <!-- Image preview and remove button -->
+            <div *ngIf="imagePreview()" class="mt-2 flex items-start gap-3">
+              <img
+                [src]="imagePreview()"
+                alt="Aperçu de l'image sélectionnée"
+                class="h-16 w-16 object-cover rounded-lg border border-[var(--border-light)]"
+              />
+              <button
+                type="button"
+                (click)="clearImagePreview()"
+                [disabled]="isUploading"
+                class="text-sm text-red-600 hover:text-red-800 underline disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Supprimer l'image
+              </button>
+            </div>
+
+            <!-- Upload progress bar -->
+            <div
+              *ngIf="isUploading"
+              class="mt-2 h-2 w-full rounded-full bg-[var(--surface-alt)] overflow-hidden"
+              role="progressbar"
+              aria-label="Progression de l'envoi de l'image"
+              [attr.aria-valuenow]="uploadProgress()"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              <div
+                class="h-full bg-[var(--accent)] transition-all duration-300"
+                [style.width.%]="uploadProgress()"
+              ></div>
+            </div>
+
             <!-- Edit panel -->
             <div
               id="content-edit-panel"
@@ -198,6 +235,7 @@ import { MarkdownComponent } from 'ngx-markdown';
               id="workType"
               formControlName="workType"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-invalid]="isFieldInvalid('workType')"
             >
               <option value="">Sélectionner un type</option>
@@ -331,7 +369,7 @@ import { MarkdownComponent } from 'ngx-markdown';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AcademicFormComponent implements OnInit, OnDestroy {
+export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   academicForm!: FormGroup;
   isEditMode = false;
   isLoading = false;
@@ -341,6 +379,8 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
   activeTab: 'edit' | 'preview' = 'edit';
   isUploading = false;
   uploadError: string | null = null;
+  imagePreview = signal<string | null>(null);
+  uploadProgress = signal<number>(0);
 
   private readonly imageFileInput = viewChild.required<ElementRef<HTMLInputElement>>('imageFileInput');
   private readonly contentTextarea = viewChild<ElementRef<HTMLTextAreaElement>>('contentTextarea');
@@ -355,6 +395,7 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
+    private location: Location,
   ) {
     this.initializeForm();
   }
@@ -420,6 +461,14 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
+  /**
+   * Returns true when the form has unsaved changes (dirty and not submitted).
+   * Used by canDeactivateGuard to warn before navigation.
+   */
+  hasUnsavedChanges(): boolean {
+    return this.academicForm?.dirty ?? false;
+  }
+
   triggerImageUpload(): void {
     this.imageFileInput().nativeElement.click();
   }
@@ -432,29 +481,53 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
     // Reset the input so the same file can be re-selected if needed
     input.value = '';
 
+    // Generate a local preview via FileReader
+    const reader = new FileReader();
+    reader.onload = (e) => this.imagePreview.set(e.target?.result as string);
+    reader.readAsDataURL(file);
+
     this.isUploading = true;
     this.uploadError = null;
+    this.uploadProgress.set(0);
     this.cdr.markForCheck();
 
     const formData = new FormData();
     formData.append('file', file);
 
     this.http
-      .post<{ url: string }>('/blog/api/media/upload', formData)
+      .post<{ url: string }>('/blog/api/media/upload', formData, {
+        reportProgress: true,
+        observe: 'events',
+      })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          this.insertImageMarkdown(response.url);
-          this.isUploading = false;
-          this.cdr.markForCheck();
+        next: (event) => {
+          if (event.type === HttpEventType.UploadProgress && event.total) {
+            this.uploadProgress.set(Math.round((100 * event.loaded) / event.total));
+          } else if (event.type === HttpEventType.Response) {
+            this.insertImageMarkdown((event.body as { url: string }).url);
+            this.isUploading = false;
+            this.uploadProgress.set(0);
+            this.imagePreview.set(null);
+            this.cdr.markForCheck();
+          }
         },
         error: (error) => {
           console.error('Image upload error:', error);
           this.uploadError = "Échec de l'envoi de l'image. Veuillez réessayer.";
+          this.imagePreview.set(null);
           this.isUploading = false;
+          this.uploadProgress.set(0);
           this.cdr.markForCheck();
         },
       });
+  }
+
+  clearImagePreview(): void {
+    this.imagePreview.set(null);
+    this.uploadProgress.set(0);
+    this.isUploading = false;
+    this.cdr.markForCheck();
   }
 
   private insertImageMarkdown(url: string): void {
@@ -507,6 +580,7 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
         this.notificationService.success(
           this.isEditMode ? 'Travail académique mis à jour' : 'Travail académique créé'
         );
+        this.academicForm.markAsPristine();
         this.isSubmitting = false;
         this.router.navigate(['/academics', academic.id]);
       },
@@ -519,6 +593,10 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
   }
 
   onCancel(): void {
-    this.router.navigate(['/academics']);
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 }
