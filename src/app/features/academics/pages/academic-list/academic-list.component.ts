@@ -3,6 +3,7 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
@@ -175,6 +176,7 @@ export class AcademicListComponent implements OnInit, OnDestroy {
     private academicService: AcademicService,
     private router: Router,
     private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -187,6 +189,7 @@ export class AcademicListComponent implements OnInit, OnDestroy {
         this.selectedSort = (params['sort'] as typeof this.selectedSort) || '';
         this.currentPage = params['page'] ? parseInt(params['page'], 10) : 1;
         this.loadAcademics();
+        this.cdr.markForCheck();
       });
 
     // Debounced search: update URL after the user stops typing; queryParams will trigger the load.
@@ -263,7 +266,7 @@ export class AcademicListComponent implements OnInit, OnDestroy {
         sort: this.selectedSort || null,
         page: this.currentPage > 1 ? this.currentPage : null,
       },
-      queryParamsHandling: 'replace',
+      queryParamsHandling: 'merge',
     });
   }
 
