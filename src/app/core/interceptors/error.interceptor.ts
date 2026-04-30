@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, filter, retry, switchMap, take, throwError, timer } from 'rxjs';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
+import { mapHttpError } from '@core/utils/http-error.utils';
 
 const RETRYABLE_STATUS_CODES = [429, 502, 503];
 const MAX_RETRY_COUNT = 3;
@@ -12,9 +13,9 @@ const MAX_RETRY_COUNT = 3;
  * HTTP Error Interceptor
  * - 429 / 502 / 503: retries up to 3× with exponential backoff (H9)
  * - 401: refreshes session once (race-safe via AuthService) then retries; redirects if still unauth (H3)
- * - 403: permission warning toast
- * - 404: silent
- * - 500: error toast
+ * - 403: permission warning toast with sanitized message
+ * - 404: silent (handled per-component)
+ * - other: error toast with sanitized message
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -33,6 +34,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       },
     }),
     catchError((error: HttpErrorResponse) => {
+      const message = mapHttpError(error);
+
       switch (error.status) {
         case 401: {
           // Let the auth endpoint errors propagate to AuthService to avoid
@@ -63,15 +66,16 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           );
         }
         case 403:
-          notifications.warning('You do not have permission to perform this action.');
+          notifications.warning(message);
           break;
         case 404:
-          console.error('Resource not found');
+          // 404s are handled per-component; no global toast needed
           break;
-        case 500:
-          notifications.error('A server error occurred. Please try again later.');
+        default:
+          notifications.error(message);
           break;
       }
+
       return throwError(() => error);
     }),
   );
