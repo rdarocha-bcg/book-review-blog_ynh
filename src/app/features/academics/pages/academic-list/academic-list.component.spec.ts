@@ -2,24 +2,24 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { of, BehaviorSubject } from 'rxjs';
-import { Review } from '../../models/review.model';
-import { ReviewListComponent } from './review-list.component';
-import { ReviewService } from '../../services/review.service';
+import { AcademicWork } from '../../models/academic.model';
+import { AcademicListComponent } from './academic-list.component';
+import { AcademicService } from '../../services/academic.service';
 
-describe('ReviewListComponent', () => {
-  let component: ReviewListComponent;
-  let fixture: ComponentFixture<ReviewListComponent>;
-  let mockReviewService: jasmine.SpyObj<ReviewService>;
+describe('AcademicListComponent', () => {
+  let component: AcademicListComponent;
+  let fixture: ComponentFixture<AcademicListComponent>;
+  let mockAcademicService: jasmine.SpyObj<AcademicService>;
   let router: Router;
-  const reviewsSubject = new BehaviorSubject<Review[]>([]);
+  const academicsSubject = new BehaviorSubject<AcademicWork[]>([]);
   const loadingSubject = new BehaviorSubject<boolean>(false);
   const queryParamsSubject = new BehaviorSubject<Params>({});
 
   beforeEach(async () => {
-    mockReviewService = jasmine.createSpyObj('ReviewService', ['getReviews', 'getReviews$', 'getLoading$']);
-    mockReviewService.getReviews$.and.returnValue(reviewsSubject.asObservable());
-    mockReviewService.getLoading$.and.returnValue(loadingSubject.asObservable());
-    mockReviewService.getReviews.and.returnValue(of({
+    mockAcademicService = jasmine.createSpyObj('AcademicService', ['getAcademics', 'getAcademics$', 'getLoading$']);
+    mockAcademicService.getAcademics$.and.returnValue(academicsSubject.asObservable());
+    mockAcademicService.getLoading$.and.returnValue(loadingSubject.asObservable());
+    mockAcademicService.getAcademics.and.returnValue(of({
       data: [],
       total: 0,
       page: 1,
@@ -28,9 +28,9 @@ describe('ReviewListComponent', () => {
     }));
 
     await TestBed.configureTestingModule({
-      imports: [ReviewListComponent, RouterTestingModule],
+      imports: [AcademicListComponent, RouterTestingModule],
       providers: [
-        { provide: ReviewService, useValue: mockReviewService },
+        { provide: AcademicService, useValue: mockAcademicService },
         { provide: ActivatedRoute, useValue: { queryParams: queryParamsSubject.asObservable() } },
       ],
     }).compileComponents();
@@ -38,10 +38,10 @@ describe('ReviewListComponent', () => {
     router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
 
-    fixture = TestBed.createComponent(ReviewListComponent);
+    fixture = TestBed.createComponent(AcademicListComponent);
     component = fixture.componentInstance;
     loadingSubject.next(false);
-    reviewsSubject.next([]);
+    academicsSubject.next([]);
     queryParamsSubject.next({});
     fixture.detectChanges();
   });
@@ -50,26 +50,25 @@ describe('ReviewListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should call getReviews on init (triggered by queryParams emission)', () => {
-    expect(mockReviewService.getReviews).toHaveBeenCalled();
+  it('should call getAcademics on init (triggered by queryParams emission)', () => {
+    expect(mockAcademicService.getAcademics).toHaveBeenCalled();
   });
 
   it('should initialize filters from URL query params', () => {
-    queryParamsSubject.next({ genre: 'fiction', rating: '4', sort: 'newest', page: '2', search: 'test' });
+    queryParamsSubject.next({ theme: 'literature', sort: 'newest', page: '2', search: 'test' });
     fixture.detectChanges();
-    expect(component.selectedGenre).toBe('fiction');
-    expect(component.selectedRating).toBe('4');
+    expect(component.selectedTheme).toBe('literature');
     expect(component.selectedSort).toBe('newest');
     expect(component.currentPage).toBe(2);
     expect(component.searchQuery).toBe('test');
   });
 
-  it('should call getReviews with filters from URL query params', () => {
-    mockReviewService.getReviews.calls.reset();
-    queryParamsSubject.next({ genre: 'fiction', page: '2' });
+  it('should call getAcademics with filters from URL query params', () => {
+    mockAcademicService.getAcademics.calls.reset();
+    queryParamsSubject.next({ theme: 'philosophy', page: '2' });
     fixture.detectChanges();
-    expect(mockReviewService.getReviews).toHaveBeenCalledWith(jasmine.objectContaining({
-      genre: 'fiction',
+    expect(mockAcademicService.getAcademics).toHaveBeenCalledWith(jasmine.objectContaining({
+      theme: 'philosophy',
       page: 2,
     }));
   });
@@ -88,10 +87,10 @@ describe('ReviewListComponent', () => {
   });
 
   it('should call router.navigate with current filters when onFilterChange is called', () => {
-    component.selectedGenre = 'fiction';
+    component.selectedTheme = 'literature';
     component.onFilterChange();
     expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({
-      queryParams: jasmine.objectContaining({ genre: 'fiction' }),
+      queryParams: jasmine.objectContaining({ theme: 'literature' }),
       queryParamsHandling: 'merge',
     }));
   });
@@ -104,26 +103,26 @@ describe('ReviewListComponent', () => {
 
   it('should debounce search input and sync URL params after delay', fakeAsync(() => {
     component.currentPage = 3;
-    component.searchQuery = 'novel';
+    component.searchQuery = 'roman';
     component.onSearchQueryInput();
     expect(router.navigate).not.toHaveBeenCalled();
     tick(350);
     expect(component.currentPage).toBe(1);
     expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({
-      queryParams: jasmine.objectContaining({ search: 'novel' }),
+      queryParams: jasmine.objectContaining({ search: 'roman' }),
       queryParamsHandling: 'merge',
     }));
   }));
 
   it('should reset filters and navigate with null params on resetFilters', () => {
     component.searchQuery = 'test';
-    component.selectedGenre = 'fiction';
+    component.selectedTheme = 'literature';
     component.resetFilters();
     expect(component.searchQuery).toBe('');
-    expect(component.selectedGenre).toBe('');
+    expect(component.selectedTheme).toBe('');
     expect(component.currentPage).toBe(1);
     expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({
-      queryParams: jasmine.objectContaining({ search: null, genre: null }),
+      queryParams: jasmine.objectContaining({ search: null, theme: null }),
       queryParamsHandling: 'merge',
     }));
   });
@@ -146,18 +145,16 @@ describe('ReviewListComponent', () => {
     }));
   });
 
-  it('should render one routerLink per review card (no duplicate navigation targets)', () => {
-    reviewsSubject.next([
+  it('should render one routerLink per academic card (no duplicate navigation targets)', () => {
+    academicsSubject.next([
       {
         id: '1',
         title: 'T',
-        author: 'A',
-        bookTitle: 'B',
-        bookAuthor: 'C',
-        rating: 4,
-        genre: 'fiction',
-        description: 'd',
+        summary: 's',
         content: 'c',
+        workType: 'thesis',
+        context: 'ctx',
+        year: 2020,
         publishedAt: new Date(),
         updatedAt: new Date(),
         createdBy: 'u',
@@ -166,26 +163,24 @@ describe('ReviewListComponent', () => {
     ]);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
-    const links = el.querySelectorAll('a[href="/reviews/1"]');
+    const links = el.querySelectorAll('a[href="/academics/1"]');
     expect(links.length).toBe(1);
   });
 
-  it('should track reviews by id', () => {
-    const review = {
+  it('should track academics by id', () => {
+    const academic: AcademicWork = {
       id: '1',
       title: 'Test',
-      author: 'A',
-      bookTitle: 'B',
-      bookAuthor: 'C',
-      rating: 4,
-      genre: 'fiction',
-      description: 'd',
+      summary: 's',
       content: 'c',
+      workType: 'thesis',
+      context: 'ctx',
+      year: 2020,
       publishedAt: new Date(),
       updatedAt: new Date(),
       createdBy: 'u',
       isPublished: true,
     };
-    expect(component.trackByReviewId(0, review)).toBe('1');
+    expect(component.trackByAcademicId(0, academic)).toBe('1');
   });
 });

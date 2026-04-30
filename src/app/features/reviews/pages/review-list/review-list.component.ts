@@ -3,9 +3,10 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../services/review.service';
 import { Review } from '../../models/review.model';
@@ -191,16 +192,34 @@ export class ReviewListComponent implements OnInit, OnDestroy {
   /** Emits when the search field changes; loads are debounced to limit API calls */
   private searchInput$ = new Subject<void>();
 
-  constructor(private reviewService: ReviewService) {}
+  constructor(
+    private reviewService: ReviewService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
+    // URL query params are the source of truth: read on every navigation change and load.
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        this.searchQuery = params['search'] || '';
+        this.selectedGenre = params['genre'] || '';
+        this.selectedRating = params['rating'] || '';
+        this.selectedSort = (params['sort'] as typeof this.selectedSort) || '';
+        this.currentPage = params['page'] ? parseInt(params['page'], 10) : 1;
+        this.loadReviews();
+        this.cdr.markForCheck();
+      });
+
+    // Debounced search: update URL after the user stops typing; queryParams will trigger the load.
     this.searchInput$
       .pipe(debounceTime(350), takeUntil(this.destroy$))
       .subscribe(() => {
         this.currentPage = 1;
-        this.loadReviews();
+        this.syncUrlParams();
       });
-    this.loadReviews();
   }
 
   ngOnDestroy(): void {
@@ -239,11 +258,12 @@ export class ReviewListComponent implements OnInit, OnDestroy {
   onPaginationChange(event: { page: number; limit: number }): void {
     this.currentPage = event.page;
     this.pageSize = event.limit;
-    this.loadReviews();
+    this.syncUrlParams();
   }
 
   onFilterChange(): void {
-    this.loadReviews();
+    this.currentPage = 1;
+    this.syncUrlParams();
   }
 
   onSearchQueryInput(): void {
@@ -256,7 +276,22 @@ export class ReviewListComponent implements OnInit, OnDestroy {
     this.selectedRating = '';
     this.selectedSort = '';
     this.currentPage = 1;
-    this.loadReviews();
+    this.syncUrlParams();
+  }
+
+  /** Reflect current filter/page state in the URL; the queryParams subscription triggers the load. */
+  private syncUrlParams(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: this.searchQuery || null,
+        genre: this.selectedGenre || null,
+        rating: this.selectedRating || null,
+        sort: this.selectedSort || null,
+        page: this.currentPage > 1 ? this.currentPage : null,
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 
   trackByReviewId(index: number, review: Review): string {

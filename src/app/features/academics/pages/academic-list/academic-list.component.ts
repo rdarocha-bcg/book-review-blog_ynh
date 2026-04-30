@@ -3,9 +3,10 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AcademicService } from '../../services/academic.service';
 import { AcademicWork } from '../../models/academic.model';
@@ -171,16 +172,33 @@ export class AcademicListComponent implements OnInit, OnDestroy {
   /** Emits when the search field changes; loads are debounced */
   private searchInput$ = new Subject<void>();
 
-  constructor(private academicService: AcademicService) {}
+  constructor(
+    private academicService: AcademicService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
+    // URL query params are the source of truth: read on every navigation change and load.
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        this.searchQuery = params['search'] || '';
+        this.selectedTheme = params['theme'] || '';
+        this.selectedSort = (params['sort'] as typeof this.selectedSort) || '';
+        this.currentPage = params['page'] ? parseInt(params['page'], 10) : 1;
+        this.loadAcademics();
+        this.cdr.markForCheck();
+      });
+
+    // Debounced search: update URL after the user stops typing; queryParams will trigger the load.
     this.searchInput$
       .pipe(debounceTime(350), takeUntil(this.destroy$))
       .subscribe(() => {
         this.currentPage = 1;
-        this.loadAcademics();
+        this.syncUrlParams();
       });
-    this.loadAcademics();
   }
 
   ngOnDestroy(): void {
@@ -218,11 +236,12 @@ export class AcademicListComponent implements OnInit, OnDestroy {
   onPaginationChange(event: { page: number; limit: number }): void {
     this.currentPage = event.page;
     this.pageSize = event.limit;
-    this.loadAcademics();
+    this.syncUrlParams();
   }
 
   onFilterChange(): void {
-    this.loadAcademics();
+    this.currentPage = 1;
+    this.syncUrlParams();
   }
 
   onSearchQueryInput(): void {
@@ -234,7 +253,21 @@ export class AcademicListComponent implements OnInit, OnDestroy {
     this.selectedTheme = '';
     this.selectedSort = '';
     this.currentPage = 1;
-    this.loadAcademics();
+    this.syncUrlParams();
+  }
+
+  /** Reflect current filter/page state in the URL; the queryParams subscription triggers the load. */
+  private syncUrlParams(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: this.searchQuery || null,
+        theme: this.selectedTheme || null,
+        sort: this.selectedSort || null,
+        page: this.currentPage > 1 ? this.currentPage : null,
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 
   trackByAcademicId(index: number, academic: AcademicWork): string {
