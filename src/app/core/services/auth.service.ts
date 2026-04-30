@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap, shareReplay, catchError, of } from 'rxjs';
+import { BehaviorSubject, Observable, tap, shareReplay, catchError, of, finalize, filter, take, switchMap } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export interface AuthUser {
@@ -67,12 +67,19 @@ export class AuthService {
 
   /** Force a fresh fetch and signal in-flight state so concurrent 401s can queue. */
   refresh(): Observable<AuthState> {
+    if (this.isRefreshing) {
+      return this.refreshSubject.pipe(
+        filter((done) => done),
+        take(1),
+        switchMap(() => this.getState()),
+      );
+    }
     this.pending$ = null;
     this.state.set(null);
     this.isRefreshing = true;
     this.refreshSubject.next(false);
     return this.getState().pipe(
-      tap(() => {
+      finalize(() => {
         this.isRefreshing = false;
         this.refreshSubject.next(true);
       }),

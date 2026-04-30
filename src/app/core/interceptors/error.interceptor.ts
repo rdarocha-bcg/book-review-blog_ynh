@@ -27,7 +27,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       count: MAX_RETRY_COUNT,
       delay: (error: unknown, retryCount: number) => {
         if (error instanceof HttpErrorResponse && RETRYABLE_STATUS_CODES.includes(error.status)) {
-          return timer(Math.pow(2, retryCount) * 500);
+          return timer(Math.pow(2, retryCount - 1) * 500);
         }
         throw error;
       },
@@ -37,7 +37,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         case 401: {
           // Let the auth endpoint errors propagate to AuthService to avoid
           // an infinite refresh loop (interceptor → refresh → /auth/me → 401 → interceptor...).
-          if (req.url.endsWith('/auth/me')) {
+          if (req.url.includes('/auth/me')) {
             return throwError(() => error);
           }
 
