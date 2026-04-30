@@ -7,6 +7,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
 import { StarRatingInputComponent } from '@shared/components/star-rating-input/star-rating-input.component';
+import { HasUnsavedChanges } from '@core/guards/can-deactivate.guard';
 import { Subject, takeUntil } from 'rxjs';
 
 /**
@@ -40,6 +41,7 @@ import { Subject, takeUntil } from 'rxjs';
               formControlName="title"
               placeholder="Saisir le titre de la critique"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-label]="'Titre de la critique'"
               [attr.aria-invalid]="isFieldInvalid('title')"
             />
@@ -55,6 +57,7 @@ import { Subject, takeUntil } from 'rxjs';
               formControlName="bookTitle"
               placeholder="Saisir le titre du livre"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-label]="'Titre du livre'"
               [attr.aria-invalid]="isFieldInvalid('bookTitle')"
             />
@@ -70,6 +73,7 @@ import { Subject, takeUntil } from 'rxjs';
               formControlName="bookAuthor"
               placeholder="Saisir le nom de l'auteur"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-label]="'Auteur du livre'"
               [attr.aria-invalid]="isFieldInvalid('bookAuthor')"
             />
@@ -83,6 +87,7 @@ import { Subject, takeUntil } from 'rxjs';
               id="genre"
               formControlName="genre"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-label]="'Genre'"
               [attr.aria-invalid]="isFieldInvalid('genre')"
             >
@@ -122,6 +127,7 @@ import { Subject, takeUntil } from 'rxjs';
               rows="3"
               maxlength="300"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-label]="'Description'"
               [attr.aria-invalid]="isFieldInvalid('description')"
             ></textarea>
@@ -142,6 +148,7 @@ import { Subject, takeUntil } from 'rxjs';
               placeholder="Saisir le texte complet de la critique"
               rows="10"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-sm"
+              aria-required="true"
               [attr.aria-label]="'Contenu de la critique'"
               [attr.aria-invalid]="isFieldInvalid('content')"
             ></textarea>
@@ -199,7 +206,7 @@ import { Subject, takeUntil } from 'rxjs';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReviewFormComponent implements OnInit, OnDestroy {
+export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   reviewForm!: FormGroup;
   isEditMode = false;
   isLoading = false;
@@ -275,6 +282,14 @@ export class ReviewFormComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Returns true when the form has unsaved changes (dirty and not submitted).
+   * Used by canDeactivateGuard to warn before navigation.
+   */
+  hasUnsavedChanges(): boolean {
+    return this.reviewForm?.dirty ?? false;
+  }
+
+  /**
    * Check if form field is invalid and touched
    */
   isFieldInvalid(fieldName: string): boolean {
@@ -303,6 +318,7 @@ export class ReviewFormComponent implements OnInit, OnDestroy {
         this.notificationService.success(
           this.isEditMode ? 'Critique mise à jour avec succès' : 'Critique créée avec succès'
         );
+        this.reviewForm.markAsPristine();
         this.isSubmitting = false;
         this.router.navigate(['/reviews', review.id]);
       },

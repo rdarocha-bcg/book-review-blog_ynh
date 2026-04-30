@@ -35,10 +35,10 @@ import { NotificationService, Notification } from '@core/services/notification.s
         <div class="flex items-start gap-3">
           <!-- Icon -->
           <div class="text-xl mt-1">
-            <span *ngIf="notification.type === 'success'">✓</span>
-            <span *ngIf="notification.type === 'error'">✕</span>
-            <span *ngIf="notification.type === 'warning'">⚠</span>
-            <span *ngIf="notification.type === 'info'">ℹ</span>
+            <span *ngIf="notification.type === 'success'" aria-hidden="true">✓</span>
+            <span *ngIf="notification.type === 'error'" aria-hidden="true">✕</span>
+            <span *ngIf="notification.type === 'warning'" aria-hidden="true">⚠</span>
+            <span *ngIf="notification.type === 'info'" aria-hidden="true">ℹ</span>
           </div>
 
           <!-- Content -->
@@ -53,7 +53,7 @@ import { NotificationService, Notification } from '@core/services/notification.s
             class="text-lg font-bold opacity-70 hover:opacity-100 transition"
             [attr.aria-label]="'Fermer la notification'"
           >
-            ✕
+            <span aria-hidden="true">✕</span>
           </button>
         </div>
 
