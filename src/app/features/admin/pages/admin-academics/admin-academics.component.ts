@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AcademicService } from '../../../academics/services/academic.service';
 import { NotificationService } from '@core/services/notification.service';
+import { ConfirmService } from '@shared/services/confirm.service';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
 import { Subject, takeUntil } from 'rxjs';
 import { AcademicWork } from '../../../academics/models/academic.model';
@@ -92,6 +93,7 @@ export class AdminAcademicsComponent implements OnInit, OnDestroy {
   constructor(
     private academicService: AcademicService,
     private notificationService: NotificationService,
+    private confirmService: ConfirmService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -139,17 +141,19 @@ export class AdminAcademicsComponent implements OnInit, OnDestroy {
   }
 
   deleteAcademic(academic: AcademicWork): void {
-    if (!confirm(`Supprimer "${academic.title}" ?`)) return;
-    this.academicService
-      .deleteAcademic(academic.id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.notificationService.success('Travail académique supprimé.');
-          this.loadAcademics();
-        },
-        error: () => this.notificationService.error('Impossible de supprimer le travail.'),
-      });
+    this.confirmService.confirm(`Supprimer "${academic.title}" ?`).then((confirmed) => {
+      if (!confirmed) return;
+      this.academicService
+        .deleteAcademic(academic.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.notificationService.success('Travail académique supprimé.');
+            this.loadAcademics();
+          },
+          error: () => this.notificationService.error('Impossible de supprimer le travail.'),
+        });
+    });
   }
 
   trackById(_index: number, academic: AcademicWork): string {
