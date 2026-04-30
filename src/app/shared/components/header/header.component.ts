@@ -9,7 +9,7 @@ import {
   viewChild,
   HostListener,
 } from '@angular/core';
-import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { SiteConfigService } from '@core/services/site-config.service';
 import { filter, Subject, takeUntil } from 'rxjs';
@@ -20,7 +20,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, RouterLinkActive],
   template: `
     <header
       class="relative sticky top-0 z-40 border-b border-[var(--border-light)] shadow-sm bg-[color:var(--header-bg)] backdrop-blur-md"
@@ -55,31 +55,52 @@ import { filter, Subject, takeUntil } from 'rxjs';
           </button>
           <ul class="hidden gap-6 md:flex">
             <li>
-              <a routerLink="/" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]">Accueil</a>
+              <a
+                routerLink="/"
+                routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
+                >Accueil</a
+              >
             </li>
             <li>
-              <a routerLink="/reviews" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+              <a
+                routerLink="/reviews"
+                routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
                 >Critiques</a
               >
             </li>
             <li>
-              <a routerLink="/academics" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+              <a
+                routerLink="/academics"
+                routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
                 >Travaux</a
               >
             </li>
             <li>
-              <a routerLink="/about" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+              <a
+                routerLink="/about"
+                routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
                 >À propos</a
               >
             </li>
             <li>
-              <a routerLink="/contact" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+              <a
+                routerLink="/contact"
+                routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
                 >Contact</a
               >
             </li>
             @if (isAdmin()) {
               <li>
-                <a routerLink="/admin" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+                <a
+                  routerLink="/admin"
+                  routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                  class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
                   >Admin</a
                 >
               </li>
@@ -106,6 +127,8 @@ import { filter, Subject, takeUntil } from 'rxjs';
             <li>
               <a
                 routerLink="/"
+                routerLinkActive="bg-[var(--surface)] text-[var(--primary)] font-semibold"
+                [routerLinkActiveOptions]="{ exact: true }"
                 class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                 (click)="closeMobileNav()"
                 >Accueil</a
@@ -114,6 +137,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
             <li>
               <a
                 routerLink="/reviews"
+                routerLinkActive="bg-[var(--surface)] text-[var(--primary)] font-semibold"
                 class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                 (click)="closeMobileNav()"
                 >Critiques</a
@@ -122,6 +146,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
             <li>
               <a
                 routerLink="/academics"
+                routerLinkActive="bg-[var(--surface)] text-[var(--primary)] font-semibold"
                 class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                 (click)="closeMobileNav()"
                 >Travaux</a
@@ -130,6 +155,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
             <li>
               <a
                 routerLink="/about"
+                routerLinkActive="bg-[var(--surface)] text-[var(--primary)] font-semibold"
                 class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                 (click)="closeMobileNav()"
                 >À propos</a
@@ -138,6 +164,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
             <li>
               <a
                 routerLink="/contact"
+                routerLinkActive="bg-[var(--surface)] text-[var(--primary)] font-semibold"
                 class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                 (click)="closeMobileNav()"
                 >Contact</a
@@ -147,6 +174,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
               <li>
                 <a
                   routerLink="/admin"
+                  routerLinkActive="bg-[var(--surface)] text-[var(--primary)] font-semibold"
                   class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
                   (click)="closeMobileNav()"
                   >Admin</a
