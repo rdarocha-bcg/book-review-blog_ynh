@@ -15,6 +15,7 @@ import { AcademicService } from '../../services/academic.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
+import { HasUnsavedChanges } from '@core/guards/can-deactivate.guard';
 import { Subject, takeUntil } from 'rxjs';
 import { MarkdownComponent } from 'ngx-markdown';
 
@@ -46,6 +47,7 @@ import { MarkdownComponent } from 'ngx-markdown';
               formControlName="title"
               placeholder="Titre du travail"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-invalid]="isFieldInvalid('title')"
             />
             <p *ngIf="isFieldInvalid('title')" class="text-red-600 text-sm mt-1">Le titre est requis</p>
@@ -60,6 +62,7 @@ import { MarkdownComponent } from 'ngx-markdown';
               placeholder="Résumé court du travail"
               rows="3"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-invalid]="isFieldInvalid('summary')"
             ></textarea>
             <p
@@ -198,6 +201,7 @@ import { MarkdownComponent } from 'ngx-markdown';
               id="workType"
               formControlName="workType"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-invalid]="isFieldInvalid('workType')"
             >
               <option value="">Sélectionner un type</option>
@@ -331,7 +335,7 @@ import { MarkdownComponent } from 'ngx-markdown';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AcademicFormComponent implements OnInit, OnDestroy {
+export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   academicForm!: FormGroup;
   isEditMode = false;
   isLoading = false;
@@ -418,6 +422,14 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.academicForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  /**
+   * Returns true when the form has unsaved changes (dirty and not submitted).
+   * Used by canDeactivateGuard to warn before navigation.
+   */
+  hasUnsavedChanges(): boolean {
+    return this.academicForm?.dirty ?? false;
   }
 
   triggerImageUpload(): void {
@@ -507,6 +519,7 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
         this.notificationService.success(
           this.isEditMode ? 'Travail académique mis à jour' : 'Travail académique créé'
         );
+        this.academicForm.markAsPristine();
         this.isSubmitting = false;
         this.router.navigate(['/academics', academic.id]);
       },
