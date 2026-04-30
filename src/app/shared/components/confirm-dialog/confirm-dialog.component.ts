@@ -5,6 +5,7 @@ import {
   ChangeDetectionStrategy,
   signal,
   HostListener,
+  ElementRef,
 } from '@angular/core';
 import { ConfirmService, ConfirmRequest } from '@shared/services/confirm.service';
 import { Subscription } from 'rxjs';
@@ -19,7 +20,7 @@ import { Subscription } from 'rxjs';
         class="fixed inset-0 z-[9999] flex items-center justify-center"
         role="dialog"
         aria-modal="true"
-        [attr.aria-labelledby]="'confirm-dialog-title'"
+        aria-labelledby="confirm-dialog-title"
       >
         <!-- Backdrop -->
         <div
@@ -31,7 +32,6 @@ import { Subscription } from 'rxjs';
         <!-- Dialog panel -->
         <div
           class="relative z-10 bg-[var(--surface,#fff)] border border-[var(--border-light,#e2d9e9)] rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4"
-          cdkTrapFocus
         >
           <h2
             id="confirm-dialog-title"
@@ -50,7 +50,6 @@ import { Subscription } from 'rxjs';
               type="button"
               (click)="confirm()"
               class="px-5 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
-              cdkFocusInitial
             >Confirmer</button>
           </div>
         </div>
@@ -63,7 +62,10 @@ export class ConfirmDialogComponent implements OnInit, OnDestroy {
   protected readonly pending = signal<ConfirmRequest | null>(null);
   private subscription?: Subscription;
 
-  constructor(private confirmService: ConfirmService) {}
+  constructor(
+    private confirmService: ConfirmService,
+    private el: ElementRef<HTMLElement>,
+  ) {}
 
   ngOnInit(): void {
     this.subscription = this.confirmService.confirmation$.subscribe((request) => {
@@ -75,10 +77,18 @@ export class ConfirmDialogComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.pending()) {
-      this.cancel();
+  @HostListener('keydown', ['$event'])
+  onKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Escape') { this.cancel(); return; }
+    if (e.key !== 'Tab') return;
+    const focusable = this.el.nativeElement.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
+      e.preventDefault();
+      (e.shiftKey ? last : first).focus();
     }
   }
 

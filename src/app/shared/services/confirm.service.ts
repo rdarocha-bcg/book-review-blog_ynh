@@ -10,10 +10,19 @@ export interface ConfirmRequest {
 export class ConfirmService {
   private subject = new Subject<ConfirmRequest>();
   readonly confirmation$ = this.subject.asObservable();
+  private _resolve: ((v: boolean) => void) | null = null;
 
   confirm(message: string): Promise<boolean> {
-    return new Promise((resolve) => {
-      this.subject.next({ message, resolve });
+    if (this._resolve) { this._resolve(false); }
+    return new Promise<boolean>(resolve => {
+      this._resolve = resolve;
+      this.subject.next({
+        message,
+        resolve: (result: boolean) => {
+          this._resolve = null;
+          resolve(result);
+        },
+      });
     });
   }
 }
