@@ -584,16 +584,22 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
     request.pipe(takeUntil(this.destroy$)).subscribe({
       next: (academic) => {
         this.notificationService.success(
-          this.isEditMode ? 'Travail académique mis à jour' : 'Travail académique créé'
+          this.isEditMode
+            ? 'Travail académique mis à jour avec succès'
+            : 'Travail académique enregistré avec succès',
         );
         this.academicForm.markAsPristine();
         this.isSubmitting = false;
-        this.router.navigate(['/academics', academic.id]);
+        this.cdr.markForCheck();
+        setTimeout(() => {
+          this.router.navigate(['/academics', academic.id]);
+        }, 0);
       },
       error: (error) => {
         this.notificationService.error('Impossible de sauvegarder le travail académique');
         console.error('Error saving academic:', error);
         this.isSubmitting = false;
+        this.cdr.markForCheck();
       },
     });
   }

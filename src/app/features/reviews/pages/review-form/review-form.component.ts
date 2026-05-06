@@ -325,16 +325,21 @@ export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges
     request.pipe(takeUntil(this.destroy$)).subscribe({
       next: (review) => {
         this.notificationService.success(
-          this.isEditMode ? 'Critique mise à jour avec succès' : 'Critique créée avec succès'
+          this.isEditMode ? 'Critique mise à jour avec succès' : 'Critique enregistrée avec succès',
         );
         this.reviewForm.markAsPristine();
         this.isSubmitting = false;
-        this.router.navigate(['/reviews', review.id]);
+        this.cdr.markForCheck();
+        // Defer navigation so the root toast can render before the route changes.
+        setTimeout(() => {
+          this.router.navigate(['/reviews', review.id]);
+        }, 0);
       },
       error: (error) => {
         this.notificationService.error('Impossible d\'enregistrer la critique');
         console.error('Error saving review:', error);
         this.isSubmitting = false;
+        this.cdr.markForCheck();
       },
     });
   }
