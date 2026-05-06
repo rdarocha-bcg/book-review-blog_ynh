@@ -319,9 +319,22 @@ export class HeaderComponent implements OnDestroy {
     }
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
-    const active = document.activeElement;
+    const active = document.activeElement as HTMLElement | null;
+    const activeInPanel = active !== null && panel.contains(active);
+
+    // If focus is outside the panel while the menu is open, keep cycling inside the dialog.
+    if (!activeInPanel) {
+      event.preventDefault();
+      if (event.shiftKey) {
+        last.focus();
+      } else {
+        first.focus();
+      }
+      return;
+    }
+
     if (event.shiftKey) {
-      if (active === first || !panel.contains(active)) {
+      if (active === first) {
         event.preventDefault();
         last.focus();
       }
