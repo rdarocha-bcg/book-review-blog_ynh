@@ -1,3 +1,4 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -70,10 +71,14 @@ describe('ReviewDetailComponent', () => {
   });
 
   it('should show edit button when user is admin', () => {
+    expect(component.review).toEqual(jasmine.objectContaining({ id: '1' }));
     authService.isAdmin.and.returnValue(true);
+    expect(authService.isAdmin()).toBe(true);
+    const cdr = fixture.debugElement.injector.get(ChangeDetectorRef);
+    cdr.markForCheck();
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
-    const editLink = el.querySelector('a[href*="/reviews/1/edit"]') as HTMLAnchorElement | null;
+    const editLink = Array.from(el.querySelectorAll('a')).find((a) => a.textContent?.includes('Modifier'));
     expect(editLink).toBeTruthy();
     expect(editLink?.textContent).toContain('Modifier');
   });
@@ -82,7 +87,7 @@ describe('ReviewDetailComponent', () => {
     authService.isAdmin.and.returnValue(false);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
-    const editLink = el.querySelector('a[href*="/reviews/1/edit"]');
-    expect(editLink).toBeNull();
+    const editLink = Array.from(el.querySelectorAll('a')).find((a) => a.textContent?.includes('Modifier'));
+    expect(editLink).toBeUndefined();
   });
 });
