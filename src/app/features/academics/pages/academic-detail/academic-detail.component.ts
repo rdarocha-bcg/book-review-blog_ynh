@@ -10,6 +10,10 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AcademicService } from '../../services/academic.service';
 import { AcademicWork } from '../../models/academic.model';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
+import {
+  BreadcrumbComponent,
+  BreadcrumbItem,
+} from '@shared/components/breadcrumb/breadcrumb.component';
 import { Subject, takeUntil } from 'rxjs';
 import { MarkdownComponent } from 'ngx-markdown';
 
@@ -22,10 +26,11 @@ import { MarkdownComponent } from 'ngx-markdown';
 @Component({
   selector: 'app-academic-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, LoadingSpinnerComponent, MarkdownComponent],
+  imports: [CommonModule, RouterLink, LoadingSpinnerComponent, MarkdownComponent, BreadcrumbComponent],
   template: `
     <!-- Back navigation -->
     <div class="page-container page-container--narrow">
+      <app-breadcrumb [items]="academicDetailBreadcrumbs()" />
       <a
         routerLink="/academics"
         class="text-[var(--accent-strong)] hover:text-[var(--primary)] mb-6 inline-flex items-center gap-1 font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-strong)]"
@@ -174,5 +179,20 @@ export class AcademicDetailComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /** Breadcrumb trail for academic detail (loading, not found, or loaded). */
+  academicDetailBreadcrumbs(): BreadcrumbItem[] {
+    const root: BreadcrumbItem[] = [
+      { label: 'Accueil', routerLink: ['/'] },
+      { label: 'Travaux académiques', routerLink: ['/academics'] },
+    ];
+    if (this.academic) {
+      return [...root, { label: this.academic.title }];
+    }
+    if (this.notFound) {
+      return [...root, { label: 'Travail introuvable' }];
+    }
+    return [...root, { label: 'Chargement…' }];
   }
 }

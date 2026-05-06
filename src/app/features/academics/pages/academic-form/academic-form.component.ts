@@ -16,6 +16,10 @@ import { AcademicService } from '../../services/academic.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
+import {
+  BreadcrumbComponent,
+  BreadcrumbItem,
+} from '@shared/components/breadcrumb/breadcrumb.component';
 import { HasUnsavedChanges } from '@core/guards/can-deactivate.guard';
 import { Subject, takeUntil } from 'rxjs';
 import { MarkdownComponent } from 'ngx-markdown';
@@ -29,9 +33,11 @@ import { MarkdownComponent } from 'ngx-markdown';
     ButtonComponent,
     LoadingSpinnerComponent,
     MarkdownComponent,
+    BreadcrumbComponent,
   ],
   template: `
     <div class="page-container">
+      <app-breadcrumb [items]="academicFormBreadcrumbs()" />
       <h1 class="text-4xl md:text-5xl font-bold mb-8 text-[var(--primary)]">
         {{ isEditMode ? 'Modifier le travail' : 'Nouveau travail académique' }}
       </h1>
@@ -598,5 +604,23 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
     } else {
       this.router.navigate(['/']);
     }
+  }
+
+  /** Breadcrumb trail for create vs edit academic form. */
+  academicFormBreadcrumbs(): BreadcrumbItem[] {
+    const root: BreadcrumbItem[] = [
+      { label: 'Accueil', routerLink: ['/'] },
+      { label: 'Travaux académiques', routerLink: ['/academics'] },
+    ];
+    if (!this.isEditMode) {
+      return [...root, { label: 'Nouveau travail' }];
+    }
+    const rawTitle = this.academicForm?.get('title')?.value as string | undefined;
+    const title = rawTitle?.trim();
+    const displayTitle = title && title.length > 0 ? title : 'Travail';
+    if (this.academicId) {
+      return [...root, { label: displayTitle, routerLink: ['/academics', this.academicId] }, { label: 'Modifier' }];
+    }
+    return [...root, { label: 'Modifier' }];
   }
 }
