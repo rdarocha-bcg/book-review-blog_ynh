@@ -86,110 +86,57 @@ import { MarkdownComponent } from 'ngx-markdown';
           <div>
             <label for="content" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Contenu</label>
 
-            <!-- Tab bar + image upload button -->
-            <div class="flex items-center justify-between mb-0">
-              <div
-                role="tablist"
-                aria-label="Éditeur de contenu"
-                class="flex rounded-t-xl overflow-hidden border border-b-0 border-[var(--border-light)]"
-              >
-                <button
-                  type="button"
-                  role="tab"
-                  [attr.aria-selected]="activeTab === 'edit'"
-                  [attr.aria-controls]="'content-edit-panel'"
-                  id="tab-edit"
-                  (click)="activeTab = 'edit'"
-                  class="px-4 py-2 text-sm font-medium transition-colors min-w-[88px] min-h-[44px]"
-                  [class.bg-[var(--surface-alt)]]="activeTab !== 'edit'"
-                  [class.text-[var(--text-muted)]]="activeTab !== 'edit'"
-                  [class.bg-white]="activeTab === 'edit'"
-                  [class.text-[var(--primary)]]="activeTab === 'edit'"
-                  [class.font-semibold]="activeTab === 'edit'"
-                >Éditer</button>
-                <button
-                  type="button"
-                  role="tab"
-                  [attr.aria-selected]="activeTab === 'preview'"
-                  [attr.aria-controls]="'content-preview-panel'"
-                  id="tab-preview"
-                  (click)="activeTab = 'preview'"
-                  class="px-4 py-2 text-sm font-medium transition-colors min-w-[88px] min-h-[44px] border-l border-[var(--border-light)]"
-                  [class.bg-[var(--surface-alt)]]="activeTab !== 'preview'"
-                  [class.text-[var(--text-muted)]]="activeTab !== 'preview'"
-                  [class.bg-white]="activeTab === 'preview'"
-                  [class.text-[var(--primary)]]="activeTab === 'preview'"
-                  [class.font-semibold]="activeTab === 'preview'"
-                >Aperçu</button>
-              </div>
-
-              <!-- Insert image button — only visible in edit tab -->
+            <div
+              role="tablist"
+              aria-label="Éditeur de contenu"
+              class="flex w-full rounded-t-xl overflow-hidden border border-b-0 border-[var(--border-light)]"
+            >
               <button
-                *ngIf="activeTab === 'edit'"
                 type="button"
-                (click)="triggerImageUpload()"
-                [disabled]="isUploading"
-                class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border border-[var(--border-light)] bg-white text-[var(--primary)] hover:bg-[var(--surface-alt)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
-                aria-label="Insérer une image"
-              >
-                <span *ngIf="!isUploading">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Insérer une image
-                </span>
-                <span *ngIf="isUploading" class="flex items-center gap-2">
-                  <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                  </svg>
-                  Envoi…
-                </span>
-              </button>
+                #contentTabEdit
+                role="tab"
+                [attr.aria-selected]="activeTab === 'edit'"
+                aria-controls="content-edit-panel"
+                id="tab-edit"
+                [attr.tabindex]="activeTab === 'edit' ? 0 : -1"
+                (click)="activeTab = 'edit'"
+                (keydown)="onContentTabKeydown($event)"
+                class="px-4 py-2 text-sm font-medium transition-colors min-w-[88px] min-h-[44px]"
+                [class.bg-[var(--surface-alt)]]="activeTab !== 'edit'"
+                [class.text-[var(--text-muted)]]="activeTab !== 'edit'"
+                [class.bg-white]="activeTab === 'edit'"
+                [class.text-[var(--primary)]]="activeTab === 'edit'"
+                [class.font-semibold]="activeTab === 'edit'"
+              >Éditer</button>
+              <button
+                type="button"
+                #contentTabPreview
+                role="tab"
+                [attr.aria-selected]="activeTab === 'preview'"
+                aria-controls="content-preview-panel"
+                id="tab-preview"
+                [attr.tabindex]="activeTab === 'preview' ? 0 : -1"
+                (click)="activeTab = 'preview'"
+                (keydown)="onContentTabKeydown($event)"
+                class="px-4 py-2 text-sm font-medium transition-colors min-w-[88px] min-h-[44px] border-l border-[var(--border-light)]"
+                [class.bg-[var(--surface-alt)]]="activeTab !== 'preview'"
+                [class.text-[var(--text-muted)]]="activeTab !== 'preview'"
+                [class.bg-white]="activeTab === 'preview'"
+                [class.text-[var(--primary)]]="activeTab === 'preview'"
+                [class.font-semibold]="activeTab === 'preview'"
+              >Aperçu</button>
             </div>
 
-            <!-- Hidden file input -->
+            <!-- Hidden file input (used by insert-image control inside edit panel) -->
             <input
               #imageFileInput
               type="file"
               accept="image/*"
               class="hidden"
               aria-hidden="true"
+              tabindex="-1"
               (change)="onImageFileSelected($event)"
             />
-
-            <!-- Image preview and remove button -->
-            <div *ngIf="imagePreview()" class="mt-2 flex items-start gap-3">
-              <img
-                [src]="imagePreview()"
-                alt="Aperçu de l'image sélectionnée"
-                class="h-16 w-16 object-cover rounded-lg border border-[var(--border-light)]"
-              />
-              <button
-                type="button"
-                (click)="clearImagePreview()"
-                [disabled]="isUploading"
-                class="text-sm text-red-600 hover:text-red-800 underline disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Supprimer l'image
-              </button>
-            </div>
-
-            <!-- Upload progress bar -->
-            <div
-              *ngIf="isUploading"
-              class="mt-2 h-2 w-full rounded-full bg-[var(--surface-alt)] overflow-hidden"
-              role="progressbar"
-              aria-label="Progression de l'envoi de l'image"
-              [attr.aria-valuenow]="uploadProgress()"
-              aria-valuemin="0"
-              aria-valuemax="100"
-            >
-              <div
-                class="h-full bg-[var(--accent)] transition-all duration-300"
-                [style.width.%]="uploadProgress()"
-              ></div>
-            </div>
 
             <!-- Edit panel -->
             <div
@@ -198,6 +145,61 @@ import { MarkdownComponent } from 'ngx-markdown';
               aria-labelledby="tab-edit"
               [hidden]="activeTab !== 'edit'"
             >
+              <div class="flex justify-end mb-2 mt-2">
+                <button
+                  type="button"
+                  (click)="triggerImageUpload()"
+                  [disabled]="isUploading"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border border-[var(--border-light)] bg-white text-[var(--primary)] hover:bg-[var(--surface-alt)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+                  aria-label="Insérer une image"
+                >
+                  <span *ngIf="!isUploading">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Insérer une image
+                  </span>
+                  <span *ngIf="isUploading" class="flex items-center gap-2">
+                    <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    Envoi…
+                  </span>
+                </button>
+              </div>
+
+              <div *ngIf="imagePreview()" class="mt-2 flex items-start gap-3">
+                <img
+                  [src]="imagePreview()"
+                  alt="Aperçu de l'image sélectionnée"
+                  class="h-16 w-16 object-cover rounded-lg border border-[var(--border-light)]"
+                />
+                <button
+                  type="button"
+                  (click)="clearImagePreview()"
+                  [disabled]="isUploading"
+                  class="text-sm text-red-600 hover:text-red-800 underline disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Supprimer l'image
+                </button>
+              </div>
+
+              <div
+                *ngIf="isUploading"
+                class="mt-2 h-2 w-full rounded-full bg-[var(--surface-alt)] overflow-hidden"
+                role="progressbar"
+                aria-label="Progression de l'envoi de l'image"
+                [attr.aria-valuenow]="uploadProgress()"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <div
+                  class="h-full bg-[var(--accent)] transition-all duration-300"
+                  [style.width.%]="uploadProgress()"
+                ></div>
+              </div>
+
               <textarea
                 id="content"
                 formControlName="content"
@@ -206,6 +208,12 @@ import { MarkdownComponent } from 'ngx-markdown';
                 class="w-full border border-[var(--border-light)] rounded-b-xl rounded-tr-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-sm font-mono"
                 #contentTextarea
               ></textarea>
+
+              <p
+                *ngIf="uploadError"
+                aria-live="assertive"
+                class="text-red-600 text-sm mt-1"
+              >{{ uploadError }}</p>
             </div>
 
             <!-- Preview panel -->
@@ -214,7 +222,8 @@ import { MarkdownComponent } from 'ngx-markdown';
               role="tabpanel"
               aria-labelledby="tab-preview"
               [hidden]="activeTab !== 'preview'"
-              class="min-h-[14rem] border border-[var(--border-light)] rounded-b-xl rounded-tr-xl px-4 py-3 bg-white prose prose-sm max-w-none"
+              [attr.tabindex]="activeTab === 'preview' ? 0 : -1"
+              class="min-h-[14rem] border border-[var(--border-light)] rounded-b-xl rounded-tr-xl px-4 py-3 bg-white prose prose-sm max-w-none outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               <markdown
                 *ngIf="academicForm.get('content')?.value"
@@ -225,13 +234,6 @@ import { MarkdownComponent } from 'ngx-markdown';
                 class="text-[var(--text-muted)] italic text-sm"
               >Aucun contenu à afficher.</p>
             </div>
-
-            <!-- Upload error -->
-            <p
-              *ngIf="uploadError"
-              aria-live="assertive"
-              class="text-red-600 text-sm mt-1"
-            >{{ uploadError }}</p>
           </div>
 
           <!-- Type de travail -->
@@ -390,6 +392,8 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
 
   private readonly imageFileInput = viewChild.required<ElementRef<HTMLInputElement>>('imageFileInput');
   private readonly contentTextarea = viewChild<ElementRef<HTMLTextAreaElement>>('contentTextarea');
+  private readonly contentTabEditRef = viewChild<ElementRef<HTMLButtonElement>>('contentTabEdit');
+  private readonly contentTabPreviewRef = viewChild<ElementRef<HTMLButtonElement>>('contentTabPreview');
 
   private destroy$ = new Subject<void>();
 
@@ -477,6 +481,46 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
 
   triggerImageUpload(): void {
     this.imageFileInput().nativeElement.click();
+  }
+
+  /**
+   * WAI-ARIA tabs keyboard support: ArrowLeft/ArrowRight (wrap), Home/End.
+   */
+  onContentTabKeydown(event: KeyboardEvent): void {
+    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+      event.preventDefault();
+      const next: 'edit' | 'preview' =
+        event.key === 'ArrowRight'
+          ? this.activeTab === 'edit'
+            ? 'preview'
+            : 'edit'
+          : this.activeTab === 'edit'
+            ? 'preview'
+            : 'edit';
+      this.activeTab = next;
+      this.cdr.markForCheck();
+      this.focusActiveContentTab();
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      this.activeTab = 'edit';
+      this.cdr.markForCheck();
+      this.focusActiveContentTab();
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      this.activeTab = 'preview';
+      this.cdr.markForCheck();
+      this.focusActiveContentTab();
+    }
+  }
+
+  private focusActiveContentTab(): void {
+    queueMicrotask(() => {
+      const el =
+        this.activeTab === 'edit'
+          ? this.contentTabEditRef()?.nativeElement
+          : this.contentTabPreviewRef()?.nativeElement;
+      el?.focus();
+    });
   }
 
   onImageFileSelected(event: Event): void {
