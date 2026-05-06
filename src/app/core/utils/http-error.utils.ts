@@ -27,3 +27,14 @@ export function mapHttpError(error: HttpErrorResponse): string {
       return 'Une erreur inattendue est survenue.';
   }
 }
+
+/**
+ * Maps any error from HTTP calls (or unknown failures) to a safe user-facing French message.
+ * Never forwards raw API or runtime exception text to the UI.
+ */
+export function mapErrorToUserMessage(error: unknown): string {
+  if (error instanceof HttpErrorResponse) {
+    return mapHttpError(error);
+  }
+  return 'Une erreur inattendue est survenue. Veuillez réessayer.';
+}
