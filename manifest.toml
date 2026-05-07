@@ -41,8 +41,8 @@ ram.runtime = "200M"
     [install.admin_usernames]
     type = "string"
     default = ""
-    ask.en = "Comma-separated YunoHost usernames that should be application admins (e.g. alice,bob). Leave empty if none."
-    ask.fr = "Noms d'utilisateur YunoHost (séparés par des virgules) pour le rôle admin de l'app. Laisser vide si aucun."
+    ask.en = "Comma-separated YunoHost usernames for application admins (e.g. alice,bob). Do not use dots as separators (e.g. not alice.bob). Semicolons or spaces also work. Leave empty if none."
+    ask.fr = "Logins YunoHost des admins de l'app, séparés par des virgules (ex. alice,bob). Ne pas utiliser des points comme séparateurs (pas alice.bob). Points-virgules ou espaces possibles aussi. Laisser vide si aucun."
 
 [resources]
     [resources.system_user]
