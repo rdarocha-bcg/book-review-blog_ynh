@@ -1,22 +1,29 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn } from '@angular/router';
 import { map } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
+import { YNH_SSO_REDIRECT } from '@core/tokens/sso-redirect.token';
+import { yunohostPortalLoginUrl } from '@core/utils/sso-login-url';
 
 /**
- * Blocks navigation to a route unless the user has an active SSO session.
- * On failure redirects to /401 (the standard unauthorized page for this app).
+ * Blocks navigation unless the user has an active SSO session.
+ * Unauthenticated users are sent to the YunoHost SSO portal (return URL preserved),
+ * which matches public blog installs where /api/auth/me has no identity until login.
  */
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
-  const router = inject(Router);
+  const ssoRedirect = inject(YNH_SSO_REDIRECT);
 
   return auth.getState().pipe(
     map((state) => {
       if (state.authenticated) {
         return true;
       }
-      return router.createUrlTree(['/401']);
+      if (typeof globalThis !== 'undefined' && 'location' in globalThis) {
+        const loc = globalThis.location as Location;
+        ssoRedirect(yunohostPortalLoginUrl(loc.href, loc.origin));
+      }
+      return false;
     }),
   );
 };

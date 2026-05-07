@@ -80,14 +80,69 @@ describe('HeaderComponent', () => {
     const toggle = el.querySelector('#mobile-nav-toggle') as HTMLButtonElement | null;
     expect(toggle).toBeTruthy();
     expect(toggle!.getAttribute('aria-expanded')).toBe('false');
+
+    // Panel is always in the DOM (CSS slide-in transition), hidden when closed
+    const panel = el.querySelector('#mobile-nav-panel');
+    expect(panel).toBeTruthy();
+    expect(panel!.getAttribute('aria-hidden')).toBe('true');
+
     toggle!.click();
     fixture.detectChanges();
     expect(toggle!.getAttribute('aria-expanded')).toBe('true');
-    const panel = el.querySelector('#mobile-nav-panel');
-    expect(panel).toBeTruthy();
+    expect(panel!.getAttribute('aria-hidden')).toBeNull();
+
     toggle!.click();
     fixture.detectChanges();
     expect(toggle!.getAttribute('aria-expanded')).toBe('false');
-    expect(el.querySelector('#mobile-nav-panel')).toBeFalsy();
+    // Panel stays in DOM but is marked aria-hidden when closed
+    expect(el.querySelector('#mobile-nav-panel')).toBeTruthy();
+    expect(panel!.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('should trap Tab inside the mobile panel when focus is on the menu toggle', async () => {
+    await setup();
+    const el = fixture.nativeElement as HTMLElement;
+    const toggle = el.querySelector('#mobile-nav-toggle') as HTMLButtonElement;
+    const panel = el.querySelector('#mobile-nav-panel') as HTMLElement;
+    toggle.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    toggle.focus();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    const firstLink = panel.querySelector('a') as HTMLAnchorElement;
+    expect(document.activeElement).toBe(firstLink);
+  });
+
+  it('should wrap Tab from last to first focusable inside the mobile panel', async () => {
+    await setup();
+    const el = fixture.nativeElement as HTMLElement;
+    const toggle = el.querySelector('#mobile-nav-toggle') as HTMLButtonElement;
+    const panel = el.querySelector('#mobile-nav-panel') as HTMLElement;
+    toggle.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const links = panel.querySelectorAll('a');
+    expect(links.length).toBeGreaterThan(0);
+    const last = links[links.length - 1] as HTMLAnchorElement;
+    last.focus();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    expect(document.activeElement).toBe(links[0]);
+  });
+
+  it('should wrap Shift+Tab from first to last focusable inside the mobile panel', async () => {
+    await setup();
+    const el = fixture.nativeElement as HTMLElement;
+    const toggle = el.querySelector('#mobile-nav-toggle') as HTMLButtonElement;
+    const panel = el.querySelector('#mobile-nav-panel') as HTMLElement;
+    toggle.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const links = panel.querySelectorAll('a');
+    const first = links[0] as HTMLAnchorElement;
+    first.focus();
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }),
+    );
+    expect(document.activeElement).toBe(links[links.length - 1]);
   });
 });

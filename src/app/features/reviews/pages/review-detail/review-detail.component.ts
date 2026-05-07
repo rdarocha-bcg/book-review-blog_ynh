@@ -11,6 +11,10 @@ import { MarkdownComponent } from 'ngx-markdown';
 import { ReviewService } from '../../services/review.service';
 import { Review } from '../../models/review.model';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
+import {
+  BreadcrumbComponent,
+  BreadcrumbItem,
+} from '@shared/components/breadcrumb/breadcrumb.component';
 import { AuthService } from '@core/services/auth.service';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -21,9 +25,10 @@ import { Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-review-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, LoadingSpinnerComponent, MarkdownComponent],
+  imports: [CommonModule, RouterLink, LoadingSpinnerComponent, MarkdownComponent, BreadcrumbComponent],
   template: `
     <div class="page-container">
+      <app-breadcrumb [items]="reviewDetailBreadcrumbs()" />
       <a
         routerLink="/reviews"
         class="text-[var(--accent-strong)] hover:text-[var(--primary)] mb-4 inline-flex items-center gap-1 font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-strong)]"
@@ -180,6 +185,21 @@ export class ReviewDetailComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /** Breadcrumb trail for review detail (loading, not found, or loaded). */
+  reviewDetailBreadcrumbs(): BreadcrumbItem[] {
+    const root: BreadcrumbItem[] = [
+      { label: 'Accueil', routerLink: ['/'] },
+      { label: 'Critiques', routerLink: ['/reviews'] },
+    ];
+    if (this.review) {
+      return [...root, { label: this.review.title }];
+    }
+    if (this.notFound) {
+      return [...root, { label: 'Critique introuvable' }];
+    }
+    return [...root, { label: 'Chargement…' }];
   }
 }
 

@@ -7,7 +7,7 @@ name = "Book Review Blog"
 description.en = "A book review blog with reviews, YunoHost SSO authentication, and admin panel."
 description.fr = "Un blog de critiques littéraires avec avis, authentification SSO YunoHost et panneau admin."
 
-version = "0.1~ynh5"
+version = "0.1~ynh10"
 
 maintainers = ["rdarocha-bcg"]
 
@@ -41,8 +41,14 @@ ram.runtime = "200M"
     [install.admin_usernames]
     type = "string"
     default = ""
-    ask.en = "Comma-separated YunoHost usernames that should be application admins (e.g. alice,bob). Leave empty if none."
-    ask.fr = "Noms d'utilisateur YunoHost (séparés par des virgules) pour le rôle admin de l'app. Laisser vide si aucun."
+    ask.en = "Comma-separated YunoHost usernames for application admins (e.g. alice,bob). Do not use dots as separators (e.g. not alice.bob). Semicolons or spaces also work. Leave empty if none."
+    ask.fr = "Logins YunoHost des admins de l'app, séparés par des virgules (ex. alice,bob). Ne pas utiliser des points comme séparateurs (pas alice.bob). Points-virgules ou espaces possibles aussi. Laisser vide si aucun."
+
+    [install.init_admin_permission]
+    type = "group"
+    default = "all_users"
+    ask.en = "SSO access to the /admin URL path: who may open it (any YunoHost login vs server admins only)? Pick « all_users » so people listed in admin usernames can sign in and use the panel; pick « admins » if only YunoHost server administrators should reach that URL."
+    ask.fr = "Accès SSO au chemin /admin : qui peut l'ouvrir ? « all_users » = tout utilisateur YunoHost connecté (recommandé si les admins sont dans « admin usernames ») ; « admins » = uniquement les administrateurs du serveur."
 
 [resources]
     [resources.system_user]
@@ -61,7 +67,6 @@ ram.runtime = "200M"
 
     admin.url = "/admin"
     admin.show_tile = false
-    admin.allowed = "admins"
 
     [resources.apt]
     packages = "nginx"

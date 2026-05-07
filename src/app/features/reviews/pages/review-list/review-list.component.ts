@@ -3,9 +3,10 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../services/review.service';
 import { Review } from '../../models/review.model';
@@ -15,6 +16,7 @@ import { ButtonComponent } from '@shared/components/button/button.component';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
 import { Subject, takeUntil, BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { mapErrorToUserMessage } from '@core/utils/http-error.utils';
 
 /**
  * Review List Component
@@ -94,12 +96,15 @@ import { debounceTime } from 'rxjs/operators';
       </div>
 
       <!-- Error State -->
-      <div *ngIf="error$ | async" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
-        <p class="font-bold mb-2">Erreur lors du chargement des critiques. Veuillez réessayer.</p>
-        <button (click)="retryLoadReviews()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-          Réessayer
-        </button>
-      </div>
+      <ng-container *ngIf="error$ | async as listError">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
+          <p class="font-bold mb-2">Erreur lors du chargement des critiques</p>
+          <p class="text-sm mb-3">{{ listError }}</p>
+          <button (click)="retryLoadReviews()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+            Réessayer
+          </button>
+        </div>
+      </ng-container>
 
       <div [attr.aria-busy]="(isLoading$ | async) === true" aria-live="polite">
         <!-- Loading placeholders (filters/pagination stay usable) -->
@@ -191,16 +196,34 @@ export class ReviewListComponent implements OnInit, OnDestroy {
   /** Emits when the search field changes; loads are debounced to limit API calls */
   private searchInput$ = new Subject<void>();
 
-  constructor(private reviewService: ReviewService) {}
+  constructor(
+    private reviewService: ReviewService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
+    // URL query params are the source of truth: read on every navigation change and load.
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        this.searchQuery = params['search'] || '';
+        this.selectedGenre = params['genre'] || '';
+        this.selectedRating = params['rating'] || '';
+        this.selectedSort = (params['sort'] as typeof this.selectedSort) || '';
+        this.currentPage = params['page'] ? parseInt(params['page'], 10) : 1;
+        this.loadReviews();
+        this.cdr.markForCheck();
+      });
+
+    // Debounced search: update URL after the user stops typing; queryParams will trigger the load.
     this.searchInput$
       .pipe(debounceTime(350), takeUntil(this.destroy$))
       .subscribe(() => {
         this.currentPage = 1;
-        this.loadReviews();
+        this.syncUrlParams();
       });
-    this.loadReviews();
   }
 
   ngOnDestroy(): void {
@@ -226,8 +249,8 @@ export class ReviewListComponent implements OnInit, OnDestroy {
           this.totalItems = res.total;
           this.totalPages = res.totalPages || Math.ceil(res.total / this.pageSize) || 1;
         },
-        error: () => {
-          this.error$.next('Erreur réseau ou serveur indisponible. Veuillez réessayer.');
+        error: (err) => {
+          this.error$.next(mapErrorToUserMessage(err));
         },
       });
   }
@@ -239,11 +262,12 @@ export class ReviewListComponent implements OnInit, OnDestroy {
   onPaginationChange(event: { page: number; limit: number }): void {
     this.currentPage = event.page;
     this.pageSize = event.limit;
-    this.loadReviews();
+    this.syncUrlParams();
   }
 
   onFilterChange(): void {
-    this.loadReviews();
+    this.currentPage = 1;
+    this.syncUrlParams();
   }
 
   onSearchQueryInput(): void {
@@ -256,7 +280,22 @@ export class ReviewListComponent implements OnInit, OnDestroy {
     this.selectedRating = '';
     this.selectedSort = '';
     this.currentPage = 1;
-    this.loadReviews();
+    this.syncUrlParams();
+  }
+
+  /** Reflect current filter/page state in the URL; the queryParams subscription triggers the load. */
+  private syncUrlParams(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: this.searchQuery || null,
+        genre: this.selectedGenre || null,
+        rating: this.selectedRating || null,
+        sort: this.selectedSort || null,
+        page: this.currentPage > 1 ? this.currentPage : null,
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 
   trackByReviewId(index: number, review: Review): string {

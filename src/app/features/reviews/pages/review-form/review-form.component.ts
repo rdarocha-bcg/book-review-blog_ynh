@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -7,6 +7,10 @@ import { NotificationService } from '@core/services/notification.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
 import { StarRatingInputComponent } from '@shared/components/star-rating-input/star-rating-input.component';
+import {
+  BreadcrumbComponent,
+  BreadcrumbItem,
+} from '@shared/components/breadcrumb/breadcrumb.component';
 import { HasUnsavedChanges } from '@core/guards/can-deactivate.guard';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -23,9 +27,11 @@ import { Subject, takeUntil } from 'rxjs';
     ButtonComponent,
     LoadingSpinnerComponent,
     StarRatingInputComponent,
+    BreadcrumbComponent,
   ],
   template: `
     <div class="page-container">
+      <app-breadcrumb [items]="reviewFormBreadcrumbs()" />
       <h1 class="text-4xl md:text-5xl font-bold mb-8 text-[var(--primary)]">
         {{ isEditMode ? 'Modifier la critique' : 'Créer une critique' }}
       </h1>
@@ -221,7 +227,8 @@ export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges
     private notificationService: NotificationService,
     private router: Router,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private cdr: ChangeDetectorRef,
   ) {
     this.initializeForm();
   }
@@ -272,11 +279,13 @@ export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges
         next: (review) => {
           this.reviewForm.patchValue(review);
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
         error: (error) => {
           this.notificationService.error('Impossible de charger la critique');
           console.error('Error loading review:', error);
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
       });
   }
@@ -316,16 +325,21 @@ export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges
     request.pipe(takeUntil(this.destroy$)).subscribe({
       next: (review) => {
         this.notificationService.success(
-          this.isEditMode ? 'Critique mise à jour avec succès' : 'Critique créée avec succès'
+          this.isEditMode ? 'Critique mise à jour avec succès' : 'Critique enregistrée avec succès',
         );
         this.reviewForm.markAsPristine();
         this.isSubmitting = false;
-        this.router.navigate(['/reviews', review.id]);
+        this.cdr.markForCheck();
+        // Defer navigation so the root toast can render before the route changes.
+        setTimeout(() => {
+          this.router.navigate(['/reviews', review.id]);
+        }, 0);
       },
       error: (error) => {
         this.notificationService.error('Impossible d\'enregistrer la critique');
         console.error('Error saving review:', error);
         this.isSubmitting = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -339,5 +353,23 @@ export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges
     } else {
       this.router.navigate(['/']);
     }
+  }
+
+  /** Breadcrumb trail for create vs edit review form. */
+  reviewFormBreadcrumbs(): BreadcrumbItem[] {
+    const root: BreadcrumbItem[] = [
+      { label: 'Accueil', routerLink: ['/'] },
+      { label: 'Critiques', routerLink: ['/reviews'] },
+    ];
+    if (!this.isEditMode) {
+      return [...root, { label: 'Nouvelle critique' }];
+    }
+    const rawTitle = this.reviewForm?.get('title')?.value as string | undefined;
+    const title = rawTitle?.trim();
+    const displayTitle = title && title.length > 0 ? title : 'Critique';
+    if (this.reviewId) {
+      return [...root, { label: displayTitle, routerLink: ['/reviews', this.reviewId] }, { label: 'Modifier' }];
+    }
+    return [...root, { label: 'Modifier' }];
   }
 }
