@@ -6,15 +6,21 @@ import {
   ChangeDetectorRef,
   viewChild,
   ElementRef,
+  signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 import { AcademicService } from '../../services/academic.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
+import {
+  BreadcrumbComponent,
+  BreadcrumbItem,
+} from '@shared/components/breadcrumb/breadcrumb.component';
+import { HasUnsavedChanges } from '@core/guards/can-deactivate.guard';
 import { Subject, takeUntil } from 'rxjs';
 import { MarkdownComponent } from 'ngx-markdown';
 
@@ -27,9 +33,11 @@ import { MarkdownComponent } from 'ngx-markdown';
     ButtonComponent,
     LoadingSpinnerComponent,
     MarkdownComponent,
+    BreadcrumbComponent,
   ],
   template: `
     <div class="page-container">
+      <app-breadcrumb [items]="academicFormBreadcrumbs()" />
       <h1 class="text-4xl md:text-5xl font-bold mb-8 text-[var(--primary)]">
         {{ isEditMode ? 'Modifier le travail' : 'Nouveau travail académique' }}
       </h1>
@@ -46,6 +54,7 @@ import { MarkdownComponent } from 'ngx-markdown';
               formControlName="title"
               placeholder="Titre du travail"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-invalid]="isFieldInvalid('title')"
             />
             <p *ngIf="isFieldInvalid('title')" class="text-red-600 text-sm mt-1">Le titre est requis</p>
@@ -60,6 +69,7 @@ import { MarkdownComponent } from 'ngx-markdown';
               placeholder="Résumé court du travail"
               rows="3"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-invalid]="isFieldInvalid('summary')"
             ></textarea>
             <p
@@ -76,75 +86,55 @@ import { MarkdownComponent } from 'ngx-markdown';
           <div>
             <label for="content" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Contenu</label>
 
-            <!-- Tab bar + image upload button -->
-            <div class="flex items-center justify-between mb-0">
-              <div
-                role="tablist"
-                aria-label="Éditeur de contenu"
-                class="flex rounded-t-xl overflow-hidden border border-b-0 border-[var(--border-light)]"
-              >
-                <button
-                  type="button"
-                  role="tab"
-                  [attr.aria-selected]="activeTab === 'edit'"
-                  [attr.aria-controls]="'content-edit-panel'"
-                  id="tab-edit"
-                  (click)="activeTab = 'edit'"
-                  class="px-4 py-2 text-sm font-medium transition-colors min-w-[88px] min-h-[44px]"
-                  [class.bg-[var(--surface-alt)]]="activeTab !== 'edit'"
-                  [class.text-[var(--text-muted)]]="activeTab !== 'edit'"
-                  [class.bg-white]="activeTab === 'edit'"
-                  [class.text-[var(--primary)]]="activeTab === 'edit'"
-                  [class.font-semibold]="activeTab === 'edit'"
-                >Éditer</button>
-                <button
-                  type="button"
-                  role="tab"
-                  [attr.aria-selected]="activeTab === 'preview'"
-                  [attr.aria-controls]="'content-preview-panel'"
-                  id="tab-preview"
-                  (click)="activeTab = 'preview'"
-                  class="px-4 py-2 text-sm font-medium transition-colors min-w-[88px] min-h-[44px] border-l border-[var(--border-light)]"
-                  [class.bg-[var(--surface-alt)]]="activeTab !== 'preview'"
-                  [class.text-[var(--text-muted)]]="activeTab !== 'preview'"
-                  [class.bg-white]="activeTab === 'preview'"
-                  [class.text-[var(--primary)]]="activeTab === 'preview'"
-                  [class.font-semibold]="activeTab === 'preview'"
-                >Aperçu</button>
-              </div>
-
-              <!-- Insert image button — only visible in edit tab -->
+            <div
+              role="tablist"
+              aria-label="Éditeur de contenu"
+              class="flex w-full rounded-t-xl overflow-hidden border border-b-0 border-[var(--border-light)]"
+            >
               <button
-                *ngIf="activeTab === 'edit'"
                 type="button"
-                (click)="triggerImageUpload()"
-                [disabled]="isUploading"
-                class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border border-[var(--border-light)] bg-white text-[var(--primary)] hover:bg-[var(--surface-alt)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
-                aria-label="Insérer une image"
-              >
-                <span *ngIf="!isUploading">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Insérer une image
-                </span>
-                <span *ngIf="isUploading" class="flex items-center gap-2">
-                  <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                  </svg>
-                  Envoi…
-                </span>
-              </button>
+                #contentTabEdit
+                role="tab"
+                [attr.aria-selected]="activeTab === 'edit'"
+                aria-controls="content-edit-panel"
+                id="tab-edit"
+                [attr.tabindex]="activeTab === 'edit' ? 0 : -1"
+                (click)="activeTab = 'edit'"
+                (keydown)="onContentTabKeydown($event)"
+                class="px-4 py-2 text-sm font-medium transition-colors min-w-[88px] min-h-[44px]"
+                [class.bg-[var(--surface-alt)]]="activeTab !== 'edit'"
+                [class.text-[var(--text-muted)]]="activeTab !== 'edit'"
+                [class.bg-white]="activeTab === 'edit'"
+                [class.text-[var(--primary)]]="activeTab === 'edit'"
+                [class.font-semibold]="activeTab === 'edit'"
+              >Éditer</button>
+              <button
+                type="button"
+                #contentTabPreview
+                role="tab"
+                [attr.aria-selected]="activeTab === 'preview'"
+                aria-controls="content-preview-panel"
+                id="tab-preview"
+                [attr.tabindex]="activeTab === 'preview' ? 0 : -1"
+                (click)="activeTab = 'preview'"
+                (keydown)="onContentTabKeydown($event)"
+                class="px-4 py-2 text-sm font-medium transition-colors min-w-[88px] min-h-[44px] border-l border-[var(--border-light)]"
+                [class.bg-[var(--surface-alt)]]="activeTab !== 'preview'"
+                [class.text-[var(--text-muted)]]="activeTab !== 'preview'"
+                [class.bg-white]="activeTab === 'preview'"
+                [class.text-[var(--primary)]]="activeTab === 'preview'"
+                [class.font-semibold]="activeTab === 'preview'"
+              >Aperçu</button>
             </div>
 
-            <!-- Hidden file input -->
+            <!-- Hidden file input (used by insert-image control inside edit panel) -->
             <input
               #imageFileInput
               type="file"
               accept="image/*"
               class="hidden"
               aria-hidden="true"
+              tabindex="-1"
               (change)="onImageFileSelected($event)"
             />
 
@@ -155,6 +145,61 @@ import { MarkdownComponent } from 'ngx-markdown';
               aria-labelledby="tab-edit"
               [hidden]="activeTab !== 'edit'"
             >
+              <div class="flex justify-end mb-2 mt-2">
+                <button
+                  type="button"
+                  (click)="triggerImageUpload()"
+                  [disabled]="isUploading"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border border-[var(--border-light)] bg-white text-[var(--primary)] hover:bg-[var(--surface-alt)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+                  aria-label="Insérer une image"
+                >
+                  <span *ngIf="!isUploading">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Insérer une image
+                  </span>
+                  <span *ngIf="isUploading" class="flex items-center gap-2">
+                    <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    Envoi…
+                  </span>
+                </button>
+              </div>
+
+              <div *ngIf="imagePreview()" class="mt-2 flex items-start gap-3">
+                <img
+                  [src]="imagePreview()"
+                  alt="Aperçu de l'image sélectionnée"
+                  class="h-16 w-16 object-cover rounded-lg border border-[var(--border-light)]"
+                />
+                <button
+                  type="button"
+                  (click)="clearImagePreview()"
+                  [disabled]="isUploading"
+                  class="text-sm text-red-600 hover:text-red-800 underline disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Supprimer l'image
+                </button>
+              </div>
+
+              <div
+                *ngIf="isUploading"
+                class="mt-2 h-2 w-full rounded-full bg-[var(--surface-alt)] overflow-hidden"
+                role="progressbar"
+                aria-label="Progression de l'envoi de l'image"
+                [attr.aria-valuenow]="uploadProgress()"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <div
+                  class="h-full bg-[var(--accent)] transition-all duration-300"
+                  [style.width.%]="uploadProgress()"
+                ></div>
+              </div>
+
               <textarea
                 id="content"
                 formControlName="content"
@@ -163,6 +208,12 @@ import { MarkdownComponent } from 'ngx-markdown';
                 class="w-full border border-[var(--border-light)] rounded-b-xl rounded-tr-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-sm font-mono"
                 #contentTextarea
               ></textarea>
+
+              <p
+                *ngIf="uploadError"
+                aria-live="assertive"
+                class="text-red-600 text-sm mt-1"
+              >{{ uploadError }}</p>
             </div>
 
             <!-- Preview panel -->
@@ -171,7 +222,8 @@ import { MarkdownComponent } from 'ngx-markdown';
               role="tabpanel"
               aria-labelledby="tab-preview"
               [hidden]="activeTab !== 'preview'"
-              class="min-h-[14rem] border border-[var(--border-light)] rounded-b-xl rounded-tr-xl px-4 py-3 bg-white prose prose-sm max-w-none"
+              [attr.tabindex]="activeTab === 'preview' ? 0 : -1"
+              class="min-h-[14rem] border border-[var(--border-light)] rounded-b-xl rounded-tr-xl px-4 py-3 bg-white prose prose-sm max-w-none outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               <markdown
                 *ngIf="academicForm.get('content')?.value"
@@ -182,13 +234,6 @@ import { MarkdownComponent } from 'ngx-markdown';
                 class="text-[var(--text-muted)] italic text-sm"
               >Aucun contenu à afficher.</p>
             </div>
-
-            <!-- Upload error -->
-            <p
-              *ngIf="uploadError"
-              aria-live="assertive"
-              class="text-red-600 text-sm mt-1"
-            >{{ uploadError }}</p>
           </div>
 
           <!-- Type de travail -->
@@ -198,6 +243,7 @@ import { MarkdownComponent } from 'ngx-markdown';
               id="workType"
               formControlName="workType"
               class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              aria-required="true"
               [attr.aria-invalid]="isFieldInvalid('workType')"
             >
               <option value="">Sélectionner un type</option>
@@ -331,7 +377,7 @@ import { MarkdownComponent } from 'ngx-markdown';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AcademicFormComponent implements OnInit, OnDestroy {
+export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   academicForm!: FormGroup;
   isEditMode = false;
   isLoading = false;
@@ -341,9 +387,13 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
   activeTab: 'edit' | 'preview' = 'edit';
   isUploading = false;
   uploadError: string | null = null;
+  imagePreview = signal<string | null>(null);
+  uploadProgress = signal<number>(0);
 
   private readonly imageFileInput = viewChild.required<ElementRef<HTMLInputElement>>('imageFileInput');
   private readonly contentTextarea = viewChild<ElementRef<HTMLTextAreaElement>>('contentTextarea');
+  private readonly contentTabEditRef = viewChild<ElementRef<HTMLButtonElement>>('contentTabEdit');
+  private readonly contentTabPreviewRef = viewChild<ElementRef<HTMLButtonElement>>('contentTabPreview');
 
   private destroy$ = new Subject<void>();
 
@@ -355,6 +405,7 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
+    private location: Location,
   ) {
     this.initializeForm();
   }
@@ -420,8 +471,56 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
+  /**
+   * Returns true when the form has unsaved changes (dirty and not submitted).
+   * Used by canDeactivateGuard to warn before navigation.
+   */
+  hasUnsavedChanges(): boolean {
+    return this.academicForm?.dirty ?? false;
+  }
+
   triggerImageUpload(): void {
     this.imageFileInput().nativeElement.click();
+  }
+
+  /**
+   * WAI-ARIA tabs keyboard support: ArrowLeft/ArrowRight (wrap), Home/End.
+   */
+  onContentTabKeydown(event: KeyboardEvent): void {
+    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+      event.preventDefault();
+      const next: 'edit' | 'preview' =
+        event.key === 'ArrowRight'
+          ? this.activeTab === 'edit'
+            ? 'preview'
+            : 'edit'
+          : this.activeTab === 'edit'
+            ? 'preview'
+            : 'edit';
+      this.activeTab = next;
+      this.cdr.markForCheck();
+      this.focusActiveContentTab();
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      this.activeTab = 'edit';
+      this.cdr.markForCheck();
+      this.focusActiveContentTab();
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      this.activeTab = 'preview';
+      this.cdr.markForCheck();
+      this.focusActiveContentTab();
+    }
+  }
+
+  private focusActiveContentTab(): void {
+    queueMicrotask(() => {
+      const el =
+        this.activeTab === 'edit'
+          ? this.contentTabEditRef()?.nativeElement
+          : this.contentTabPreviewRef()?.nativeElement;
+      el?.focus();
+    });
   }
 
   onImageFileSelected(event: Event): void {
@@ -432,29 +531,53 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
     // Reset the input so the same file can be re-selected if needed
     input.value = '';
 
+    // Generate a local preview via FileReader
+    const reader = new FileReader();
+    reader.onload = (e) => this.imagePreview.set(e.target?.result as string);
+    reader.readAsDataURL(file);
+
     this.isUploading = true;
     this.uploadError = null;
+    this.uploadProgress.set(0);
     this.cdr.markForCheck();
 
     const formData = new FormData();
     formData.append('file', file);
 
     this.http
-      .post<{ url: string }>('/blog/api/media/upload', formData)
+      .post<{ url: string }>('/blog/api/media/upload', formData, {
+        reportProgress: true,
+        observe: 'events',
+      })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          this.insertImageMarkdown(response.url);
-          this.isUploading = false;
-          this.cdr.markForCheck();
+        next: (event) => {
+          if (event.type === HttpEventType.UploadProgress && event.total) {
+            this.uploadProgress.set(Math.round((100 * event.loaded) / event.total));
+          } else if (event.type === HttpEventType.Response) {
+            this.insertImageMarkdown((event.body as { url: string }).url);
+            this.isUploading = false;
+            this.uploadProgress.set(0);
+            this.imagePreview.set(null);
+            this.cdr.markForCheck();
+          }
         },
         error: (error) => {
           console.error('Image upload error:', error);
           this.uploadError = "Échec de l'envoi de l'image. Veuillez réessayer.";
+          this.imagePreview.set(null);
           this.isUploading = false;
+          this.uploadProgress.set(0);
           this.cdr.markForCheck();
         },
       });
+  }
+
+  clearImagePreview(): void {
+    this.imagePreview.set(null);
+    this.uploadProgress.set(0);
+    this.isUploading = false;
+    this.cdr.markForCheck();
   }
 
   private insertImageMarkdown(url: string): void {
@@ -505,20 +628,49 @@ export class AcademicFormComponent implements OnInit, OnDestroy {
     request.pipe(takeUntil(this.destroy$)).subscribe({
       next: (academic) => {
         this.notificationService.success(
-          this.isEditMode ? 'Travail académique mis à jour' : 'Travail académique créé'
+          this.isEditMode
+            ? 'Travail académique mis à jour avec succès'
+            : 'Travail académique enregistré avec succès',
         );
+        this.academicForm.markAsPristine();
         this.isSubmitting = false;
-        this.router.navigate(['/academics', academic.id]);
+        this.cdr.markForCheck();
+        setTimeout(() => {
+          this.router.navigate(['/academics', academic.id]);
+        }, 0);
       },
       error: (error) => {
         this.notificationService.error('Impossible de sauvegarder le travail académique');
         console.error('Error saving academic:', error);
         this.isSubmitting = false;
+        this.cdr.markForCheck();
       },
     });
   }
 
   onCancel(): void {
-    this.router.navigate(['/academics']);
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/']);
+    }
+  }
+
+  /** Breadcrumb trail for create vs edit academic form. */
+  academicFormBreadcrumbs(): BreadcrumbItem[] {
+    const root: BreadcrumbItem[] = [
+      { label: 'Accueil', routerLink: ['/'] },
+      { label: 'Travaux académiques', routerLink: ['/academics'] },
+    ];
+    if (!this.isEditMode) {
+      return [...root, { label: 'Nouveau travail' }];
+    }
+    const rawTitle = this.academicForm?.get('title')?.value as string | undefined;
+    const title = rawTitle?.trim();
+    const displayTitle = title && title.length > 0 ? title : 'Travail';
+    if (this.academicId) {
+      return [...root, { label: displayTitle, routerLink: ['/academics', this.academicId] }, { label: 'Modifier' }];
+    }
+    return [...root, { label: 'Modifier' }];
   }
 }

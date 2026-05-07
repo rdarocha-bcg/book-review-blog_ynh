@@ -1,7 +1,7 @@
 import { APP_INITIALIZER, ApplicationConfig } from '@angular/core';
 import { APP_BASE_HREF, registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
 registerLocaleData(localeFr);
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -20,7 +20,7 @@ function appBaseHrefFactory(): string {
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: APP_BASE_HREF, useFactory: appBaseHrefFactory },
-    provideRouter(routes),
+    provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' })),
     provideHttpClient(withInterceptors([errorInterceptor])),
     provideAnimations(),
     provideMarkdown(),

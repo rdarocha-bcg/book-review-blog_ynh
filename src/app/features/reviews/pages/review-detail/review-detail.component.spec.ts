@@ -1,3 +1,4 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -5,11 +6,13 @@ import { of } from 'rxjs';
 import { provideMarkdown } from 'ngx-markdown';
 import { ReviewDetailComponent } from './review-detail.component';
 import { ReviewService } from '../../services/review.service';
+import { AuthService } from '@core/services/auth.service';
 
 describe('ReviewDetailComponent', () => {
   let component: ReviewDetailComponent;
   let fixture: ComponentFixture<ReviewDetailComponent>;
   let reviewService: jasmine.SpyObj<ReviewService>;
+  let authService: jasmine.SpyObj<AuthService>;
 
   const mockReview = {
     id: '1',
@@ -34,11 +37,15 @@ describe('ReviewDetailComponent', () => {
     });
     reviewService.getReviewById.and.returnValue(of(mockReview));
 
+    authService = jasmine.createSpyObj('AuthService', ['isAdmin']);
+    authService.isAdmin.and.returnValue(false);
+
     await TestBed.configureTestingModule({
       imports: [ReviewDetailComponent, RouterTestingModule],
       providers: [
         { provide: ReviewService, useValue: reviewService },
         { provide: ActivatedRoute, useValue: { params: of({ id: '1' }) } },
+        { provide: AuthService, useValue: authService },
         provideMarkdown(),
       ],
     }).compileComponents();
@@ -61,5 +68,26 @@ describe('ReviewDetailComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Test Review');
     expect(el.textContent).toContain('Book');
+  });
+
+  it('should show edit button when user is admin', () => {
+    expect(component.review).toEqual(jasmine.objectContaining({ id: '1' }));
+    authService.isAdmin.and.returnValue(true);
+    expect(authService.isAdmin()).toBe(true);
+    const cdr = fixture.debugElement.injector.get(ChangeDetectorRef);
+    cdr.markForCheck();
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const editLink = Array.from(el.querySelectorAll('a')).find((a) => a.textContent?.includes('Modifier'));
+    expect(editLink).toBeTruthy();
+    expect(editLink?.textContent).toContain('Modifier');
+  });
+
+  it('should hide edit button when user is not admin', () => {
+    authService.isAdmin.and.returnValue(false);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const editLink = Array.from(el.querySelectorAll('a')).find((a) => a.textContent?.includes('Modifier'));
+    expect(editLink).toBeUndefined();
   });
 });

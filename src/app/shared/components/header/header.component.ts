@@ -2,15 +2,16 @@ import {
   Component,
   OnDestroy,
   ChangeDetectionStrategy,
+  computed,
   inject,
   signal,
   ElementRef,
   viewChild,
   HostListener,
 } from '@angular/core';
-import { NavigationEnd, Router, RouterLink } from '@angular/router';
-import { SiteConfigService } from '@core/services/site-config.service';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { SiteConfigService } from '@core/services/site-config.service';
 import { filter, Subject, takeUntil } from 'rxjs';
 
 /**
@@ -19,7 +20,39 @@ import { filter, Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, RouterLinkActive],
+  styles: [
+    `
+      .nav-mobile-panel {
+        transform: translateX(-100%);
+        transition:
+          transform 0.25s ease-in-out,
+          opacity 0.25s ease-in-out;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .nav-mobile-panel.is-open {
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .nav-mobile-backdrop {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease-in-out;
+      }
+      .nav-mobile-backdrop.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .nav-mobile-panel,
+        .nav-mobile-backdrop {
+          transition: none;
+        }
+      }
+    `,
+  ],
   template: `
     <header
       class="relative sticky top-0 z-40 border-b border-[var(--border-light)] shadow-sm bg-[color:var(--header-bg)] backdrop-blur-md"
@@ -54,33 +87,56 @@ import { filter, Subject, takeUntil } from 'rxjs';
           </button>
           <ul class="hidden gap-6 md:flex">
             <li>
-              <a routerLink="/" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]">Accueil</a>
+              <a
+                routerLink="/"
+                routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
+                >Accueil</a
+              >
             </li>
             <li>
-              <a routerLink="/reviews" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+              <a
+                routerLink="/reviews"
+                routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
                 >Critiques</a
               >
             </li>
             <li>
-              <a routerLink="/academics" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+              <a
+                routerLink="/academics"
+                routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
                 >Travaux</a
               >
             </li>
             <li>
-              <a routerLink="/about" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+              <a
+                routerLink="/about"
+                routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
                 >À propos</a
               >
             </li>
             <li>
-              <a routerLink="/contact" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
+              <a
+                routerLink="/contact"
+                routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
                 >Contact</a
               >
             </li>
-            <li>
-              <a routerLink="/admin" class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)]"
-                >Admin</a
-              >
-            </li>
+            @if (isAdmin()) {
+              <li>
+                <a
+                  routerLink="/admin"
+                  routerLinkActive="text-[var(--primary)] border-b-2 border-[var(--primary)]"
+                  class="font-medium text-[var(--text-dark)] hover:text-[var(--accent-strong)] pb-0.5"
+                  >Admin</a
+                >
+              </li>
+            }
           </ul>
         </div>
         @if (auth.state()?.authenticated) {
@@ -95,61 +151,68 @@ import { filter, Subject, takeUntil } from 'rxjs';
         }
       </nav>
 
-      @if (mobileNavOpen()) {
-        <div
-          class="fixed inset-0 z-[45] bg-black/35 md:hidden"
-          aria-hidden="true"
-          (click)="closeMobileNav()"
-        ></div>
-        <div
-          #mobileNavPanel
-          id="mobile-nav-panel"
-          class="fixed left-4 right-4 top-[4.25rem] z-50 max-h-[min(70vh,calc(100dvh-6rem))] overflow-y-auto rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-4 shadow-lg md:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menu mobile"
-        >
-          <ul class="flex flex-col gap-1">
-            <li>
-              <a
-                routerLink="/"
-                class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
-                (click)="closeMobileNav()"
-                >Accueil</a
-              >
-            </li>
-            <li>
-              <a
-                routerLink="/reviews"
-                class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
-                (click)="closeMobileNav()"
-                >Critiques</a
-              >
-            </li>
-            <li>
-              <a
-                routerLink="/academics"
-                class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
-                (click)="closeMobileNav()"
-                >Travaux</a
-              >
-            </li>
-            <li>
-              <a
-                routerLink="/about"
-                class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
-                (click)="closeMobileNav()"
-                >À propos</a
-              >
-            </li>
-            <li>
-              <a
-                routerLink="/contact"
-                class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
-                (click)="closeMobileNav()"
-                >Contact</a
-              >
-            </li>
+      <!-- Backdrop: always in DOM, fades in/out via .is-open -->
+      <div
+        class="nav-mobile-backdrop fixed inset-0 z-[45] bg-black/35 md:hidden"
+        [class.is-open]="mobileNavOpen()"
+        aria-hidden="true"
+        (click)="closeMobileNav()"
+      ></div>
+
+      <!-- Panel: always in DOM, slides in from left via .is-open -->
+      <div
+        #mobileNavPanel
+        id="mobile-nav-panel"
+        class="nav-mobile-panel fixed left-4 right-4 top-[4.25rem] z-50 max-h-[min(70vh,calc(100dvh-6rem))] overflow-y-auto rounded-lg border border-[var(--border-light)] bg-[var(--card-bg)] p-4 shadow-lg md:hidden"
+        [class.is-open]="mobileNavOpen()"
+        [attr.aria-hidden]="!mobileNavOpen() ? 'true' : null"
+        [attr.inert]="!mobileNavOpen() ? '' : null"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu mobile"
+      >
+        <ul class="flex flex-col gap-1">
+          <li>
+            <a
+              routerLink="/"
+              class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+              (click)="closeMobileNav()"
+              >Accueil</a
+            >
+          </li>
+          <li>
+            <a
+              routerLink="/reviews"
+              class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+              (click)="closeMobileNav()"
+              >Critiques</a
+            >
+          </li>
+          <li>
+            <a
+              routerLink="/academics"
+              class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+              (click)="closeMobileNav()"
+              >Travaux</a
+            >
+          </li>
+          <li>
+            <a
+              routerLink="/about"
+              class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+              (click)="closeMobileNav()"
+              >À propos</a
+            >
+          </li>
+          <li>
+            <a
+              routerLink="/contact"
+              class="block rounded-md px-3 py-3 font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+              (click)="closeMobileNav()"
+              >Contact</a
+            >
+          </li>
+          @if (isAdmin()) {
             <li>
               <a
                 routerLink="/admin"
@@ -158,20 +221,20 @@ import { filter, Subject, takeUntil } from 'rxjs';
                 >Admin</a
               >
             </li>
-            @if (auth.state()?.authenticated) {
-              <li>
-                <button
-                  type="button"
-                  class="block w-full rounded-md px-3 py-3 text-left font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
-                  (click)="onLogout(); closeMobileNav()"
-                >
-                  Se déconnecter
-                </button>
-              </li>
-            }
-          </ul>
-        </div>
-      }
+          }
+          @if (auth.state()?.authenticated) {
+            <li>
+              <button
+                type="button"
+                class="block w-full rounded-md px-3 py-3 text-left font-medium text-[var(--text-dark)] hover:bg-[var(--surface)]"
+                (click)="onLogout(); closeMobileNav()"
+              >
+                Se déconnecter
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
     </header>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -180,6 +243,9 @@ export class HeaderComponent implements OnDestroy {
   readonly site = inject(SiteConfigService);
   readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  /** True when the current user holds the admin role. */
+  readonly isAdmin = computed(() => this.auth.state()?.user?.role === 'admin');
 
   readonly mobileNavOpen = signal(false);
   private readonly menuButtonRef = viewChild<ElementRef<HTMLButtonElement>>('menuButton');
@@ -253,9 +319,22 @@ export class HeaderComponent implements OnDestroy {
     }
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
-    const active = document.activeElement;
+    const active = document.activeElement as HTMLElement | null;
+    const activeInPanel = active !== null && panel.contains(active);
+
+    // If focus is outside the panel while the menu is open, keep cycling inside the dialog.
+    if (!activeInPanel) {
+      event.preventDefault();
+      if (event.shiftKey) {
+        last.focus();
+      } else {
+        first.focus();
+      }
+      return;
+    }
+
     if (event.shiftKey) {
-      if (active === first || !panel.contains(active)) {
+      if (active === first) {
         event.preventDefault();
         last.focus();
       }
