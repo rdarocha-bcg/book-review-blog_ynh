@@ -4,16 +4,21 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { adminGuard } from './admin.guard';
 import { AuthService, AuthState } from '@core/services/auth.service';
+import { YNH_SSO_REDIRECT } from '@core/tokens/sso-redirect.token';
 
-function runGuard(authState: AuthState) {
+function runGuard(authState: AuthState, ssoRedirect?: jasmine.Spy) {
   const authServiceStub = { getState: () => of(authState) };
+  const redirectSpy = ssoRedirect ?? jasmine.createSpy('ssoRedirect');
   TestBed.configureTestingModule({
     imports: [RouterTestingModule],
-    providers: [{ provide: AuthService, useValue: authServiceStub }],
+    providers: [
+      { provide: AuthService, useValue: authServiceStub },
+      { provide: YNH_SSO_REDIRECT, useValue: redirectSpy },
+    ],
   });
   const router = TestBed.inject(Router);
   const result$ = TestBed.runInInjectionContext(() => adminGuard({} as never, [] as never));
-  return { result$, router };
+  return { result$, router, redirectSpy };
 }
 
 describe('adminGuard', () => {
@@ -41,11 +46,14 @@ describe('adminGuard', () => {
     });
   });
 
-  it('should redirect to /login for an unauthenticated user', (done) => {
+  it('should invoke SSO redirect and return false when unauthenticated', (done) => {
     const state: AuthState = { authenticated: false };
-    const { result$, router } = runGuard(state);
+    const { result$, redirectSpy } = runGuard(state);
     (result$ as ReturnType<typeof of>).subscribe((result) => {
-      expect(result).toEqual(router.createUrlTree(['/login']));
+      expect(result).toBe(false);
+      expect(redirectSpy).toHaveBeenCalledTimes(1);
+      const url = redirectSpy.calls.first().args[0] as string;
+      expect(url).toMatch(new RegExp(`^${window.location.origin}/yunohost/sso\\?r=`));
       done();
     });
   });
