@@ -188,7 +188,7 @@ Le backend expose `POST /api/auth/logout` qui renvoie `204` (no-op) pour compati
 
 | Guard | Type | Comportement en cas d'échec |
 |-------|------|------------------------------|
-| `authGuard` | `CanActivateFn` | Redirige vers `/401` si non authentifié |
+| `authGuard` | `CanActivateFn` | Redirige vers le portail YunoHost SSO (URL de retour encodée) si non authentifié |
 
 ---
 
@@ -296,9 +296,9 @@ TRUST_SSO_HEADERS=always
 
 4. **Fallback Basic échoue.** Vérifier que `auth_header` est activé dans la configuration SSOWat et que `Authorization` est bien transmis par NGINX (`proxy_set_header Authorization $http_authorization`).
 
-### L'utilisateur voit `/401` au lieu du contenu
+### L'utilisateur voit `/401` ou le portail SSO au lieu du contenu
 
-L'`authGuard` a reçu `{ authenticated: false }` de `GET /api/auth/me`. Voir le point précédent. Vérifier aussi que la session YunoHost est active (cookie `yunohost.portal` présent dans le navigateur).
+Pour `/reviews/new`, `/academics/new`, etc., l'`authGuard` envoie d'abord l'utilisateur vers **le portail YunoHost** si `GET /api/auth/me` indique `{ authenticated: false }`, afin qu'il puisse ouvrir une session. Les routes qui exigent le rôle `admin` renvoient les non-admins vers **`/401`**. Pour toute session vide, vérifier les points ci-dessus (en-têtes SSO, cookie `yunohost.portal`, etc.).
 
 ### L'utilisateur authentifié ne voit pas les routes admin
 
