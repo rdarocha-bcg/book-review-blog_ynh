@@ -16,6 +16,7 @@ import { ButtonComponent } from '@shared/components/button/button.component';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
 import { Subject, takeUntil, BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { mapErrorToUserMessage } from '@core/utils/http-error.utils';
 
 /**
  * Academic List Component
@@ -224,7 +225,7 @@ export class AcademicListComponent implements OnInit, OnDestroy {
           this.totalPages = res.totalPages || Math.ceil(res.total / this.pageSize) || 1;
         },
         error: (error) => {
-          this.error$.next(error?.message || 'Erreur réseau ou serveur indisponible');
+          this.error$.next(mapErrorToUserMessage(error));
         },
       });
   }

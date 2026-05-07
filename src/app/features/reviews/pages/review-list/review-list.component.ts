@@ -16,6 +16,7 @@ import { ButtonComponent } from '@shared/components/button/button.component';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
 import { Subject, takeUntil, BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { mapErrorToUserMessage } from '@core/utils/http-error.utils';
 
 /**
  * Review List Component
@@ -95,12 +96,15 @@ import { debounceTime } from 'rxjs/operators';
       </div>
 
       <!-- Error State -->
-      <div *ngIf="error$ | async" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
-        <p class="font-bold mb-2">Erreur lors du chargement des critiques. Veuillez réessayer.</p>
-        <button (click)="retryLoadReviews()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-          Réessayer
-        </button>
-      </div>
+      <ng-container *ngIf="error$ | async as listError">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
+          <p class="font-bold mb-2">Erreur lors du chargement des critiques</p>
+          <p class="text-sm mb-3">{{ listError }}</p>
+          <button (click)="retryLoadReviews()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+            Réessayer
+          </button>
+        </div>
+      </ng-container>
 
       <div [attr.aria-busy]="(isLoading$ | async) === true" aria-live="polite">
         <!-- Loading placeholders (filters/pagination stay usable) -->
@@ -245,8 +249,8 @@ export class ReviewListComponent implements OnInit, OnDestroy {
           this.totalItems = res.total;
           this.totalPages = res.totalPages || Math.ceil(res.total / this.pageSize) || 1;
         },
-        error: () => {
-          this.error$.next('Erreur réseau ou serveur indisponible. Veuillez réessayer.');
+        error: (err) => {
+          this.error$.next(mapErrorToUserMessage(err));
         },
       });
   }

@@ -5,7 +5,7 @@
  * Covers:
  *   1. Navigation & routing (including /blog/ base href)
  *   2. Public pages — French UI, empty states, structure
- *   3. Auth guard — /reviews/new, /academics/new → /401
+ *   3. Auth guard — /reviews/new, /academics/new → YunoHost SSO (when not logged in)
  *   4. Admin panel access
  *   5. UI/UX quality — no console errors, loading states, empty states
  *   6. API integration — auth/me, 404 error handling
@@ -320,34 +320,34 @@ test.describe('Academics List Page', () => {
 // 5. Auth Guard — Protection of creation routes
 // ---------------------------------------------------------------------------
 
-test.describe('Auth Guard — creation routes require login', () => {
-  test('/blog/reviews/new redirects to /blog/401 for unauthenticated users', async ({ page }) => {
-    await page.goto('/reviews/new');
-    await expect(page.locator('#main-content')).toBeVisible();
-    // Should land on the 401 unauthorized page
-    await expect(page).toHaveURL(/401/);
-    await expect(page.locator('#unauthorized-heading')).toBeVisible();
+test.describe('Auth Guard — creation routes send anonymous users to SSO', () => {
+  test('/blog/reviews/new redirects unauthenticated users to YunoHost SSO', async ({
+    page,
+  }) => {
+    await page.goto('/reviews/new', { waitUntil: 'commit', timeout: 45_000 });
+    await expect(page).toHaveURL(/yunohost\/sso/, { timeout: 15_000 });
+    expect(page.url()).toMatch(/[?&]r=/);
   });
 
-  test('/blog/academics/new redirects to /blog/401 for unauthenticated users', async ({ page }) => {
-    await page.goto('/academics/new');
-    await expect(page.locator('#main-content')).toBeVisible();
-    await expect(page).toHaveURL(/401/);
-    await expect(page.locator('#unauthorized-heading')).toBeVisible();
+  test('/blog/academics/new redirects unauthenticated users to YunoHost SSO', async ({
+    page,
+  }) => {
+    await page.goto('/academics/new', { waitUntil: 'commit', timeout: 45_000 });
+    await expect(page).toHaveURL(/yunohost\/sso/, { timeout: 15_000 });
+    expect(page.url()).toMatch(/[?&]r=/);
   });
 
-  test('401 page has "Go to home page" link', async ({ page }) => {
+  test('401 page has home link', async ({ page }) => {
     await page.goto('/401');
     await expect(page.locator('#main-content')).toBeVisible();
-    // The 401 component renders a button-styled link with aria-label="Go to home page"
-    const homeLink = page.getByRole('link', { name: 'Go to home page' });
+    const homeLink = page.getByRole('link', { name: /Retourner à l'accueil/i });
     await expect(homeLink).toBeVisible();
   });
 
-  test('401 "Go to home page" link navigates back to home', async ({ page }) => {
+  test('401 home link navigates back to home', async ({ page }) => {
     await page.goto('/401');
     await expect(page.locator('#main-content')).toBeVisible();
-    await page.getByRole('link', { name: 'Go to home page' }).click();
+    await page.getByRole('link', { name: /Retourner à l'accueil/i }).click();
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('#hero-heading')).toBeVisible();
   });

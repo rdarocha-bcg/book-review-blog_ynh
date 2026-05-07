@@ -54,7 +54,7 @@ export const routes: Routes = [
           },
           {
             path: 'edit',
-            canActivate: [authGuard],
+            canActivate: [authGuard, adminGuard],
             canDeactivate: [canDeactivateGuard],
             loadComponent: () =>
               import('./features/reviews/pages/review-form/review-form.component').then(
