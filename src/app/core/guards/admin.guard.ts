@@ -11,6 +11,7 @@ import { yunohostPortalLoginUrl } from '@core/utils/sso-login-url';
  * Unauthenticated users are sent to the YunoHost SSO portal (nginx normally
  * already enforces login on /admin only). Authenticated non-admins → /401.
  * Uses `canMatch` so the admin chunk is not loaded for ineligible users.
+ * Also usable as `canActivate` for individual admin-only routes.
  */
 export const adminGuard: CanActivateFn & CanMatchFn = () => {
   const auth = inject(AuthService);
