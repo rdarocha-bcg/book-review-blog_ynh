@@ -79,6 +79,11 @@ pushd "$install_dir/api"
     ynh_exec_warn_less npm ci --omit=dev --no-audit --no-fund
 popd
 
+ynh_sso_cookie_secret=""
+if [ -r /etc/yunohost/.ssowat_cookie_secret ]; then
+    ynh_sso_cookie_secret=$(cat /etc/yunohost/.ssowat_cookie_secret)
+fi
+
 cat > "$install_dir/api/.env" <<EOF
 HOST=127.0.0.1
 PORT=$port
@@ -89,6 +94,7 @@ DATABASE_PASSWORD=$db_pwd
 DATABASE_NAME=$db_name
 ADMIN_USERNAMES=$admin_usernames
 TRUST_SSO_HEADERS=auto
+YNH_SSO_COOKIE_SECRET=$ynh_sso_cookie_secret
 EOF
 
 chmod 640 "$install_dir/api/.env"

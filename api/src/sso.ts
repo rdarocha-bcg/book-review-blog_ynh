@@ -1,4 +1,5 @@
 import type { FastifyRequest } from 'fastify';
+import { readPortalCookieIdentity } from './portal-cookie.js';
 
 export type YnhIdentity = {
   uid: string;
@@ -64,9 +65,12 @@ export function readYnhIdentity(req: FastifyRequest): YnhIdentity | null {
   const uidFromHeaders = firstHeader(req, ['ynh-user', 'ynh_user']);
   const uidFromBasic = readBasicAuthUsername(req);
   const uid = uidFromHeaders ?? uidFromBasic;
-  if (!uid) return null;
+  if (uid) {
+    return { uid, email, fullName };
+  }
 
-  return { uid, email, fullName };
+  // SSOWat headers are often stripped by nginx proxy_set_header; trust portal JWT from Cookie.
+  return readPortalCookieIdentity(req);
 }
 
 export function parseAdminUsernames(): Set<string> {
