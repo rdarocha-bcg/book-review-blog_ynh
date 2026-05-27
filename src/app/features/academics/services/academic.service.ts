@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap, catchError, retry } from 'rxjs/operators';
+import { tap, catchError, retry, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ApiService } from '@core/services/api.service';
 import { AcademicWork, AcademicFilter, AcademicPaginationResponse } from '../models/academic.model';
+import { AcademicWorkDto, fromAcademicWorkDto } from '@core/dto/academic.dto';
 
 /**
  * Academic Service
@@ -26,8 +27,12 @@ export class AcademicService {
     this.loading$.next(true);
     const params = this.buildParams(filters);
 
-    return this.apiService.get<AcademicPaginationResponse>('academics', { params }).pipe(
+    return this.apiService.get<{ data: AcademicWorkDto[]; total: number; page: number; limit: number; totalPages: number }>('academics', { params }).pipe(
       retry(2),
+      map((response) => ({
+        ...response,
+        data: response.data.map(fromAcademicWorkDto),
+      })),
       tap((response) => {
         this.academics$.next(response.data);
         this.loading$.next(false);
@@ -45,7 +50,8 @@ export class AcademicService {
   getAcademicById(id: string): Observable<AcademicWork> {
     this.loading$.next(true);
 
-    return this.apiService.get<AcademicWork>(`academics/${id}`).pipe(
+    return this.apiService.get<AcademicWorkDto>(`academics/${id}`).pipe(
+      map(fromAcademicWorkDto),
       tap((academic) => {
         this.selectedAcademic$.next(academic);
         this.loading$.next(false);

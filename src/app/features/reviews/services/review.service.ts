@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap, catchError, retry } from 'rxjs/operators';
+import { tap, catchError, retry, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ApiService } from '@core/services/api.service';
 import { Review, ReviewFilter, ReviewPaginationResponse } from '../models/review.model';
+import { ReviewDto, fromReviewDto } from '@core/dto/review.dto';
 
 /**
  * Review Service
@@ -26,8 +27,12 @@ export class ReviewService {
     this.loading$.next(true);
     const params = this.buildParams(filters);
 
-    return this.apiService.get<ReviewPaginationResponse>('reviews', { params }).pipe(
+    return this.apiService.get<{ data: ReviewDto[]; total: number; page: number; limit: number; totalPages: number }>('reviews', { params }).pipe(
       retry(2),
+      map((response) => ({
+        ...response,
+        data: response.data.map(fromReviewDto),
+      })),
       tap((response) => {
         this.reviews$.next(response.data);
         this.loading$.next(false);
@@ -47,7 +52,8 @@ export class ReviewService {
   getReviewById(id: string): Observable<Review> {
     this.loading$.next(true);
 
-    return this.apiService.get<Review>(`reviews/${id}`).pipe(
+    return this.apiService.get<ReviewDto>(`reviews/${id}`).pipe(
+      map(fromReviewDto),
       tap((review) => {
         this.selectedReview$.next(review);
         this.loading$.next(false);
