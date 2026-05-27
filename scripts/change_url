@@ -40,7 +40,8 @@ ynh_script_progression --message="Rebuilding Angular app with new path (this may
 
 pushd "$install_dir/src"
     ynh_use_nodejs
-    ynh_exec_warn_less npm ci
+    export npm_config_cache="$install_dir/.npm-cache"
+    ynh_exec_warn_less npm ci --no-audit --no-fund
     ynh_exec_warn_less npx ng build --configuration production --base-href "$base_href"
 popd
 
