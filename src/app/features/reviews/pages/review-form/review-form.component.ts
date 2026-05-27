@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, ActivatedRoute } from '@angular/router';
 import { ReviewService } from '../../services/review.service';
 import { NotificationService } from '@core/services/notification.service';
+import { LoggerService } from '@core/services/logger.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
 import { StarRatingInputComponent } from '@shared/components/star-rating-input/star-rating-input.component';
@@ -225,6 +226,7 @@ export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges
     private fb: FormBuilder,
     private reviewService: ReviewService,
     private notificationService: NotificationService,
+    private logger: LoggerService,
     private router: Router,
     private route: ActivatedRoute,
     private location: Location,
@@ -283,7 +285,7 @@ export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges
         },
         error: (error) => {
           this.notificationService.error('Impossible de charger la critique');
-          console.error('Error loading review:', error);
+          this.logger.error('Error loading review:', error, { reviewId: this.reviewId });
           this.isLoading = false;
           this.cdr.markForCheck();
         },
@@ -337,7 +339,7 @@ export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges
       },
       error: (error) => {
         this.notificationService.error('Impossible d\'enregistrer la critique');
-        console.error('Error saving review:', error);
+        this.logger.error('Error saving review:', error);
         this.isSubmitting = false;
         this.cdr.markForCheck();
       },

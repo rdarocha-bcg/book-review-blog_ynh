@@ -14,6 +14,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { AcademicService } from '../../services/academic.service';
 import { NotificationService } from '@core/services/notification.service';
+import { LoggerService } from '@core/services/logger.service';
 import { ButtonComponent } from '@shared/components/button/button.component';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
 import {
@@ -401,6 +402,7 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
     private fb: FormBuilder,
     private academicService: AcademicService,
     private notificationService: NotificationService,
+    private logger: LoggerService,
     private router: Router,
     private route: ActivatedRoute,
     private http: HttpClient,
@@ -459,7 +461,7 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
         },
         error: (error) => {
           this.notificationService.error('Impossible de charger le travail académique');
-          console.error('Error loading academic:', error);
+          this.logger.error('Error loading academic:', error, { academicId: this.academicId });
           this.isLoading = false;
           this.cdr.markForCheck();
         },
@@ -563,7 +565,7 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
           }
         },
         error: (error) => {
-          console.error('Image upload error:', error);
+          this.logger.error('Image upload error:', error);
           this.uploadError = "Échec de l'envoi de l'image. Veuillez réessayer.";
           this.imagePreview.set(null);
           this.isUploading = false;
@@ -641,7 +643,7 @@ export class AcademicFormComponent implements OnInit, OnDestroy, HasUnsavedChang
       },
       error: (error) => {
         this.notificationService.error('Impossible de sauvegarder le travail académique');
-        console.error('Error saving academic:', error);
+        this.logger.error('Error saving academic:', error);
         this.isSubmitting = false;
         this.cdr.markForCheck();
       },
