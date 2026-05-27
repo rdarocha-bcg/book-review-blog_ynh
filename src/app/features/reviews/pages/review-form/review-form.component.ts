@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, viewChild, ElementRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -13,6 +13,7 @@ import {
 } from '@shared/components/breadcrumb/breadcrumb.component';
 import { HasUnsavedChanges } from '@core/guards/can-deactivate.guard';
 import { Subject, takeUntil } from 'rxjs';
+import { MarkdownComponent } from 'ngx-markdown';
 
 /**
  * Review Form Component
@@ -28,6 +29,7 @@ import { Subject, takeUntil } from 'rxjs';
     LoadingSpinnerComponent,
     StarRatingInputComponent,
     BreadcrumbComponent,
+    MarkdownComponent,
   ],
   template: `
     <div class="page-container">
@@ -145,20 +147,90 @@ import { Subject, takeUntil } from 'rxjs';
             </p>
           </div>
 
-          <!-- Contenu complet -->
+          <!-- Contenu complet — Markdown editor with preview toggle -->
           <div>
             <label for="content" class="block text-sm font-semibold mb-2 text-[var(--primary)]">Critique complète *</label>
-            <textarea
-              id="content"
-              formControlName="content"
-              placeholder="Saisir le texte complet de la critique"
-              rows="10"
-              class="w-full border border-[var(--border-light)] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-sm"
-              aria-required="true"
-              [attr.aria-label]="'Contenu de la critique'"
-              [attr.aria-invalid]="isFieldInvalid('content')"
-            ></textarea>
-            <p *ngIf="isFieldInvalid('content')" class="text-red-600 text-sm mt-1">Le contenu de la critique est requis</p>
+
+            <div
+              role="tablist"
+              aria-label="Éditeur de contenu"
+              class="flex w-full rounded-t-xl overflow-hidden border border-b-0 border-[var(--border-light)]"
+            >
+              <button
+                type="button"
+                #contentTabEdit
+                role="tab"
+                [attr.aria-selected]="activeTab === 'edit'"
+                aria-controls="review-content-edit-panel"
+                id="review-tab-edit"
+                [attr.tabindex]="activeTab === 'edit' ? 0 : -1"
+                (click)="activeTab = 'edit'"
+                (keydown)="onContentTabKeydown($event)"
+                class="px-4 py-2 text-sm font-medium transition-colors min-w-[88px] min-h-[44px]"
+                [class.bg-[var(--surface-alt)]]="activeTab !== 'edit'"
+                [class.text-[var(--text-muted)]]="activeTab !== 'edit'"
+                [class.bg-white]="activeTab === 'edit'"
+                [class.text-[var(--primary)]]="activeTab === 'edit'"
+                [class.font-semibold]="activeTab === 'edit'"
+              >Écrire</button>
+              <button
+                type="button"
+                #contentTabPreview
+                role="tab"
+                [attr.aria-selected]="activeTab === 'preview'"
+                aria-controls="review-content-preview-panel"
+                id="review-tab-preview"
+                [attr.tabindex]="activeTab === 'preview' ? 0 : -1"
+                (click)="activeTab = 'preview'"
+                (keydown)="onContentTabKeydown($event)"
+                class="px-4 py-2 text-sm font-medium transition-colors min-w-[88px] min-h-[44px] border-l border-[var(--border-light)]"
+                [class.bg-[var(--surface-alt)]]="activeTab !== 'preview'"
+                [class.text-[var(--text-muted)]]="activeTab !== 'preview'"
+                [class.bg-white]="activeTab === 'preview'"
+                [class.text-[var(--primary)]]="activeTab === 'preview'"
+                [class.font-semibold]="activeTab === 'preview'"
+              >Aperçu</button>
+            </div>
+
+            <!-- Edit panel -->
+            <div
+              id="review-content-edit-panel"
+              role="tabpanel"
+              aria-labelledby="review-tab-edit"
+              [hidden]="activeTab !== 'edit'"
+            >
+              <textarea
+                id="content"
+                formControlName="content"
+                placeholder="Saisir le texte complet de la critique (Markdown supporté)"
+                rows="10"
+                class="w-full border border-[var(--border-light)] rounded-b-xl rounded-tr-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-sm font-mono"
+                aria-required="true"
+                [attr.aria-label]="'Contenu de la critique'"
+                [attr.aria-invalid]="isFieldInvalid('content')"
+              ></textarea>
+            </div>
+
+            <!-- Preview panel -->
+            <div
+              id="review-content-preview-panel"
+              role="tabpanel"
+              aria-labelledby="review-tab-preview"
+              [hidden]="activeTab !== 'preview'"
+              [attr.tabindex]="activeTab === 'preview' ? 0 : -1"
+              class="min-h-[14rem] border border-[var(--border-light)] rounded-b-xl rounded-tr-xl px-4 py-3 bg-white prose prose-sm max-w-none outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+            >
+              <markdown
+                *ngIf="reviewForm.get('content')?.value"
+                [data]="reviewForm.get('content')?.value"
+              ></markdown>
+              <p
+                *ngIf="!reviewForm.get('content')?.value"
+                class="text-[var(--text-muted)] italic text-sm"
+              >Aucun contenu à afficher.</p>
+            </div>
+
+            <p *ngIf="isFieldInvalid('content')" class="text-red-600 text-sm mt-1">Le contenu de la critique est requis (minimum 50 caractères)</p>
           </div>
 
           <!-- URL de couverture -->
@@ -219,6 +291,11 @@ export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges
   isSubmitting = false;
   reviewId: string | null = null;
 
+  activeTab: 'edit' | 'preview' = 'edit';
+
+  private readonly contentTabEditRef = viewChild<ElementRef<HTMLButtonElement>>('contentTabEdit');
+  private readonly contentTabPreviewRef = viewChild<ElementRef<HTMLButtonElement>>('contentTabPreview');
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -246,6 +323,35 @@ export class ReviewFormComponent implements OnInit, OnDestroy, HasUnsavedChanges
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  onContentTabKeydown(event: KeyboardEvent): void {
+    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+      event.preventDefault();
+      this.activeTab = this.activeTab === 'edit' ? 'preview' : 'edit';
+      this.cdr.markForCheck();
+      this.focusActiveContentTab();
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      this.activeTab = 'edit';
+      this.cdr.markForCheck();
+      this.focusActiveContentTab();
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      this.activeTab = 'preview';
+      this.cdr.markForCheck();
+      this.focusActiveContentTab();
+    }
+  }
+
+  private focusActiveContentTab(): void {
+    queueMicrotask(() => {
+      const el =
+        this.activeTab === 'edit'
+          ? this.contentTabEditRef()?.nativeElement
+          : this.contentTabPreviewRef()?.nativeElement;
+      el?.focus();
+    });
   }
 
   /**

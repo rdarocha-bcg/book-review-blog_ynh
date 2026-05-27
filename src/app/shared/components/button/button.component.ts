@@ -65,7 +65,7 @@ export class ButtonComponent {
     const variantClasses: Record<ButtonVariant, string> = {
       primary: 'bg-[var(--primary)] text-[var(--text-light)] hover:brightness-110',
       secondary: 'bg-[var(--secondary)] text-[var(--text-light)] hover:brightness-105',
-      danger: 'bg-rose-600 text-white hover:bg-rose-700',
+      danger: 'bg-[var(--danger)] text-white hover:bg-[var(--danger-hover)]',
       ghost: 'bg-white/80 border border-[var(--border-light)] text-[var(--text-dark)] hover:bg-[var(--surface-alt)]',
     };
 

@@ -73,7 +73,7 @@ import { AcademicWork } from '../../../academics/models/academic.model';
               <button
                 type="button"
                 (click)="deleteAcademic(academic)"
-                class="px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition"
+                class="px-4 py-2 bg-[var(--danger)] text-white rounded font-medium hover:bg-[var(--danger-hover)] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--danger)]"
                 [attr.aria-label]="'Supprimer ' + academic.title"
               >Supprimer</button>
             </div>
