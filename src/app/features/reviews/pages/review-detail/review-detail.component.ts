@@ -136,6 +136,49 @@ import { Subject, takeUntil } from 'rxjs';
           </div>
         </div>
       </div>
+
+      <!-- Section Critiques similaires -->
+      <section
+        *ngIf="!isLoading && review && relatedReviews.length > 0"
+        class="mt-8"
+        aria-labelledby="related-reviews-heading"
+      >
+        <h2
+          id="related-reviews-heading"
+          class="text-2xl font-semibold tracking-tight mb-4 text-[var(--primary)]"
+        >
+          Vous aimerez aussi
+          <span class="text-sm font-normal text-[var(--text-muted)] ml-2">— genre « {{ review!.genre }} »</span>
+        </h2>
+
+        <div class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory" role="list">
+          <a
+            *ngFor="let related of relatedReviews"
+            [routerLink]="['/reviews', related.id]"
+            role="listitem"
+            class="snap-start shrink-0 w-64 bg-[var(--card-bg)] border border-[var(--border-light)] rounded-2xl shadow-[0_12px_24px_-24px_rgba(122,54,95,0.55)] p-5 hover:shadow-[0_20px_36px_-24px_rgba(122,54,95,0.75)] hover:scale-[1.02] transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-strong)]"
+            [attr.aria-label]="'Lire la critique : ' + related.title"
+          >
+            <img
+              *ngIf="related.imageUrl"
+              [src]="related.imageUrl"
+              [alt]="related.bookTitle"
+              class="w-full h-36 object-cover rounded-xl mb-3 border border-[var(--border-light)]"
+            />
+            <div
+              *ngIf="!related.imageUrl"
+              class="w-full h-36 bg-[var(--surface-alt)] rounded-xl mb-3 flex items-center justify-center border border-[var(--border-light)]"
+              aria-hidden="true"
+            >
+              <span class="text-3xl">📚</span>
+            </div>
+            <p class="text-xs text-[var(--accent-strong)] font-semibold uppercase tracking-wide mb-1">{{ related.genre }}</p>
+            <h3 class="text-sm font-semibold text-[var(--primary)] mb-1 line-clamp-2 leading-snug">{{ related.title }}</h3>
+            <p class="text-xs text-[var(--text-muted)] mb-2">{{ related.bookAuthor }}</p>
+            <span class="text-xs text-[var(--accent)] font-semibold">★ {{ related.rating }}/5</span>
+          </a>
+        </div>
+      </section>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -144,6 +187,7 @@ export class ReviewDetailComponent implements OnInit, OnDestroy {
   review: Review | null = null;
   isLoading = false;
   notFound = false;
+  relatedReviews: Review[] = [];
 
   private destroy$ = new Subject<void>();
 
@@ -161,6 +205,7 @@ export class ReviewDetailComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         this.notFound = false;
         this.review = null;
+        this.relatedReviews = [];
         this.cdr.markForCheck();
 
         this.reviewService.getReviewById(id)
@@ -171,6 +216,7 @@ export class ReviewDetailComponent implements OnInit, OnDestroy {
               this.isLoading = false;
               this.notFound = false;
               this.cdr.markForCheck();
+              this.loadRelatedReviews(review.genre, review.id);
             },
             error: () => {
               this.isLoading = false;
@@ -201,5 +247,17 @@ export class ReviewDetailComponent implements OnInit, OnDestroy {
     }
     return [...root, { label: 'Chargement…' }];
   }
-}
 
+  private loadRelatedReviews(genre: string, currentId: string): void {
+    this.reviewService.getReviews({ genre })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.relatedReviews = response.data
+            .filter((r) => r.id !== currentId)
+            .slice(0, 4);
+          this.cdr.markForCheck();
+        },
+      });
+  }
+}
