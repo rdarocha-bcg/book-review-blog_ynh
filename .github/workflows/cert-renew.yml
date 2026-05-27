@@ -1,0 +1,66 @@
+name: Renew SSL Certificate
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Domain to renew cert for (e.g. blog.remidarocha.fr)"
+        required: true
+        default: "blog.remidarocha.fr"
+
+permissions:
+  contents: read
+
+jobs:
+  renew:
+    name: Renew Let's Encrypt cert
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+
+    steps:
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.YNH_SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.YNH_SSH_KNOWN_HOSTS }}
+        run: |
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+      - name: Renew certificate
+        env:
+          SSH_HOST: ${{ secrets.YNH_SSH_HOST }}
+          SSH_USER: ${{ secrets.YNH_SSH_USER }}
+          SSH_PORT: ${{ vars.YNH_SSH_PORT || '22' }}
+          DOMAIN: ${{ inputs.domain }}
+        run: |
+          ssh -i "$HOME/.ssh/id_ed25519" \
+              -p "$SSH_PORT" \
+              -o BatchMode=yes \
+              -o StrictHostKeyChecking=yes \
+              -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+              -o IdentitiesOnly=yes \
+              "$SSH_USER@$SSH_HOST" bash -s -- "$DOMAIN" <<'ENDSSH'
+            set -euo pipefail
+            DOMAIN="$1"
+
+            echo "==> Checking domain $DOMAIN..."
+            sudo yunohost domain list 2>&1 | grep -q "$DOMAIN" || {
+              echo "::error::Domain $DOMAIN not found in YunoHost. Add it first via the webadmin."
+              exit 1
+            }
+
+            echo "==> Current cert status:"
+            sudo yunohost domain cert status "$DOMAIN" 2>&1 || true
+
+            echo "==> Renewing/installing Let's Encrypt certificate for $DOMAIN..."
+            sudo yunohost domain cert install "$DOMAIN" --no-checks 2>&1 \
+              || sudo yunohost domain cert renew "$DOMAIN" --force 2>&1
+
+            echo "==> Final cert status:"
+            sudo yunohost domain cert status "$DOMAIN" 2>&1
+          ENDSSH
