@@ -60,16 +60,9 @@ Certaines versions de NGINX ne transmettent pas correctement les en-têtes avec 
 
 ### Configuration NGINX (extrait de `conf/nginx.conf`)
 
-Use the YunoHost `proxy_params_with_auth` snippet so SSOWat-injected `Ynh-*` and `Authorization` headers are forwarded to Fastify after the access phase:
+Do **not** use `proxy_params_with_auth` on `location __PATH__/api/`: its `proxy_set_header Ynh-User $http_ynh_user` replaces SSOWat-injected headers with empty client values. The packaged `conf/nginx.conf` uses a minimal `proxy_pass` block and forwards `X-Forwarded-Host`.
 
-```nginx
-location __PATH__/api/ {
-    include /usr/share/yunohost/conf/nginx/proxy_params_with_auth;
-    proxy_pass http://127.0.0.1:__PORT__/api/;
-}
-```
-
-Do **not** hand-roll `proxy_set_header Ynh-User $http_ynh_user` in a partial block without this snippet: any `proxy_set_header` in the location limits what nginx forwards upstream, so missing `Ynh-*` lines leave the API blind even when SSOWat ran.
+Fastify falls back to verifying the `yunohost.portal` cookie (`YNH_SSO_COOKIE_SECRET` in `api/.env`, copied at install from `/etc/yunohost/.ssowat_cookie_secret`) when `Ynh-*` headers are absent.
 
 ---
 
@@ -288,7 +281,7 @@ TRUST_SSO_HEADERS=always
 
 **Causes possibles :**
 
-1. **L'API ne reçoit pas les en-têtes SSO.** Vérifier que `location __PATH__/api/` inclut `proxy_params_with_auth` (voir `conf/nginx.conf`). Un bloc `proxy_pass` avec seulement `Host` / `Cookie` n'envoie pas `Ynh-*` à Fastify ; des `proxy_set_header Ynh-User $http_ynh_user` isolés peuvent rester vides si la session portail n'est pas active sur cette requête.
+1. **L'API ne reçoit pas les en-têtes SSO.** Vérifier `conf/nginx.conf` (pas de `proxy_params_with_auth` sur `/api/`). Vérifier que `YNH_SSO_COOKIE_SECRET` est présent dans `api/.env` (réinstaller ou recopier depuis `/etc/yunohost/.ssowat_cookie_secret` puis `systemctl restart book-review-blog`). L'API accepte alors le cookie `yunohost.portal` en secours.
 
 2. **La requête ne vient pas de `127.0.0.1`.** Si `TRUST_SSO_HEADERS=auto` (défaut), le backend rejette les en-têtes si l'adresse TCP source n'est pas le loopback. Vérifier les logs Fastify pour l'adresse source.
 
