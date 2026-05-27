@@ -1,6 +1,5 @@
 #!/bin/bash
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$script_dir/_common.sh"
+source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -19,6 +18,17 @@ ynh_restore_file --origin_path="$install_dir"
 
 chown -R $app:www-data "$install_dir/www"
 chmod -R 750 "$install_dir/www"
+chown $app:$app "$install_dir/api"
+chown -R $app:$app "$install_dir/api"
+chown $app:www-data "$install_dir"
+chmod 750 "$install_dir"
+
+#=================================================
+# RESTORE THE DATABASE
+#=================================================
+ynh_script_progression --message="Restoring the database..." --weight=5
+
+ynh_mysql_connect_as "$db_user" "$db_pwd" "$db_name" < ./db.sql
 
 #=================================================
 # RESTORE NGINX CONFIGURATION
@@ -27,6 +37,15 @@ ynh_script_progression --message="Restoring NGINX configuration..." --weight=2
 
 ynh_restore_file --origin_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# RESTORE SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Restoring systemd service..." --weight=1
+
+ynh_restore_file --origin_path="/etc/systemd/system/$app.service"
+systemctl enable "$app.service" --quiet
+systemctl daemon-reload
 
 #=================================================
 # START API
