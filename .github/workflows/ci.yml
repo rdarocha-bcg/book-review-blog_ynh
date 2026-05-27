@@ -76,7 +76,9 @@ jobs:
                   sys.exit(f"Missing integration.{k} in manifest.toml")
           print(f"manifest.toml OK — id={data['id']} version={data['version']}")
           EOF
-    runs-on: ubuntu-latest
+
+  api:
+    name: API (build)
 
     defaults:
       run:
