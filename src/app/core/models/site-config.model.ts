@@ -17,7 +17,7 @@ export interface SiteConfig {
 export const DEFAULT_SITE_CONFIG: SiteConfig = {
   siteName: 'Book Review Blog',
   siteNameShort: 'BookReview',
-  copyrightYear: 2026,
+  copyrightYear: new Date().getFullYear(),
   colors: {
     primary: '#1f2937',
     secondary: '#059669',

@@ -20,10 +20,12 @@ describe('UnauthorizedComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display 401 and Unauthorized with home link', () => {
+  it('should display 401 and Unauthorized with navigation links', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('401');
-    expect(el.textContent).toContain('Non autorisé');
+    expect(el.textContent).toContain('Accès non autorisé');
     expect(el.querySelector('a[routerLink="/"]')).toBeTruthy();
+    expect(el.querySelector('a[routerLink="/reviews"]')).toBeTruthy();
+    expect(el.querySelector('a[routerLink="/contact"]')).toBeTruthy();
   });
 });
