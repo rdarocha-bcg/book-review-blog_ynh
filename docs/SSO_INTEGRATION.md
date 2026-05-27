@@ -60,16 +60,16 @@ Certaines versions de NGINX ne transmettent pas correctement les en-têtes avec 
 
 ### Configuration NGINX (extrait de `conf/nginx.conf`)
 
+Use the YunoHost `proxy_params_with_auth` snippet so SSOWat-injected `Ynh-*` and `Authorization` headers are forwarded to Fastify after the access phase:
+
 ```nginx
 location __PATH__/api/ {
+    include /usr/share/yunohost/conf/nginx/proxy_params_with_auth;
     proxy_pass http://127.0.0.1:__PORT__/api/;
-    proxy_set_header Ynh-User          $http_ynh_user;
-    proxy_set_header Ynh-User-Email    $http_ynh_user_email;
-    proxy_set_header Ynh-User-Fullname $http_ynh_user_fullname;
-    proxy_set_header Authorization     $http_authorization;
-    proxy_set_header Cookie            $http_cookie;
 }
 ```
+
+Do **not** hand-roll `proxy_set_header Ynh-User $http_ynh_user` in a partial block without this snippet: any `proxy_set_header` in the location limits what nginx forwards upstream, so missing `Ynh-*` lines leave the API blind even when SSOWat ran.
 
 ---
 
@@ -288,13 +288,13 @@ TRUST_SSO_HEADERS=always
 
 **Causes possibles :**
 
-1. **L'API ne reçoit pas les en-têtes SSO.** Vérifier la configuration NGINX (`conf/nginx.conf`) : les directives `proxy_set_header Ynh-User` doivent être présentes dans le bloc `location __PATH__/api/`.
+1. **L'API ne reçoit pas les en-têtes SSO.** Vérifier que `location __PATH__/api/` inclut `proxy_params_with_auth` (voir `conf/nginx.conf`). Un bloc `proxy_pass` avec seulement `Host` / `Cookie` n'envoie pas `Ynh-*` à Fastify ; des `proxy_set_header Ynh-User $http_ynh_user` isolés peuvent rester vides si la session portail n'est pas active sur cette requête.
 
 2. **La requête ne vient pas de `127.0.0.1`.** Si `TRUST_SSO_HEADERS=auto` (défaut), le backend rejette les en-têtes si l'adresse TCP source n'est pas le loopback. Vérifier les logs Fastify pour l'adresse source.
 
 3. **Variante d'en-tête non reconnue.** Certaines versions de NGINX transforment les tirets en tirets bas (`Ynh_User`). Le backend accepte les deux variantes, mais vérifier les logs pour voir les en-têtes reçus.
 
-4. **Fallback Basic échoue.** Vérifier que `auth_header` est activé dans la configuration SSOWat et que `Authorization` est bien transmis par NGINX (`proxy_set_header Authorization $http_authorization`).
+4. **Fallback Basic échoue.** Vérifier que `auth_header` est activé dans la configuration SSOWat et que `Authorization` arrive bien dans Fastify après le proxy. Si NGINX force `Authorization` à `$http_authorization`, cette valeur peut écraser l'en-tête Basic injecté par SSOWat.
 
 ### L'utilisateur voit `/401` ou le portail SSO au lieu du contenu
 
