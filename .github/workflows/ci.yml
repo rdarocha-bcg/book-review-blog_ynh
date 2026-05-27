@@ -79,6 +79,7 @@ jobs:
 
   api:
     name: API (build)
+    runs-on: ubuntu-latest
 
     defaults:
       run:
