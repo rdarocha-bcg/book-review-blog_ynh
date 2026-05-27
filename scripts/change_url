@@ -3,11 +3,97 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
+# STOP API
+#=================================================
+ynh_script_progression --message="Stopping API..." --weight=1
+
+ynh_systemd_action --service_name=$app --action=stop --log_path=systemd || true
+
+#=================================================
+# COPY SOURCES FOR REBUILD
+#=================================================
+ynh_script_progression --message="Copying sources for rebuild..." --weight=5
+
+ynh_copy_app_sources "$install_dir/src"
+
+mkdir -p "$install_dir/src/src/assets"
+cp "$pkg_dir/conf/site.config.json" "$install_dir/src/src/assets/site.config.json"
+
+admin_usernames=$(ynh_app_setting_get --app=$app --key=admin_usernames)
+
+if [ "$new_path" = "/" ]; then
+    base_href="/"
+    api_path="/api"
+else
+    base_href="$new_path/"
+    api_path="$new_path/api"
+fi
+
+sed -e "s|__API_PATH__|$api_path|g" -e "s|__DOMAIN__|$new_domain|g" \
+    "$pkg_dir/conf/environment.prod.ts" \
+    > "$install_dir/src/src/environments/environment.prod.ts"
+
+#=================================================
+# REBUILD ANGULAR WITH NEW BASE-HREF
+#=================================================
+ynh_script_progression --message="Rebuilding Angular app with new path (this may take a few minutes)..." --weight=35
+
+pushd "$install_dir/src"
+    ynh_use_nodejs
+    export npm_config_cache="$install_dir/.npm-cache"
+    ynh_exec_warn_less npm ci --no-audit --no-fund
+    ynh_exec_warn_less npx ng build --configuration production --base-href "$base_href"
+popd
+
+#=================================================
+# DEPLOY STATIC FILES
+#=================================================
+ynh_script_progression --message="Deploying static files..." --weight=3
+
+site_cfg_bak=""
+if [ -f "$install_dir/www/assets/site.config.json" ]; then
+    site_cfg_bak=$(mktemp)
+    cp "$install_dir/www/assets/site.config.json" "$site_cfg_bak"
+fi
+
+rm -rf "$install_dir/www"
+mkdir -p "$install_dir/www"
+cp -a "$install_dir/src/dist/book-review-blog/." "$install_dir/www/"
+
+if [ -n "$site_cfg_bak" ] && [ -f "$site_cfg_bak" ]; then
+    mkdir -p "$install_dir/www/assets"
+    cp "$site_cfg_bak" "$install_dir/www/assets/site.config.json"
+    rm -f "$site_cfg_bak"
+else
+    mkdir -p "$install_dir/www/assets"
+    cp "$pkg_dir/conf/site.config.json" "$install_dir/www/assets/site.config.json"
+fi
+
+chown -R $app:www-data "$install_dir/www"
+chmod -R 750 "$install_dir/www"
+
+rm -rf "$install_dir/src"
+
+#=================================================
+# UPDATE API .ENV WITH NEW PATH
+#=================================================
+ynh_script_progression --message="Updating API environment..." --weight=1
+
+sed -i "s|^PORT=.*|PORT=$port|" "$install_dir/api/.env" || true
+
+#=================================================
 # UPDATE NGINX CONFIGURATION
 #=================================================
 ynh_script_progression --message="Updating NGINX configuration..." --weight=5
 
 ynh_change_url_nginx_config
+
+#=================================================
+# RESTART API
+#=================================================
+ynh_script_progression --message="Restarting API service..." --weight=1
+
+ynh_systemd_action --service_name=$app --action=start --log_path=systemd
 
 #=================================================
 # END

@@ -26,6 +26,8 @@
   --nav-bg: rgb(255 255 255 / 0.95);
   --card-bg: rgb(255 255 255 / 0.95);
   --input-bg: #ffffff;
+  --danger: #c0304e;
+  --danger-hover: #a02540;
   --panel-bg-start: #ffffff;
   --panel-bg-end: var(--surface-alt);
   --font-sans: "Inter", "Avenir Next", "Avenir", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -133,6 +135,18 @@ button {
   transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   border: none;
   border-radius: 999px;
+
+  &:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+  }
+}
+
+/* Global focus-visible for links not overriding their own outline */
+a:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Form Elements */
@@ -145,13 +159,27 @@ select {
   border-radius: 0.85rem;
   padding: 0.625rem 0.75rem;
   background: var(--input-bg);
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 
-  &:focus {
+  &:hover {
+    border-color: var(--secondary);
+  }
+
+  &:focus,
+  &:focus-visible {
     outline: none;
     border-color: var(--secondary);
     box-shadow: 0 0 0 4px rgb(213 111 161 / 18%);
   }
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23463540' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
 }
 
 /* Utility Classes */
@@ -221,7 +249,7 @@ select {
 }
 
 .card-container {
-  background: #fff;
+  background: var(--card-bg);
   border: 1px solid var(--border-light);
   border-radius: 1rem;
   box-shadow: 0 12px 28px -24px rgb(122 54 95 / 55%);
@@ -250,4 +278,41 @@ select {
 .luxe-title {
   font-family: var(--font-luxe);
   letter-spacing: 0.02em;
+}
+
+/* ============================================================
+ * DARK MODE — prefers-color-scheme: dark
+ * All tokens redefined; components use vars so they adapt
+ * automatically without any template changes.
+ * ============================================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --primary: #e8a0c8;
+    --secondary: #d56fa1;
+    --accent: #b06090;
+    --accent-strong: #e8a0c8;
+    --surface: #150a11;
+    --surface-alt: #1e0e18;
+    --text-dark: #f2dde8;
+    --text-light: #150a11;
+    --text-muted: #c49ab4;
+    --border-light: #3d1f30;
+    --header-bg: rgb(21 10 17 / 0.9);
+    --nav-bg: rgb(30 14 24 / 0.97);
+    --card-bg: rgb(30 14 24 / 0.95);
+    --input-bg: #2a1020;
+    --panel-bg-start: #1e0e18;
+    --panel-bg-end: #270f1e;
+    --danger: #e05070;
+    --danger-hover: #c5405a;
+  }
+
+  html, body {
+    background-color: var(--surface);
+    background-image:
+      radial-gradient(circle at 15% 20%, #2a0e1e 0%, transparent 35%),
+      radial-gradient(circle at 85% 0%, #230b18 0%, transparent 30%),
+      linear-gradient(180deg, #170c13 0%, #1c0f17 100%);
+  }
 }

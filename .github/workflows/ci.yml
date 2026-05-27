@@ -54,6 +54,29 @@ jobs:
           path: dist/book-review-blog
           if-no-files-found: error
 
+  manifest:
+    name: Manifest (TOML)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate manifest.toml
+        run: |
+          python3 - <<'EOF'
+          import sys, tomllib
+          with open("manifest.toml", "rb") as f:
+              data = tomllib.load(f)
+          for key in ["id", "name", "description", "version"]:
+              if key not in data:
+                  sys.exit(f"Missing required key in manifest.toml: {key}")
+          integ = data.get("integration", {})
+          for k in ["yunohost", "helpers_version"]:
+              if k not in integ:
+                  sys.exit(f"Missing integration.{k} in manifest.toml")
+          print(f"manifest.toml OK — id={data['id']} version={data['version']}")
+          EOF
+
   api:
     name: API (build)
     runs-on: ubuntu-latest

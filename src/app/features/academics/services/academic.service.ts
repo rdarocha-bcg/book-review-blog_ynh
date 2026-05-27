@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap, catchError, retry } from 'rxjs/operators';
+import { tap, catchError, retry, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ApiService } from '@core/services/api.service';
 import { AcademicWork, AcademicFilter, AcademicPaginationResponse } from '../models/academic.model';
+import { AcademicWorkDto, fromAcademicWorkDto } from '@core/dto/academic.dto';
 
 /**
  * Academic Service
@@ -13,90 +14,99 @@ import { AcademicWork, AcademicFilter, AcademicPaginationResponse } from '../mod
   providedIn: 'root',
 })
 export class AcademicService {
-  private academics$ = new BehaviorSubject<AcademicWork[]>([]);
-  private selectedAcademic$ = new BehaviorSubject<AcademicWork | null>(null);
-  private loading$ = new BehaviorSubject<boolean>(false);
+  private readonly _academics$ = new BehaviorSubject<AcademicWork[]>([]);
+  private readonly _selectedAcademic$ = new BehaviorSubject<AcademicWork | null>(null);
+  private readonly _loading$ = new BehaviorSubject<boolean>(false);
+
+  /** Current page of academic works. */
+  readonly academics$ = this._academics$.asObservable();
+  /** Currently selected academic work (detail view). */
+  readonly selectedAcademic$ = this._selectedAcademic$.asObservable();
+  /** Whether an HTTP request is in progress. */
+  readonly loading$ = this._loading$.asObservable();
 
   constructor(private apiService: ApiService) {}
 
-  /**
-   * Get all academic works with filters and pagination
-   */
   getAcademics(filters?: AcademicFilter): Observable<AcademicPaginationResponse> {
-    this.loading$.next(true);
+    this._loading$.next(true);
     const params = this.buildParams(filters);
 
-    return this.apiService.get<AcademicPaginationResponse>('academics', { params }).pipe(
+    return this.apiService.get<{ data: AcademicWorkDto[]; total: number; page: number; limit: number; totalPages: number }>('academics', { params }).pipe(
       retry(2),
+      map((response) => ({
+        ...response,
+        data: response.data.map(fromAcademicWorkDto),
+      })),
       tap((response) => {
-        this.academics$.next(response.data);
-        this.loading$.next(false);
+        this._academics$.next(response.data);
+        this._loading$.next(false);
       }),
       catchError((err) => {
-        this.loading$.next(false);
+        this._loading$.next(false);
         return throwError(() => err);
       })
     );
   }
 
-  /**
-   * Fetches a single academic work by id
-   */
   getAcademicById(id: string): Observable<AcademicWork> {
-    this.loading$.next(true);
+    this._loading$.next(true);
 
-    return this.apiService.get<AcademicWork>(`academics/${id}`).pipe(
+    return this.apiService.get<AcademicWorkDto>(`academics/${id}`).pipe(
+      map(fromAcademicWorkDto),
       tap((academic) => {
-        this.selectedAcademic$.next(academic);
-        this.loading$.next(false);
+        this._selectedAcademic$.next(academic);
+        this._loading$.next(false);
       }),
       catchError((err) => {
-        this.loading$.next(false);
+        this._loading$.next(false);
         return throwError(() => err);
       })
     );
   }
 
   createAcademic(academic: Partial<AcademicWork>): Observable<AcademicWork> {
-    this.loading$.next(true);
+    this._loading$.next(true);
 
     return this.apiService.post<AcademicWork>('academics', academic).pipe(
       tap(() => {
-        this.loading$.next(false);
+        this._loading$.next(false);
       })
     );
   }
 
   updateAcademic(id: string, academic: Partial<AcademicWork>): Observable<AcademicWork> {
-    this.loading$.next(true);
+    this._loading$.next(true);
 
     return this.apiService.put<AcademicWork>(`academics/${id}`, academic).pipe(
       tap(() => {
-        this.loading$.next(false);
+        this._loading$.next(false);
       })
     );
   }
 
   deleteAcademic(id: string): Observable<void> {
-    this.loading$.next(true);
+    this._loading$.next(true);
 
     return this.apiService.delete<void>(`academics/${id}`).pipe(
       tap(() => {
-        this.loading$.next(false);
+        this._loading$.next(false);
       })
     );
   }
 
+  /** @deprecated Use the readonly `academics$` property directly. */
   getAcademics$(): Observable<AcademicWork[]> {
-    return this.academics$.asObservable();
+    return this.academics$;
   }
 
+  /** @deprecated Use the readonly `selectedAcademic$` property directly. */
   getSelectedAcademic$(): Observable<AcademicWork | null> {
-    return this.selectedAcademic$.asObservable();
+    return this.selectedAcademic$;
   }
 
+  /** @deprecated Use the readonly `loading$` property directly. */
   getLoading$(): Observable<boolean> {
-    return this.loading$.asObservable();
+    return this.loading$;
   }
 
   private buildParams(filters?: AcademicFilter): Record<string, string | number | boolean> {

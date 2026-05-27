@@ -12,9 +12,15 @@ ExecStart=__INSTALL_DIR__/api/run.sh
 Restart=on-failure
 RestartSec=5
 
+StandardOutput=journal
+StandardError=journal
+
 # Hardening
 NoNewPrivileges=yes
 PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=__INSTALL_DIR__/api
 
 [Install]
 WantedBy=multi-user.target

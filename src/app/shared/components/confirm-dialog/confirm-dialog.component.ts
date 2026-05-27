@@ -54,7 +54,7 @@ import { Subscription } from 'rxjs';
               #confirmBtn
               type="button"
               (click)="confirm()"
-              class="px-5 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
+              class="px-5 py-2 rounded-lg bg-[var(--danger)] text-white font-semibold hover:bg-[var(--danger-hover)] transition focus-visible:outline-2 focus-visible:outline-[var(--danger)] focus-visible:outline-offset-2"
             >Confirmer</button>
           </div>
         </div>

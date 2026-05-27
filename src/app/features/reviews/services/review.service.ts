@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap, catchError, retry } from 'rxjs/operators';
+import { tap, catchError, retry, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ApiService } from '@core/services/api.service';
 import { Review, ReviewFilter, ReviewPaginationResponse } from '../models/review.model';
+import { ReviewDto, fromReviewDto } from '@core/dto/review.dto';
 
 /**
  * Review Service
@@ -13,9 +14,16 @@ import { Review, ReviewFilter, ReviewPaginationResponse } from '../models/review
   providedIn: 'root',
 })
 export class ReviewService {
-  private reviews$ = new BehaviorSubject<Review[]>([]);
-  private selectedReview$ = new BehaviorSubject<Review | null>(null);
-  private loading$ = new BehaviorSubject<boolean>(false);
+  private readonly _reviews$ = new BehaviorSubject<Review[]>([]);
+  private readonly _selectedReview$ = new BehaviorSubject<Review | null>(null);
+  private readonly _loading$ = new BehaviorSubject<boolean>(false);
+
+  /** Current page of reviews. */
+  readonly reviews$ = this._reviews$.asObservable();
+  /** Currently selected review (detail view). */
+  readonly selectedReview$ = this._selectedReview$.asObservable();
+  /** Whether an HTTP request is in progress. */
+  readonly loading$ = this._loading$.asObservable();
 
   constructor(private apiService: ApiService) {}
 
@@ -23,100 +31,85 @@ export class ReviewService {
    * Get all reviews with filters and pagination
    */
   getReviews(filters?: ReviewFilter): Observable<ReviewPaginationResponse> {
-    this.loading$.next(true);
+    this._loading$.next(true);
     const params = this.buildParams(filters);
 
-    return this.apiService.get<ReviewPaginationResponse>('reviews', { params }).pipe(
+    return this.apiService.get<{ data: ReviewDto[]; total: number; page: number; limit: number; totalPages: number }>('reviews', { params }).pipe(
       retry(2),
+      map((response) => ({
+        ...response,
+        data: response.data.map(fromReviewDto),
+      })),
       tap((response) => {
-        this.reviews$.next(response.data);
-        this.loading$.next(false);
+        this._reviews$.next(response.data);
+        this._loading$.next(false);
       }),
       catchError((err) => {
-        this.loading$.next(false);
+        this._loading$.next(false);
         return throwError(() => err);
       })
     );
   }
 
-  /**
-   * Fetches a single review by id. Updates selectedReview$ and loading$ state.
-   * @param id - Review id
-   * @returns Observable of the review, or errors if not found
-   */
   getReviewById(id: string): Observable<Review> {
-    this.loading$.next(true);
+    this._loading$.next(true);
 
-    return this.apiService.get<Review>(`reviews/${id}`).pipe(
+    return this.apiService.get<ReviewDto>(`reviews/${id}`).pipe(
+      map(fromReviewDto),
       tap((review) => {
-        this.selectedReview$.next(review);
-        this.loading$.next(false);
+        this._selectedReview$.next(review);
+        this._loading$.next(false);
       }),
       catchError((err) => {
-        this.loading$.next(false);
+        this._loading$.next(false);
         return throwError(() => err);
       })
     );
   }
 
-  /**
-   * Create new review
-   */
   createReview(review: Partial<Review>): Observable<Review> {
-    this.loading$.next(true);
+    this._loading$.next(true);
 
     return this.apiService.post<Review>('reviews', review).pipe(
       tap(() => {
-        this.loading$.next(false);
+        this._loading$.next(false);
       })
     );
   }
 
-  /**
-   * Update review
-   */
   updateReview(id: string, review: Partial<Review>): Observable<Review> {
-    this.loading$.next(true);
+    this._loading$.next(true);
 
     return this.apiService.put<Review>(`reviews/${id}`, review).pipe(
       tap(() => {
-        this.loading$.next(false);
+        this._loading$.next(false);
       })
     );
   }
 
-  /**
-   * Delete review
-   */
   deleteReview(id: string): Observable<void> {
-    this.loading$.next(true);
+    this._loading$.next(true);
 
     return this.apiService.delete<void>(`reviews/${id}`).pipe(
       tap(() => {
-        this.loading$.next(false);
+        this._loading$.next(false);
       })
     );
   }
 
-  /**
-   * Get reviews as Observable
-   */
+  /** @deprecated Use the readonly `reviews$` property directly. */
   getReviews$(): Observable<Review[]> {
-    return this.reviews$.asObservable();
+    return this.reviews$;
   }
 
-  /**
-   * Get selected review as Observable
-   */
+  /** @deprecated Use the readonly `selectedReview$` property directly. */
   getSelectedReview$(): Observable<Review | null> {
-    return this.selectedReview$.asObservable();
+    return this.selectedReview$;
   }
 
-  /**
-   * Get loading state
-   */
+  /** @deprecated Use the readonly `loading$` property directly. */
   getLoading$(): Observable<boolean> {
-    return this.loading$.asObservable();
+    return this.loading$;
   }
 
   /**

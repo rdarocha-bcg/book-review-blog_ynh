@@ -11,9 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { ReviewService } from '../../services/review.service';
 import { Review } from '../../models/review.model';
 import { CardComponent } from '@shared/components/card/card.component';
-import { ReviewCardSkeletonComponent } from '@shared/components/review-card-skeleton/review-card-skeleton.component';
-import { ButtonComponent } from '@shared/components/button/button.component';
-import { PaginationComponent } from '@shared/components/pagination/pagination.component';
+import { ListPageShellComponent } from '@shared/components/list-page-shell/list-page-shell.component';
 import { Subject, takeUntil, BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { mapErrorToUserMessage } from '@core/utils/http-error.utils';
@@ -30,9 +28,7 @@ import { mapErrorToUserMessage } from '@core/utils/http-error.utils';
     RouterLink,
     FormsModule,
     CardComponent,
-    ReviewCardSkeletonComponent,
-    ButtonComponent,
-    PaginationComponent,
+    ListPageShellComponent,
   ],
   template: `
     <div class="page-container">
@@ -40,21 +36,33 @@ import { mapErrorToUserMessage } from '@core/utils/http-error.utils';
         <h1 class="mb-1 text-3xl font-bold text-[var(--primary)]">Critiques</h1>
       </div>
 
-      <div class="mb-6 pinterest-panel p-4 md:p-5">
-        <h2 class="mb-3 text-lg font-semibold text-[var(--primary)]">Recherche &amp; filtres</h2>
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <app-list-page-shell
+        [loading]="(isLoading$ | async) ?? false"
+        [error]="(error$ | async) ?? null"
+        errorTitle="Erreur lors du chargement des critiques"
+        [isEmpty]="((reviews$ | async)?.length ?? 0) === 0"
+        emptyMessage="Aucune critique trouvée. Essayez d'ajuster vos filtres."
+        [currentPage]="currentPage"
+        [totalPages]="totalPages"
+        [total]="totalItems"
+        [limit]="pageSize"
+        (retryClick)="retryLoadReviews()"
+        (pageChange)="onPaginationChange($event)"
+      >
+        <!-- Filters -->
+        <div filters class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <input
             type="text"
             placeholder="Rechercher une critique..."
             [(ngModel)]="searchQuery"
             (ngModelChange)="onSearchQueryInput()"
-            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
+            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-[var(--input-bg)]"
             aria-label="Rechercher une critique"
           />
           <select
             [(ngModel)]="selectedGenre"
             (change)="onFilterChange()"
-            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
+            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-[var(--input-bg)]"
             aria-label="Filtrer par genre"
           >
             <option value="">Tous les genres</option>
@@ -66,7 +74,7 @@ import { mapErrorToUserMessage } from '@core/utils/http-error.utils';
           <select
             [(ngModel)]="selectedRating"
             (change)="onFilterChange()"
-            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
+            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-[var(--input-bg)]"
             aria-label="Filtrer par note"
           >
             <option value="">Toutes les notes</option>
@@ -77,7 +85,7 @@ import { mapErrorToUserMessage } from '@core/utils/http-error.utils';
           <select
             [(ngModel)]="selectedSort"
             (change)="onFilterChange()"
-            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-white"
+            class="border border-[var(--border-light)] rounded-xl px-3 py-2 bg-[var(--input-bg)]"
             aria-label="Trier les critiques"
           >
             <option value="">Trier par</option>
@@ -88,50 +96,23 @@ import { mapErrorToUserMessage } from '@core/utils/http-error.utils';
           </select>
           <button
             (click)="resetFilters()"
-            class="bg-white text-[var(--primary)] border border-[var(--border-light)] rounded-full px-3 py-2 hover:bg-[var(--surface-alt)]"
+            class="bg-[var(--input-bg)] text-[var(--primary)] border border-[var(--border-light)] rounded-full px-3 py-2 hover:bg-[var(--surface-alt)]"
           >
             Réinitialiser
           </button>
         </div>
-      </div>
 
-      <!-- Error State -->
-      <ng-container *ngIf="error$ | async as listError">
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
-          <p class="font-bold mb-2">Erreur lors du chargement des critiques</p>
-          <p class="text-sm mb-3">{{ listError }}</p>
-          <button (click)="retryLoadReviews()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-            Réessayer
-          </button>
-        </div>
-      </ng-container>
-
-      <div [attr.aria-busy]="(isLoading$ | async) === true" aria-live="polite">
-        <!-- Loading placeholders (filters/pagination stay usable) -->
-        <div
-          *ngIf="isLoading$ | async"
-          class="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6"
-        >
-          <app-review-card-skeleton
-            *ngFor="let s of skeletonSlots; trackBy: trackBySkeletonSlot"
-          ></app-review-card-skeleton>
-        </div>
-
-        <!-- Reviews List -->
-        <div
-          *ngIf="(isLoading$ | async) === false && (error$ | async) === null"
-          class="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6"
-        >
+        <!-- Review cards -->
         <app-card
+          items
           *ngFor="let review of reviews$ | async; trackBy: trackByReviewId"
           [hoverable]="true"
           class="break-inside-avoid block mb-6"
         >
-          <!-- Single block link (option A): one focus target per card, no nested links -->
           <a
-            [routerLink]="['/reviews', review.id]"
+            [routerLink]="['\/reviews', review.id]"
             class="group -m-1 block rounded-xl p-1 no-underline outline-none ring-[var(--accent)] transition focus-visible:ring-2"
-            [attr.aria-label]="'Ouvrir la critique : ' + review.title"
+            [attr.aria-label]="'Ouvrir la critique : ' + review.title"
           >
             <h3 class="text-xl font-semibold mb-2 text-[var(--primary)] group-hover:text-[var(--accent-strong)]">
               {{ review.title }}
@@ -153,31 +134,12 @@ import { mapErrorToUserMessage } from '@core/utils/http-error.utils';
             <span class="font-semibold text-[var(--accent-strong)] group-hover:text-[var(--primary)]">Lire →</span>
           </a>
         </app-card>
-        </div>
-      </div>
-
-      <!-- No Results -->
-      <div *ngIf="(reviews$ | async)?.length === 0 && (isLoading$ | async) === false && (error$ | async) === null" class="text-center py-12">
-        <p class="text-xl text-[var(--text-muted)]">Aucune critique trouvée. Essayez d'ajuster vos filtres.</p>
-      </div>
-
-      <!-- Pagination -->
-      <app-pagination
-        *ngIf="(isLoading$ | async) === false && totalItems > 0"
-        [currentPage]="currentPage"
-        [totalPages]="totalPages"
-        [total]="totalItems"
-        [limit]="pageSize"
-        (pageChange)="onPaginationChange($event)"
-      ></app-pagination>
+      </app-list-page-shell>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReviewListComponent implements OnInit, OnDestroy {
-  /** Shown while any review list request is in flight (initial load, filters, pagination) */
-  readonly skeletonSlots = [0, 1, 2, 3, 4, 5] as const;
-
   reviews$ = this.reviewService.getReviews$();
   isLoading$ = this.reviewService.getLoading$();
   error$ = new BehaviorSubject<string | null>(null);
@@ -302,8 +264,5 @@ export class ReviewListComponent implements OnInit, OnDestroy {
     return review.id;
   }
 
-  trackBySkeletonSlot(index: number, slot: number): number {
-    return slot;
-  }
 }
 

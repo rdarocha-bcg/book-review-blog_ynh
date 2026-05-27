@@ -108,11 +108,7 @@ export class AuthService {
       .pipe(
         switchMap(() => this.refresh()),
         map(() => void 0),
-        catchError(() =>
-          this.refresh().pipe(
-            map(() => void 0),
-          ),
-        ),
+        catchError(() => this.refresh().pipe(map(() => void 0))),
       );
   }
 

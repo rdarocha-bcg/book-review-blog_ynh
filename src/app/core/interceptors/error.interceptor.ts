@@ -59,7 +59,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
               if (state.authenticated) {
                 return next(req);
               }
-              notifications.warning('Session expired — please sign in from the server portal.');
+              notifications.warning(message);
               router.navigate(['/401']);
               return throwError(() => error);
             }),

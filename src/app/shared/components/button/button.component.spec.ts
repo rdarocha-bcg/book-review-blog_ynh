@@ -50,7 +50,7 @@ describe('ButtonComponent', () => {
   it('should apply danger variant classes when set', () => {
     component.variant = 'danger';
     const classes = component.getClasses();
-    expect(classes).toContain('bg-rose-600');
+    expect(classes).toContain('bg-[var(--danger)]');
   });
 
   it('should apply size classes', () => {

@@ -5,8 +5,14 @@
  * Do not use http://localhost:3000 here unless you run a separate API on 3000
  * without the proxy — that bypasses the proxy and breaks when nothing listens on 3000.
  */
-export const environment = {
+import { IEnvironment } from './environment.interface';
+
+export const environment: IEnvironment = {
   production: false,
   apiUrl: '/api',
+  features: {
+    markdownPreview: true,
+    adminAnalytics: true,
+  },
 };
 
